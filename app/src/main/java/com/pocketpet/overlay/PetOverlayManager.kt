@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.Choreographer
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
@@ -30,10 +31,13 @@ class PetOverlayManager(
     private var params: WindowManager.LayoutParams? = null
     private var widthPx = 0
     private var heightPx = 0
-    private var groundY = 0
     private var currentFrameRes = 0
     private var lastFrameTimeNanos = 0L
     private var running = false
+
+    // 누른 지점과 펫 왼쪽 위 모서리 사이의 거리 (순간이동 방지)
+    private var touchOffsetX = 0f
+    private var touchOffsetY = 0f
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
@@ -54,7 +58,10 @@ class PetOverlayManager(
         heightPx = (definition.heightDp * density).toInt()
         widthPx = heightPx * drawable.intrinsicWidth / drawable.intrinsicHeight
 
-        val view = ImageView(context).apply { setImageDrawable(drawable) }
+        val view = ImageView(context).apply {
+            setImageDrawable(drawable)
+            setOnTouchListener { _, event -> onPetTouch(event) }
+        }
         currentFrameRes = firstFrame
 
         val lp = WindowManager.LayoutParams(
@@ -71,7 +78,7 @@ class PetOverlayManager(
         updateBounds()
         controller.placeInMiddle()
         lp.x = controller.x.toInt()
-        lp.y = groundY
+        lp.y = controller.y.toInt()
 
         windowManager.addView(view, lp)
         petView = view
@@ -103,6 +110,26 @@ class PetOverlayManager(
         applyPosition()
     }
 
+    private fun onPetTouch(event: MotionEvent): Boolean {
+        val lp = params ?: return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchOffsetX = event.rawX - lp.x
+                touchOffsetY = event.rawY - lp.y
+                controller.startDrag()
+                applyFrame()
+            }
+            MotionEvent.ACTION_MOVE -> {
+                controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
+                applyPosition()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                controller.release()
+            }
+        }
+        return true
+    }
+
     private fun onFrame(frameTimeNanos: Long) {
         if (lastFrameTimeNanos == 0L) {
             lastFrameTimeNanos = frameTimeNanos
@@ -132,18 +159,23 @@ class PetOverlayManager(
         val view = petView ?: return
         val lp = params ?: return
         val newX = controller.x.toInt()
+        val newY = controller.y.toInt()
         // 위치가 그대로면 창을 다시 배치하지 않는다
-        if (newX == lp.x && groundY == lp.y) return
+        if (newX == lp.x && newY == lp.y) return
         lp.x = newX
-        lp.y = groundY
+        lp.y = newY
         windowManager.updateViewLayout(view, lp)
     }
 
     private fun updateBounds() {
         val area = usableArea()
         val bottomMargin = (BOTTOM_MARGIN_DP * density).toInt()
-        controller.setBounds(area.left.toFloat(), (area.right - widthPx).toFloat())
-        groundY = area.bottom - heightPx - bottomMargin
+        controller.setBounds(
+            minX = area.left.toFloat(),
+            maxX = (area.right - widthPx).toFloat(),
+            minY = area.top.toFloat(),
+            groundY = (area.bottom - heightPx - bottomMargin).toFloat()
+        )
     }
 
     /** 상태 표시줄, 내비게이션 바, 카메라 구멍을 뺀 화면 영역 */
