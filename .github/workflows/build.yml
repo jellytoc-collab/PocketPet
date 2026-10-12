@@ -4,9 +4,16 @@ on:
   push:
   workflow_dispatch:
 
+# 여러 번 연달아 커밋하면 이전 빌드는 취소하고 마지막 것만 빌드한다
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Release를 만들기 위한 권한
     steps:
       - uses: actions/checkout@v4
 
@@ -26,3 +33,16 @@ jobs:
         with:
           name: pocketpet-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish APK to latest release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk PocketPet.apk
+          gh release delete latest-build --yes --cleanup-tag || true
+          gh release create latest-build PocketPet.apk \
+            --target "${{ github.sha }}" \
+            --title "최신 빌드 #${{ github.run_number }}" \
+            --notes "main 브랜치에 커밋할 때마다 자동으로 갱신되는 빌드입니다." \
+            --latest
