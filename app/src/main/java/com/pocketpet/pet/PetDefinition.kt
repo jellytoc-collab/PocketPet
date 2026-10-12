@@ -18,9 +18,14 @@ object Pets {
         id = "shiro",
         name = "시로",
         idleFrames = listOf(R.drawable.pet_idle_01),
-        walkFrames = listOf(R.drawable.pet_walk_01, R.drawable.pet_walk_02),
+                walkFrames = listOf(
+            R.drawable.pet_walk_01,
+            R.drawable.pet_walk_mid,
+            R.drawable.pet_walk_02,
+            R.drawable.pet_walk_mid
+        ),
         walkSpeedDp = 40f,
-        walkFps = 4f,
+        walkFps = 6f,
         heightDp = 120
     )
 }
