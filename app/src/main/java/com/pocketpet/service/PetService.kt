@@ -7,12 +7,14 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import com.pocketpet.MainActivity
 import com.pocketpet.R
 import com.pocketpet.overlay.PetOverlayManager
+import com.pocketpet.pet.Pets
 
 class PetService : Service() {
 
@@ -20,7 +22,7 @@ class PetService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        overlayManager = PetOverlayManager(this)
+        overlayManager = PetOverlayManager(this, Pets.SHIRO)
         createNotificationChannel()
     }
 
@@ -36,6 +38,12 @@ class PetService : Service() {
         overlayManager.show()
         isRunning = true
         return START_NOT_STICKY
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // 화면 회전 등으로 크기가 바뀌면 이동 범위를 다시 계산한다
+        overlayManager.refreshBounds()
     }
 
     override fun onDestroy() {
@@ -79,7 +87,7 @@ class PetService : Service() {
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.pet_idle_01)
             .setContentTitle("Pocket Pet")
-            .setContentText("펫이 화면 위에 나와 있어요")
+            .setContentText("${Pets.SHIRO.name}가 화면 위에 나와 있어요")
             .setContentIntent(openApp)
             .setOngoing(true)
             .build()
