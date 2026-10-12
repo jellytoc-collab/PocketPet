@@ -9,7 +9,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val label = TextView(this).apply {
-            text = "Pocket Pet\n빌드 환경 테스트 성공!"
+            text = "펫 선택 + 설정\n(준비 중)"
             textSize = 24f
             gravity = Gravity.CENTER
         }
