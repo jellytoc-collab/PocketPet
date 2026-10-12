@@ -77,7 +77,7 @@ class PetService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         return Notification.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.pet_default)
+            .setSmallIcon(R.drawable.pet_idle_01)
             .setContentTitle("Pocket Pet")
             .setContentText("펫이 화면 위에 나와 있어요")
             .setContentIntent(openApp)
