@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.os.Build
@@ -13,16 +14,33 @@ import android.os.IBinder
 import android.provider.Settings
 import com.pocketpet.MainActivity
 import com.pocketpet.R
+import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.overlay.PetOverlayManager
 import com.pocketpet.pet.Pets
 
 class PetService : Service() {
 
     private lateinit var overlayManager: PetOverlayManager
+    private lateinit var settings: PetSettingsRepository
+
+    // 설정 화면에서 값이 바뀌면 실행 중인 펫에 바로 반영한다
+    private val settingsListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                PetSettingsRepository.KEY_SIZE_DP ->
+                    overlayManager.setSize(settings.sizeDp)
+                PetSettingsRepository.KEY_ACTIVITY ->
+                    overlayManager.setActivityLevel(settings.activityLevel)
+            }
+        }
 
     override fun onCreate() {
         super.onCreate()
+        settings = PetSettingsRepository(this)
         overlayManager = PetOverlayManager(this, Pets.SHIRO)
+        overlayManager.setSize(settings.sizeDp)
+        overlayManager.setActivityLevel(settings.activityLevel)
+        settings.registerListener(settingsListener)
         createNotificationChannel()
     }
 
@@ -47,6 +65,7 @@ class PetService : Service() {
     }
 
     override fun onDestroy() {
+        settings.unregisterListener(settingsListener)
         overlayManager.hide()
         isRunning = false
         super.onDestroy()
