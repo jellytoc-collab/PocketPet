@@ -9,25 +9,31 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.service.PetService
 
 class MainActivity : Activity() {
 
     private lateinit var permissionStatus: TextView
     private lateinit var petStatus: TextView
+    private lateinit var settings: PetSettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        settings = PetSettingsRepository(this)
         permissionStatus = findViewById(R.id.permissionStatus)
         petStatus = findViewById(R.id.petStatus)
 
         findViewById<Button>(R.id.summonButton).setOnClickListener { summonPet() }
         findViewById<Button>(R.id.dismissButton).setOnClickListener { dismissPet() }
 
+        setupSizeSeekBar()
+        setupActivitySeekBar()
         requestNotificationPermissionIfNeeded()
     }
 
@@ -36,6 +42,61 @@ class MainActivity : Activity() {
         // 설정 화면에서 권한을 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
     }
+
+    // ---------- 설정 ----------
+
+    private fun setupSizeSeekBar() {
+        val label = findViewById<TextView>(R.id.sizeLabel)
+        val bar = findViewById<SeekBar>(R.id.sizeSeekBar)
+
+        // 10dp 단위로 조절한다 (80dp ~ 200dp)
+        bar.min = PetSettingsRepository.MIN_SIZE_DP / SIZE_STEP_DP
+        bar.max = PetSettingsRepository.MAX_SIZE_DP / SIZE_STEP_DP
+        bar.progress = settings.sizeDp / SIZE_STEP_DP
+        label.text = sizeText(settings.sizeDp)
+
+        bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                val dp = progress * SIZE_STEP_DP
+                label.text = sizeText(dp)
+                if (fromUser) settings.sizeDp = dp
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+    }
+
+    private fun setupActivitySeekBar() {
+        val label = findViewById<TextView>(R.id.activityLabel)
+        val bar = findViewById<SeekBar>(R.id.activitySeekBar)
+
+        bar.min = PetSettingsRepository.MIN_ACTIVITY
+        bar.max = PetSettingsRepository.MAX_ACTIVITY
+        bar.progress = settings.activityLevel
+        label.text = activityText(settings.activityLevel)
+
+        bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                label.text = activityText(progress)
+                if (fromUser) settings.activityLevel = progress
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+    }
+
+    private fun sizeText(dp: Int): String {
+        val percent = dp * 100 / PetSettingsRepository.DEFAULT_SIZE_DP
+        return "크기: $percent%"
+    }
+
+    private fun activityText(level: Int): String {
+        val names = arrayOf("아주 얌전함", "얌전함", "보통", "활발함", "아주 활발함")
+        val index = (level - 1).coerceIn(0, names.size - 1)
+        return "움직임 빈도: ${names[index]}"
+    }
+
+    // ---------- 소환 ----------
 
     private fun summonPet() {
         if (!Settings.canDrawOverlays(this)) {
@@ -80,5 +141,9 @@ class MainActivity : Activity() {
         ) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
+    }
+
+    companion object {
+        private const val SIZE_STEP_DP = 10
     }
 }
