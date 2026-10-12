@@ -2,7 +2,7 @@ package com.pocketpet.pet
 
 import kotlin.random.Random
 
-enum class PetState { IDLE, WALK }
+enum class PetState { IDLE, WALK, DRAGGED, FALL }
 
 /**
  * 펫의 위치와 행동 상태를 관리한다.
@@ -15,6 +15,8 @@ class PetController(
 ) {
     var x = 0f
         private set
+    var y = 0f
+        private set
     var state = PetState.IDLE
         private set
     var facingRight = true
@@ -22,52 +24,109 @@ class PetController(
 
     private var minX = 0f
     private var maxX = 0f
+    private var minY = 0f
+    private var groundY = 0f
+    private var velocityY = 0f       // 떨어지는 속도 (초당 px)
     private var stateTimeLeft = 0f   // 현재 행동의 남은 시간 (초)
     private var animTime = 0f        // 현재 행동을 시작한 뒤 지난 시간 (초)
 
-    fun setBounds(minX: Float, maxX: Float) {
+    fun setBounds(minX: Float, maxX: Float, minY: Float, groundY: Float) {
         this.minX = minX
         this.maxX = maxOf(minX, maxX)
+        this.minY = minY
+        this.groundY = maxOf(minY, groundY)
         x = x.coerceIn(this.minX, this.maxX)
+        y = if (state == PetState.DRAGGED || state == PetState.FALL) {
+            y.coerceIn(this.minY, this.groundY)
+        } else {
+            this.groundY
+        }
     }
 
     fun placeInMiddle() {
         x = (minX + maxX) / 2f
+        y = groundY
         enter(PetState.IDLE)
+    }
+
+    /** 손가락으로 누른 순간: 공중에서 퍼덕이기 시작 */
+    fun startDrag() {
+        velocityY = 0f
+        enter(PetState.DRAGGED)
+    }
+
+    /** 손가락을 따라 이동 (화면 안, 바닥 위로 제한) */
+    fun dragTo(newX: Float, newY: Float) {
+        if (state != PetState.DRAGGED) return
+        x = newX.coerceIn(minX, maxX)
+        y = newY.coerceIn(minY, groundY)
+    }
+
+    /** 손가락을 뗀 순간: 바닥으로 떨어지기 시작 */
+    fun release() {
+        if (state != PetState.DRAGGED) return
+        velocityY = 0f
+        enter(PetState.FALL)
     }
 
     /** dt: 지난 프레임 이후 흐른 시간 (초) */
     fun update(dt: Float) {
-        stateTimeLeft -= dt
         animTime += dt
 
-        if (state == PetState.WALK) {
-            val speedPx = definition.walkSpeedDp * density
-            x += if (facingRight) speedPx * dt else -speedPx * dt
-
-            val hitEdge = (facingRight && x >= maxX) || (!facingRight && x <= minX)
-            if (hitEdge) {
-                x = x.coerceIn(minX, maxX)
-                facingRight = !facingRight   // 다음에는 반대쪽으로
-                enter(PetState.IDLE)
+        when (state) {
+            PetState.DRAGGED -> return               // 위치는 손가락이 정한다
+            PetState.FALL -> {
+                updateFall(dt)
                 return
             }
+            PetState.WALK -> if (updateWalk(dt)) return
+            PetState.IDLE -> Unit
         }
 
+        stateTimeLeft -= dt
         if (stateTimeLeft <= 0f) chooseNextState()
     }
 
     /** 지금 보여 줄 그림 */
     fun currentFrame(): Int {
-        val frames = if (state == PetState.WALK) definition.walkFrames else definition.idleFrames
-        val index = (animTime * definition.walkFps).toInt() % frames.size
+        val (frames, fps) = when (state) {
+            PetState.IDLE, PetState.FALL -> definition.idleFrames to 1f
+            PetState.WALK -> definition.walkFrames to definition.walkFps
+            PetState.DRAGGED -> definition.flapFrames to definition.flapFps
+        }
+        val index = (animTime * fps).toInt() % frames.size
         return frames[index]
+    }
+
+    private fun updateFall(dt: Float) {
+        velocityY += definition.gravityDp * density * dt
+        y += velocityY * dt
+        if (y >= groundY) {
+            y = groundY
+            velocityY = 0f
+            enter(PetState.IDLE)
+        }
+    }
+
+    /** 벽에 닿아 멈췄으면 true */
+    private fun updateWalk(dt: Float): Boolean {
+        val speedPx = definition.walkSpeedDp * density
+        x += if (facingRight) speedPx * dt else -speedPx * dt
+
+        val hitEdge = (facingRight && x >= maxX) || (!facingRight && x <= minX)
+        if (hitEdge) {
+            x = x.coerceIn(minX, maxX)
+            facingRight = !facingRight   // 다음에는 반대쪽으로
+            enter(PetState.IDLE)
+            return true
+        }
+        return false
     }
 
     private fun chooseNextState() {
         when (state) {
             PetState.IDLE -> if (random.nextFloat() < 0.65f) startWalk() else enter(PetState.IDLE)
-            PetState.WALK -> enter(PetState.IDLE)
+            else -> enter(PetState.IDLE)
         }
     }
 
@@ -86,6 +145,7 @@ class PetController(
         stateTimeLeft = when (newState) {
             PetState.IDLE -> 1.5f + random.nextFloat() * 2.5f   // 1.5 ~ 4초
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
+            PetState.DRAGGED, PetState.FALL -> 0f               // 시간 제한 없음
         }
     }
 }
