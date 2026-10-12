@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="임시 펫"
+        android:text="시로"
         android:textColor="#3B2F2F"
         android:textSize="18sp" />
 
