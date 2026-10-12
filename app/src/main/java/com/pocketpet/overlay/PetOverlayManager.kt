@@ -19,15 +19,19 @@ class PetOverlayManager(private val context: Context) {
         if (petView != null) return
 
         val density = context.resources.displayMetrics.density
-        val sizePx = (PET_SIZE_DP * density).toInt()
+        val drawable = context.getDrawable(R.drawable.pet_idle_01) ?: return
+
+        // 그림의 가로세로 비율을 유지해서 창 크기를 정한다
+        val heightPx = (PET_HEIGHT_DP * density).toInt()
+        val widthPx = heightPx * drawable.intrinsicWidth / drawable.intrinsicHeight
 
         val view = ImageView(context).apply {
-            setImageResource(R.drawable.pet_default)
+            setImageDrawable(drawable)
         }
 
         val params = WindowManager.LayoutParams(
-            sizePx,
-            sizePx,
+            widthPx,
+            heightPx,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
@@ -53,7 +57,7 @@ class PetOverlayManager(private val context: Context) {
     }
 
     companion object {
-        private const val PET_SIZE_DP = 96
+        private const val PET_HEIGHT_DP = 120
         private const val START_X_DP = 40
         private const val START_Y_DP = 200
     }
