@@ -19,7 +19,9 @@ class PetController(
         private set
     var state = PetState.IDLE
         private set
-    
+    var facingRight = true
+        private set
+
     /** 움직임 빈도: 1(아주 얌전함) ~ 5(아주 활발함) */
     var activityLevel = 3
         set(value) {
@@ -129,11 +131,12 @@ class PetController(
 
     private fun chooseNextState() {
         when (state) {
-                PetState.IDLE -> {
+            PetState.IDLE -> {
                 // 활발할수록 쉬고 나서 걸을 확률이 높다 (35% ~ 95%)
                 val walkChance = 0.35f + 0.15f * (activityLevel - 1)
                 if (random.nextFloat() < walkChance) startWalk() else enter(PetState.IDLE)
             }
+            else -> enter(PetState.IDLE)
         }
     }
 
@@ -150,7 +153,7 @@ class PetController(
         state = newState
         animTime = 0f
         stateTimeLeft = when (newState) {
-                PetState.IDLE -> {
+            PetState.IDLE -> {
                 // 활발할수록 짧게 쉰다 (보통일 때 1.5 ~ 4초)
                 val restScale = 1f + 0.35f * (3 - activityLevel)
                 (1.5f + random.nextFloat() * 2.5f) * restScale
