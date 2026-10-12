@@ -31,6 +31,7 @@ class PetOverlayManager(
     private var params: WindowManager.LayoutParams? = null
     private var widthPx = 0
     private var heightPx = 0
+    private var sizeDp = definition.heightDp
     private var currentFrameRes = 0
     private var lastFrameTimeNanos = 0L
     private var running = false
@@ -54,9 +55,7 @@ class PetOverlayManager(
         val firstFrame = definition.idleFrames.first()
         val drawable = drawableFor(firstFrame) ?: return
 
-        // 그림의 가로세로 비율을 유지해서 창 크기를 정한다
-        heightPx = (definition.heightDp * density).toInt()
-        widthPx = heightPx * drawable.intrinsicWidth / drawable.intrinsicHeight
+            computeSize()
 
         val view = ImageView(context).apply {
             setImageDrawable(drawable)
@@ -109,7 +108,30 @@ class PetOverlayManager(
         updateBounds()
         applyPosition()
     }
+        /** 크기 설정이 바뀌었을 때 창 크기와 이동 범위를 다시 계산한다 */
+    fun setSize(newSizeDp: Int) {
+        sizeDp = newSizeDp
+        val view = petView ?: return   // 아직 소환 전이면 값만 기억해 둔다
+        val lp = params ?: return
+        computeSize()
+        lp.width = widthPx
+        lp.height = heightPx
+        updateBounds()
+        lp.x = controller.x.toInt()
+        lp.y = controller.y.toInt()
+        windowManager.updateViewLayout(view, lp)
+    }
 
+    fun setActivityLevel(level: Int) {
+        controller.activityLevel = level
+    }
+
+    /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
+    private fun computeSize() {
+        val d = drawableFor(definition.idleFrames.first()) ?: return
+        heightPx = (sizeDp * density).toInt()
+        widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
+    }
     private fun onPetTouch(event: MotionEvent): Boolean {
         val lp = params ?: return false
         when (event.actionMasked) {
