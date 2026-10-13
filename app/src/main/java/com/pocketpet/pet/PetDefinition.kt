@@ -9,11 +9,11 @@ data class PetDefinition(
     val idleFrames: List<Int>,
     val walkFrames: List<Int>,
     val flapFrames: List<Int>,
-    val walkSpeedDp: Float,   // 걷는 속도 (초당 dp)
-    val walkFps: Float,       // 걷기 그림이 바뀌는 속도 (초당 장수)
-    val flapFps: Float,       // 드래그 중 퍼덕이는 속도 (초당 장수)
-    val gravityDp: Float,     // 떨어질 때 중력 가속도 (초당 dp/초)
-    val heightDp: Int         // 화면에 표시되는 키
+    val walkSpeedDp: Float = 40f,   // 걷는 속도 (초당 dp)
+    val walkFps: Float = 6f,        // 걷기 그림이 바뀌는 속도 (초당 장수)
+    val flapFps: Float = 14f,       // 드래그 중 퍼덕이는 속도 (초당 장수)
+    val gravityDp: Float = 2500f,   // 떨어질 때 중력 가속도
+    val heightDp: Int = 120         // 화면에 표시되는 키
 )
 
 object Pets {
@@ -32,11 +32,29 @@ object Pets {
             R.drawable.pet_flap_mid,
             R.drawable.pet_flap_down,
             R.drawable.pet_flap_mid
-        ),
-        walkSpeedDp = 40f,
-        walkFps = 6f,
-        flapFps = 14f,
-        gravityDp = 2500f,
-        heightDp = 120
+        )
     )
+
+    val KURO = PetDefinition(
+        id = "kuro",
+        name = "쿠로",
+        idleFrames = listOf(R.drawable.kuro_idle),
+        walkFrames = listOf(
+            R.drawable.kuro_walk_01,
+            R.drawable.kuro_walk_mid,
+            R.drawable.kuro_walk_02,
+            R.drawable.kuro_walk_mid
+        ),
+        flapFrames = listOf(
+            R.drawable.kuro_flap_up,
+            R.drawable.kuro_flap_mid,
+            R.drawable.kuro_flap_down,
+            R.drawable.kuro_flap_mid
+        )
+    )
+
+    /** 선택 화면에서 넘겨 볼 순서 */
+    val ALL = listOf(SHIRO, KURO)
+
+    fun byId(id: String?): PetDefinition = ALL.firstOrNull { it.id == id } ?: SHIRO
 }
