@@ -22,18 +22,41 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/petPreview"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:src="@drawable/pet_idle_01" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/prevPetButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="◀"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/petPreview"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/nextPetButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="▶"
+                android:textSize="20sp" />
+
+        </LinearLayout>
 
         <TextView
+            android:id="@+id/petName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="시로"
             android:textColor="#3B2F2F"
             android:textSize="18sp" />
 
