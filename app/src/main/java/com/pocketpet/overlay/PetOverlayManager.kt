@@ -54,8 +54,7 @@ class PetOverlayManager(
 
         val firstFrame = definition.idleFrames.first()
         val drawable = drawableFor(firstFrame) ?: return
-
-            computeSize()
+        computeSize()
 
         val view = ImageView(context).apply {
             setImageDrawable(drawable)
@@ -108,7 +107,8 @@ class PetOverlayManager(
         updateBounds()
         applyPosition()
     }
-        /** 크기 설정이 바뀌었을 때 창 크기와 이동 범위를 다시 계산한다 */
+
+    /** 크기 설정이 바뀌었을 때 창 크기와 이동 범위를 다시 계산한다 */
     fun setSize(newSizeDp: Int) {
         sizeDp = newSizeDp
         val view = petView ?: return   // 아직 소환 전이면 값만 기억해 둔다
@@ -132,6 +132,7 @@ class PetOverlayManager(
         heightPx = (sizeDp * density).toInt()
         widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
     }
+
     private fun onPetTouch(event: MotionEvent): Boolean {
         val lp = params ?: return false
         when (event.actionMasked) {
