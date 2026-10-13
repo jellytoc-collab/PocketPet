@@ -11,7 +11,7 @@ data class PetDefinition(
     val flapFrames: List<Int>,
     val walkSpeedDp: Float = 40f,   // 걷는 속도 (초당 dp)
     val walkFps: Float = 6f,        // 걷기 그림이 바뀌는 속도 (초당 장수)
-    val flapFps: Float = 14f,       // 드래그 중 퍼덕이는 속도 (초당 장수)
+    val flapFps: Float = 6f,       // 드래그 중 퍼덕이는 속도 (초당 장수)
     val gravityDp: Float = 2500f,   // 떨어질 때 중력 가속도
     val heightDp: Int = 120         // 화면에 표시되는 키
 )
