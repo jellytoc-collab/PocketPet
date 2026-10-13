@@ -16,17 +16,21 @@ import com.pocketpet.MainActivity
 import com.pocketpet.R
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.overlay.PetOverlayManager
+import com.pocketpet.pet.PetDefinition
 import com.pocketpet.pet.Pets
 
 class PetService : Service() {
 
-    private lateinit var overlayManager: PetOverlayManager
     private lateinit var settings: PetSettingsRepository
+    private lateinit var currentPet: PetDefinition
+    private lateinit var overlayManager: PetOverlayManager
 
     // 설정 화면에서 값이 바뀌면 실행 중인 펫에 바로 반영한다
     private val settingsListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
+                PetSettingsRepository.KEY_PET ->
+                    switchPet(Pets.byId(settings.selectedPetId))
                 PetSettingsRepository.KEY_SIZE_DP ->
                     overlayManager.setSize(settings.sizeDp)
                 PetSettingsRepository.KEY_ACTIVITY ->
@@ -37,9 +41,8 @@ class PetService : Service() {
     override fun onCreate() {
         super.onCreate()
         settings = PetSettingsRepository(this)
-        overlayManager = PetOverlayManager(this, Pets.SHIRO)
-        overlayManager.setSize(settings.sizeDp)
-        overlayManager.setActivityLevel(settings.activityLevel)
+        currentPet = Pets.byId(settings.selectedPetId)
+        overlayManager = createOverlay(currentPet)
         settings.registerListener(settingsListener)
         createNotificationChannel()
     }
@@ -72,6 +75,26 @@ class PetService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun createOverlay(pet: PetDefinition): PetOverlayManager {
+        return PetOverlayManager(this, pet).apply {
+            setSize(settings.sizeDp)
+            setActivityLevel(settings.activityLevel)
+        }
+    }
+
+    /** 펫이 나와 있는 동안 다른 펫을 고르면 바로 바꿔 띄운다 */
+    private fun switchPet(pet: PetDefinition) {
+        if (pet.id == currentPet.id) return
+        overlayManager.hide()
+        currentPet = pet
+        overlayManager = createOverlay(pet)
+        if (isRunning) {
+            overlayManager.show()
+            getSystemService(NotificationManager::class.java)
+                .notify(NOTIFICATION_ID, buildNotification())
+        }
+    }
 
     private fun startAsForeground() {
         val notification = buildNotification()
@@ -106,7 +129,7 @@ class PetService : Service() {
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.pet_idle_01)
             .setContentTitle("Pocket Pet")
-            .setContentText("${Pets.SHIRO.name}가 화면 위에 나와 있어요")
+            .setContentText("${currentPet.name}가 화면 위에 나와 있어요")
             .setContentIntent(openApp)
             .setOngoing(true)
             .build()
