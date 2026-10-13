@@ -9,6 +9,13 @@ class PetSettingsRepository(context: Context) {
     private val prefs: SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    /** 선택한 펫 */
+    var selectedPetId: String
+        get() = prefs.getString(KEY_PET, DEFAULT_PET) ?: DEFAULT_PET
+        set(value) {
+            prefs.edit().putString(KEY_PET, value).apply()
+        }
+
     /** 펫의 키 (dp) */
     var sizeDp: Int
         get() = prefs.getInt(KEY_SIZE_DP, DEFAULT_SIZE_DP)
@@ -33,8 +40,11 @@ class PetSettingsRepository(context: Context) {
 
     companion object {
         private const val PREFS_NAME = "pet_settings"
+        const val KEY_PET = "selected_pet"
         const val KEY_SIZE_DP = "size_dp"
         const val KEY_ACTIVITY = "activity_level"
+
+        const val DEFAULT_PET = "shiro"
 
         const val MIN_SIZE_DP = 80
         const val MAX_SIZE_DP = 200
