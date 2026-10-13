@@ -9,17 +9,23 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import com.pocketpet.data.PetSettingsRepository
+import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
 
 class MainActivity : Activity() {
 
     private lateinit var permissionStatus: TextView
     private lateinit var petStatus: TextView
+    private lateinit var petPreview: ImageView
+    private lateinit var petName: TextView
     private lateinit var settings: PetSettingsRepository
+
+    private var petIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +34,13 @@ class MainActivity : Activity() {
         settings = PetSettingsRepository(this)
         permissionStatus = findViewById(R.id.permissionStatus)
         petStatus = findViewById(R.id.petStatus)
+        petPreview = findViewById(R.id.petPreview)
+        petName = findViewById(R.id.petName)
 
         findViewById<Button>(R.id.summonButton).setOnClickListener { summonPet() }
         findViewById<Button>(R.id.dismissButton).setOnClickListener { dismissPet() }
 
+        setupPetSelector()
         setupSizeSeekBar()
         setupActivitySeekBar()
         requestNotificationPermissionIfNeeded()
@@ -41,6 +50,28 @@ class MainActivity : Activity() {
         super.onResume()
         // 설정 화면에서 권한을 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
+    }
+
+    // ---------- 펫 선택 ----------
+
+    private fun setupPetSelector() {
+        petIndex = Pets.ALL.indexOfFirst { it.id == settings.selectedPetId }.coerceAtLeast(0)
+        findViewById<Button>(R.id.prevPetButton).setOnClickListener { selectPet(petIndex - 1) }
+        findViewById<Button>(R.id.nextPetButton).setOnClickListener { selectPet(petIndex + 1) }
+        showSelectedPet()
+    }
+
+    private fun selectPet(index: Int) {
+        // 양 끝에서 넘기면 반대쪽 끝으로 돌아간다
+        petIndex = (index + Pets.ALL.size) % Pets.ALL.size
+        settings.selectedPetId = Pets.ALL[petIndex].id
+        showSelectedPet()
+    }
+
+    private fun showSelectedPet() {
+        val pet = Pets.ALL[petIndex]
+        petPreview.setImageResource(pet.idleFrames.first())
+        petName.text = pet.name
     }
 
     // ---------- 설정 ----------
