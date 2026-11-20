@@ -1,8 +1,11 @@
 package com.pocketpet.overlay
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.DisplayMetrics
@@ -12,6 +15,8 @@ import android.view.MotionEvent
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
+import com.pocketpet.pet.Anim
+import com.pocketpet.pet.Frame
 import com.pocketpet.pet.PetController
 import com.pocketpet.pet.PetDefinition
 import com.pocketpet.pet.PetState
@@ -25,14 +30,18 @@ class PetOverlayManager(
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val density = context.resources.displayMetrics.density
     private val controller = PetController(definition, density)
-    private val drawables = HashMap<Int, Drawable>()
+
+    // 그림은 처음 소환할 때 한 번만 불러온다
+    private var idleDrawable: Drawable? = null
+    private var walkFrames: List<Drawable> = emptyList()
+    private var flapFrames: List<Drawable> = emptyList()
 
     private var petView: ImageView? = null
     private var params: WindowManager.LayoutParams? = null
     private var widthPx = 0
     private var heightPx = 0
     private var sizeDp = definition.heightDp
-    private var currentFrameRes = 0
+    private var currentFrame: Frame? = null
     private var lastFrameTimeNanos = 0L
     private var running = false
 
@@ -52,15 +61,15 @@ class PetOverlayManager(
         // 이미 펫이 떠 있으면 새로 만들지 않는다 (중복 생성 방지)
         if (petView != null) return
 
-        val firstFrame = definition.idleFrames.first()
-        val drawable = drawableFor(firstFrame) ?: return
+        loadFrames()
+        val idle = idleDrawable ?: return
         computeSize()
 
         val view = ImageView(context).apply {
-            setImageDrawable(drawable)
+            setImageDrawable(idle)
             setOnTouchListener { _, event -> onPetTouch(event) }
         }
-        currentFrameRes = firstFrame
+        currentFrame = Frame(Anim.IDLE, 0)
 
         val lp = WindowManager.LayoutParams(
             widthPx,
@@ -126,9 +135,29 @@ class PetOverlayManager(
         controller.activityLevel = level
     }
 
+    private fun loadFrames() {
+        if (idleDrawable != null) return
+        idleDrawable = context.getDrawable(definition.idle)
+        walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
+        flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+    }
+
+    /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
+    private fun loadStrip(res: Int, count: Int): List<Drawable> {
+        val options = BitmapFactory.Options().apply { inScaled = false }
+        val sheet = BitmapFactory.decodeResource(context.resources, res, options)
+        val frameWidth = sheet.width / count
+        val frames = (0 until count).map { i ->
+            val bitmap = Bitmap.createBitmap(sheet, i * frameWidth, 0, frameWidth, sheet.height)
+            BitmapDrawable(context.resources, bitmap)
+        }
+        sheet.recycle()
+        return frames
+    }
+
     /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
     private fun computeSize() {
-        val d = drawableFor(definition.idleFrames.first()) ?: return
+        val d = idleDrawable ?: return
         heightPx = (sizeDp * density).toInt()
         widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
     }
@@ -170,12 +199,18 @@ class PetOverlayManager(
     private fun applyFrame() {
         val view = petView ?: return
         val frame = controller.currentFrame()
-        if (frame != currentFrameRes) {
+        if (frame != currentFrame) {
             drawableFor(frame)?.let { view.setImageDrawable(it) }
-            currentFrameRes = frame
+            currentFrame = frame
         }
         // 걷기 그림은 오른쪽을 보고 있으므로, 왼쪽으로 걸을 때만 좌우를 뒤집는다
         view.scaleX = if (controller.state == PetState.WALK && !controller.facingRight) -1f else 1f
+    }
+
+    private fun drawableFor(frame: Frame): Drawable? = when (frame.anim) {
+        Anim.IDLE -> idleDrawable
+        Anim.WALK -> walkFrames.getOrNull(frame.index)
+        Anim.FLAP -> flapFrames.getOrNull(frame.index)
     }
 
     private fun applyPosition() {
@@ -221,13 +256,6 @@ class PetOverlayManager(
             val dm = DisplayMetrics().also { windowManager.defaultDisplay.getRealMetrics(it) }
             Rect(0, (24 * density).toInt(), dm.widthPixels, dm.heightPixels - (48 * density).toInt())
         }
-    }
-
-    private fun drawableFor(res: Int): Drawable? {
-        drawables[res]?.let { return it }
-        val d = context.getDrawable(res) ?: return null
-        drawables[res] = d
-        return d
     }
 
     companion object {
