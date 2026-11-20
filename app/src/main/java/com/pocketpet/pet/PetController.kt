@@ -26,10 +26,10 @@ class PetController(
     var facingRight = true
         private set
 
-    /** 움직임 빈도: 1(아주 얌전함) ~ 5(아주 활발함) */
-    var activityLevel = 3
+    /** 한 번 걷고 나서 쉬는 시간 (초) */
+    var restSec = 3f
         set(value) {
-            field = value.coerceIn(1, 5)
+            field = value.coerceAtLeast(0f)
         }
 
     private var minX = 0f
@@ -44,7 +44,7 @@ class PetController(
         this.minX = minX
         this.maxX = maxOf(minX, maxX)
         this.minY = minY
-        this.groundY = maxOf(minY, groundY)
+        this.groundY = maxOf(minY, groundY)   // 바닥이 화면보다 높으면 화면 맨 위가 바닥
         x = x.coerceIn(this.minX, this.maxX)
         y = if (state == PetState.DRAGGED || state == PetState.FALL) {
             y.coerceIn(this.minY, this.groundY)
@@ -137,11 +137,7 @@ class PetController(
 
     private fun chooseNextState() {
         when (state) {
-            PetState.IDLE -> {
-                // 활발할수록 쉬고 나서 걸을 확률이 높다 (35% ~ 95%)
-                val walkChance = 0.35f + 0.15f * (activityLevel - 1)
-                if (random.nextFloat() < walkChance) startWalk() else enter(PetState.IDLE)
-            }
+            PetState.IDLE -> startWalk()          // 다 쉬었으면 걷는다
             else -> enter(PetState.IDLE)
         }
     }
@@ -159,11 +155,8 @@ class PetController(
         state = newState
         animTime = 0f
         stateTimeLeft = when (newState) {
-            PetState.IDLE -> {
-                // 활발할수록 짧게 쉰다 (보통일 때 1.5 ~ 4초)
-                val restScale = 1f + 0.35f * (3 - activityLevel)
-                (1.5f + random.nextFloat() * 2.5f) * restScale
-            }
+            // 쉬는 시간: 설정값의 0.6 ~ 1.4배 사이에서 조금씩 달라진다
+            PetState.IDLE -> restSec * (0.6f + random.nextFloat() * 0.8f)
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
             PetState.DRAGGED, PetState.FALL -> 0f               // 시간 제한 없음
         }
