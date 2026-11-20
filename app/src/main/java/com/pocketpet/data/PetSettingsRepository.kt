@@ -16,18 +16,29 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putString(KEY_PET, value).apply()
         }
 
-    /** 펫의 키 (dp) */
-    var sizeDp: Int
-        get() = prefs.getInt(KEY_SIZE_DP, DEFAULT_SIZE_DP)
+    /** 크기 (기본 크기 대비 %) — 최솟값만 있고 최댓값은 없다 */
+    var sizePercent: Int
+        get() = prefs.getInt(KEY_SIZE, DEFAULT_SIZE_PERCENT)
         set(value) {
-            prefs.edit().putInt(KEY_SIZE_DP, value.coerceIn(MIN_SIZE_DP, MAX_SIZE_DP)).apply()
+            prefs.edit().putInt(KEY_SIZE, value.coerceAtLeast(MIN_SIZE_PERCENT)).apply()
         }
 
-    /** 움직임 빈도: 1(아주 얌전함) ~ 5(아주 활발함) */
-    var activityLevel: Int
-        get() = prefs.getInt(KEY_ACTIVITY, DEFAULT_ACTIVITY)
+    /** 화면에 표시되는 키 (dp) */
+    val sizeDp: Int
+        get() = BASE_SIZE_DP * sizePercent / 100
+
+    /** 바닥을 화면 아래에서 띄우는 높이 (dp) */
+    var floorDp: Int
+        get() = prefs.getInt(KEY_FLOOR, DEFAULT_FLOOR_DP)
         set(value) {
-            prefs.edit().putInt(KEY_ACTIVITY, value.coerceIn(MIN_ACTIVITY, MAX_ACTIVITY)).apply()
+            prefs.edit().putInt(KEY_FLOOR, value.coerceAtLeast(0)).apply()
+        }
+
+    /** 한 번 걷고 나서 쉬는 시간 (초) */
+    var restSec: Float
+        get() = prefs.getFloat(KEY_REST, DEFAULT_REST_SEC)
+        set(value) {
+            prefs.edit().putFloat(KEY_REST, value.coerceAtLeast(0f)).apply()
         }
 
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -41,17 +52,17 @@ class PetSettingsRepository(context: Context) {
     companion object {
         private const val PREFS_NAME = "pet_settings"
         const val KEY_PET = "selected_pet"
-        const val KEY_SIZE_DP = "size_dp"
-        const val KEY_ACTIVITY = "activity_level"
+        const val KEY_SIZE = "size_percent"
+        const val KEY_FLOOR = "floor_dp"
+        const val KEY_REST = "rest_sec"
 
         const val DEFAULT_PET = "shiro"
 
-        const val MIN_SIZE_DP = 80
-        const val MAX_SIZE_DP = 200
-        const val DEFAULT_SIZE_DP = 120
+        const val BASE_SIZE_DP = 120
+        const val DEFAULT_SIZE_PERCENT = 100
+        const val MIN_SIZE_PERCENT = 10
 
-        const val MIN_ACTIVITY = 1
-        const val MAX_ACTIVITY = 5
-        const val DEFAULT_ACTIVITY = 3
+        const val DEFAULT_FLOOR_DP = 0
+        const val DEFAULT_REST_SEC = 3f
     }
 }
