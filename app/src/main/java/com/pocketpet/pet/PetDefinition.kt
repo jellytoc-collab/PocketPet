@@ -11,8 +11,8 @@ data class PetDefinition(
     val flapStrip: Int,             // 팔 휘적거리기 컷을 가로로 이어 붙인 그림
     val walkFrameCount: Int = 8,    // 걷기 컷 수
     val flapFrameCount: Int = 8,    // 휘적거리기 컷 수
-    val walkSpeedDp: Float = 40f,   // 걷는 속도 (초당 dp)
-    val walkFps: Float = 12f,       // 걷기 그림이 바뀌는 속도 (초당 장수)
+    val walkSpeedDp: Float = 20f,   // 걷는 속도 (초당 dp)
+    val walkFps: Float = 6f,        // 걷기 그림이 바뀌는 속도 (초당 장수)
     val flapFps: Float = 12f,       // 휘적거리기 그림이 바뀌는 속도 (초당 장수)
     val gravityDp: Float = 2500f,   // 떨어질 때 중력 가속도
     val heightDp: Int = 120         // 화면에 표시되는 키
