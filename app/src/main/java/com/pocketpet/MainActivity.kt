@@ -70,7 +70,7 @@ class MainActivity : Activity() {
 
     private fun showSelectedPet() {
         val pet = Pets.ALL[petIndex]
-        petPreview.setImageResource(pet.idleFrames.first())
+        petPreview.setImageResource(pet.idle)
         petName.text = pet.name
     }
 
