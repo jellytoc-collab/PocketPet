@@ -13,19 +13,34 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 상단: 제목 + 설정 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="펫 선택 + 설정"
-            android:textColor="#3B2F2F"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="펫 선택"
+                android:textColor="#3B2F2F"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/settingsButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="⚙"
+                android:textSize="22sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -38,8 +53,8 @@
 
             <ImageView
                 android:id="@+id/petPreview"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp" />
 
@@ -58,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="#3B2F2F"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/petStatus"
@@ -76,38 +91,6 @@
             android:gravity="center"
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/sizeLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:textColor="#3B2F2F"
-            android:textSize="16sp" />
-
-        <SeekBar
-            android:id="@+id/sizeSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:progressTint="#F28C38"
-            android:thumbTint="#F28C38" />
-
-        <TextView
-            android:id="@+id/activityLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textColor="#3B2F2F"
-            android:textSize="16sp" />
-
-        <SeekBar
-            android:id="@+id/activitySeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:progressTint="#F28C38"
-            android:thumbTint="#F28C38" />
 
         <Space
             android:layout_width="0dp"
