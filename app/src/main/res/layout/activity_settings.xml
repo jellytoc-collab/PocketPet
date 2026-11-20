@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF8EE"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- 상단: 뒤로가기 + 제목 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/backButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="←"
+                android:textSize="22sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="설정"
+                android:textColor="#3B2F2F"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 크기 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="크기"
+                android:textColor="#3B2F2F"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/sizeInput"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:inputType="number"
+                android:maxLength="5"
+                android:selectAllOnFocus="true"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="%"
+                android:textColor="#7A6A5A"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sizeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:progressTint="#F28C38"
+            android:thumbTint="#F28C38" />
+
+        <!-- 바닥 높이 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="바닥 높이"
+                android:textColor="#3B2F2F"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/floorInput"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:inputType="number"
+                android:maxLength="5"
+                android:selectAllOnFocus="true"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="dp"
+                android:textColor="#7A6A5A"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/floorSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:progressTint="#F28C38"
+            android:thumbTint="#F28C38" />
+
+        <!-- 걷는 주기 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="걷는 주기"
+                android:textColor="#3B2F2F"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/restInput"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:inputType="numberDecimal"
+                android:maxLength="5"
+                android:selectAllOnFocus="true"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="초"
+                android:textColor="#7A6A5A"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/restSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:progressTint="#F28C38"
+            android:thumbTint="#F28C38" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="한 번 걷고 나서 쉬는 시간이에요. 0이면 쉬지 않고 걸어요."
+            android:textColor="#7A6A5A"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+</ScrollView>
