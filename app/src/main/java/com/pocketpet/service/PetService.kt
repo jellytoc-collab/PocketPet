@@ -31,10 +31,12 @@ class PetService : Service() {
             when (key) {
                 PetSettingsRepository.KEY_PET ->
                     switchPet(Pets.byId(settings.selectedPetId))
-                PetSettingsRepository.KEY_SIZE_DP ->
+                PetSettingsRepository.KEY_SIZE ->
                     overlayManager.setSize(settings.sizeDp)
-                PetSettingsRepository.KEY_ACTIVITY ->
-                    overlayManager.setActivityLevel(settings.activityLevel)
+                PetSettingsRepository.KEY_FLOOR ->
+                    overlayManager.setFloor(settings.floorDp)
+                PetSettingsRepository.KEY_REST ->
+                    overlayManager.setRestSec(settings.restSec)
             }
         }
 
@@ -79,7 +81,8 @@ class PetService : Service() {
     private fun createOverlay(pet: PetDefinition): PetOverlayManager {
         return PetOverlayManager(this, pet).apply {
             setSize(settings.sizeDp)
-            setActivityLevel(settings.activityLevel)
+            setFloor(settings.floorDp)
+            setRestSec(settings.restSec)
         }
     }
 
