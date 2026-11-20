@@ -41,6 +41,7 @@ class PetOverlayManager(
     private var widthPx = 0
     private var heightPx = 0
     private var sizeDp = definition.heightDp
+    private var floorDp = 0
     private var currentFrame: Frame? = null
     private var lastFrameTimeNanos = 0L
     private var running = false
@@ -131,8 +132,16 @@ class PetOverlayManager(
         windowManager.updateViewLayout(view, lp)
     }
 
-    fun setActivityLevel(level: Int) {
-        controller.activityLevel = level
+    /** 바닥 높이 설정이 바뀌었을 때 바닥 위치를 다시 계산한다 */
+    fun setFloor(newFloorDp: Int) {
+        floorDp = newFloorDp
+        if (petView == null) return    // 아직 소환 전이면 값만 기억해 둔다
+        updateBounds()
+        applyPosition()
+    }
+
+    fun setRestSec(sec: Float) {
+        controller.restSec = sec
     }
 
     private fun loadFrames() {
@@ -157,7 +166,7 @@ class PetOverlayManager(
 
     /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
     private fun computeSize() {
-        val d = idleDrawable ?: return
+        val d = idleDrawable ?: context.getDrawable(definition.idle) ?: return
         heightPx = (sizeDp * density).toInt()
         widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
     }
@@ -227,7 +236,7 @@ class PetOverlayManager(
 
     private fun updateBounds() {
         val area = usableArea()
-        val bottomMargin = (BOTTOM_MARGIN_DP * density).toInt()
+        val bottomMargin = ((BOTTOM_MARGIN_DP + floorDp) * density).toInt()
         controller.setBounds(
             minX = area.left.toFloat(),
             maxX = (area.right - widthPx).toFloat(),
