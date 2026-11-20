@@ -4,6 +4,10 @@ import kotlin.random.Random
 
 enum class PetState { IDLE, WALK, DRAGGED, FALL }
 
+/** 어떤 그림 묶음의 몇 번째 컷을 보여 줄지 */
+enum class Anim { IDLE, WALK, FLAP }
+data class Frame(val anim: Anim, val index: Int)
+
 /**
  * 펫의 위치와 행동 상태를 관리한다.
  * 화면(View)과 관계없는 계산만 담당한다.
@@ -55,7 +59,7 @@ class PetController(
         enter(PetState.IDLE)
     }
 
-    /** 손가락으로 누른 순간: 공중에서 퍼덕이기 시작 */
+    /** 손가락으로 누른 순간: 공중에서 휘적거리기 시작 */
     fun startDrag() {
         velocityY = 0f
         enter(PetState.DRAGGED)
@@ -93,15 +97,17 @@ class PetController(
         if (stateTimeLeft <= 0f) chooseNextState()
     }
 
-    /** 지금 보여 줄 그림 */
-    fun currentFrame(): Int {
-        val (frames, fps) = when (state) {
-            PetState.IDLE, PetState.FALL -> definition.idleFrames to 1f
-            PetState.WALK -> definition.walkFrames to definition.walkFps
-            PetState.DRAGGED -> definition.flapFrames to definition.flapFps
-        }
-        val index = (animTime * fps).toInt() % frames.size
-        return frames[index]
+    /** 지금 보여 줄 컷 */
+    fun currentFrame(): Frame = when (state) {
+        PetState.IDLE, PetState.FALL -> Frame(Anim.IDLE, 0)
+        PetState.WALK -> Frame(
+            Anim.WALK,
+            (animTime * definition.walkFps).toInt() % definition.walkFrameCount
+        )
+        PetState.DRAGGED -> Frame(
+            Anim.FLAP,
+            (animTime * definition.flapFps).toInt() % definition.flapFrameCount
+        )
     }
 
     private fun updateFall(dt: Float) {
