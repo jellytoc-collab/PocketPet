@@ -5,24 +5,19 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.text.TextUtils
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
-import com.pocketpet.pet.PetDefinition
 import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
 
@@ -31,7 +26,8 @@ class MainActivity : Activity() {
     private lateinit var permissionStatus: TextView
     private lateinit var petStatus: TextView
     private lateinit var hiddenWarning: TextView
-    private val petCells = mutableListOf<View>()   // 격자의 칸들 (Pets.ALL과 같은 순서)
+    private lateinit var petPreview: ImageView
+    private lateinit var petName: TextView
     private lateinit var drawer: View
     private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
@@ -49,6 +45,8 @@ class MainActivity : Activity() {
         permissionStatus = findViewById(R.id.permissionStatus)
         petStatus = findViewById(R.id.petStatus)
         hiddenWarning = findViewById(R.id.hiddenWarning)
+        petPreview = findViewById(R.id.petPreview)
+        petName = findViewById(R.id.petName)
         drawer = findViewById(R.id.drawer)
         scrim = findViewById(R.id.drawerScrim)
 
@@ -206,90 +204,24 @@ class MainActivity : Activity() {
 
     // ---------- 펫 선택 ----------
 
-    /** 펫 13마리를 한 줄에 GRID_COLUMNS마리씩 격자로 늘어놓는다 */
     private fun setupPetSelector() {
         petIndex = Pets.ALL.indexOfFirst { it.id == settings.selectedPetId }.coerceAtLeast(0)
-        val grid = findViewById<LinearLayout>(R.id.petGrid)
-        grid.removeAllViews()
-        petCells.clear()
-
-        Pets.ALL.chunked(GRID_COLUMNS).forEach { rowPets ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                weightSum = GRID_COLUMNS.toFloat()
-                gravity = Gravity.CENTER_HORIZONTAL   // 마지막 줄(3마리)은 가운데 정렬
-            }
-            rowPets.forEach { pet ->
-                val index = petCells.size
-                val cell = createPetCell(pet)
-                cell.setOnClickListener { selectPet(index) }
-                petCells.add(cell)
-                row.addView(cell, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-            }
-            grid.addView(
-                row,
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
+        findViewById<Button>(R.id.prevPetButton).setOnClickListener { selectPet(petIndex - 1) }
+        findViewById<Button>(R.id.nextPetButton).setOnClickListener { selectPet(petIndex + 1) }
         showSelectedPet()
     }
 
-    /** 격자 한 칸: 펫 그림 + 이름 */
-    private fun createPetCell(pet: PetDefinition): View {
-        val density = resources.displayMetrics.density
-        val pad = (4 * density).toInt()
-        return LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(pad, pad * 2, pad, pad * 2)
-            isClickable = true
-            isFocusable = true
-
-            addView(
-                ImageView(context).apply {
-                    setImageResource(pet.idle)
-                    scaleType = ImageView.ScaleType.FIT_CENTER
-                },
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    (CELL_IMAGE_DP * density).toInt()
-                )
-            )
-            addView(TextView(context).apply {
-                setText(pet.nameRes)
-                setTextColor(0xFF3B2F2F.toInt())
-                textSize = 13f
-                gravity = Gravity.CENTER
-                maxLines = 1
-                ellipsize = TextUtils.TruncateAt.END
-                setPadding(0, pad, 0, 0)
-            })
-        }
-    }
-
     private fun selectPet(index: Int) {
-        petIndex = index
+        // 양 끝에서 넘기면 반대쪽 끝으로 돌아간다
+        petIndex = (index + Pets.ALL.size) % Pets.ALL.size
         settings.selectedPetId = Pets.ALL[petIndex].id
         showSelectedPet()
     }
 
-    /** 고른 칸에만 주황 테두리를 그린다 */
     private fun showSelectedPet() {
-        val density = resources.displayMetrics.density
-        petCells.forEachIndexed { i, cell ->
-            cell.background = if (i == petIndex) {
-                GradientDrawable().apply {
-                    cornerRadius = 12 * density
-                    setColor(0xFFFFE9D2.toInt())
-                    setStroke((2 * density).toInt(), 0xFFF28C38.toInt())
-                }
-            } else {
-                null
-            }
-        }
+        val pet = Pets.ALL[petIndex]
+        petPreview.setImageResource(pet.idle)
+        petName.setText(pet.nameRes)
     }
 
     // ---------- 소환 ----------
@@ -352,8 +284,6 @@ class MainActivity : Activity() {
         const val CONTACT_EMAIL = "your-email@example.com"
 
         private const val STATUS_DELAY_MS = 700L
-        private const val GRID_COLUMNS = 5      // 한 줄에 펫 몇 마리 (13마리 → 3줄)
-        private const val CELL_IMAGE_DP = 56    // 격자 칸의 펫 그림 높이
         private const val DRAWER_WIDTH_DP = 280
         private const val OPEN_MS = 220L
         private const val CLOSE_MS = 180L

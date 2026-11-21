@@ -43,13 +43,42 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- 펫 13마리 격자 (한 줄에 5마리, 3줄). 칸은 코드에서 만든다 -->
             <LinearLayout
-                android:id="@+id/petGrid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="vertical" />
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/prevPetButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="◀"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/petPreview"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp" />
+
+                <Button
+                    android:id="@+id/nextPetButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="▶"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/petName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#3B2F2F"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/petStatus"
