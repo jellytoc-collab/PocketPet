@@ -46,6 +46,10 @@
     <string name="toast_no_app">No app found to open this</string>
     <string name="contact_subject">[Pocket Pet] Question</string>
 
+    <!-- 경고 -->
+    <string name="warn_pet_hidden">⚠ The floor is so high that your pet is off the screen. It will not be visible when summoned.</string>
+    <string name="warn_pet_hidden_main">⚠ Your pet is off the screen because the floor is too high.\nLower the floor height in ≡ → Settings.</string>
+
     <!-- 펫 이름 -->
     <string name="pet_shiro">Shiro</string>
     <string name="pet_kuro">Kuro</string>
