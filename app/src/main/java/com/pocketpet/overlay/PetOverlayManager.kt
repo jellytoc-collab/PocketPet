@@ -15,6 +15,7 @@ import android.util.DisplayMetrics
 import android.view.Choreographer
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -65,6 +66,13 @@ class PetOverlayManager(
     private var touchOffsetX = 0f
     private var touchOffsetY = 0f
 
+    // 손가락을 놓는 순간의 속도를 재서 던지기에 쓴다
+    private var velocityTracker: VelocityTracker? = null
+
+    // 키보드가 떠 있는 동안 펫을 숨길지, 지금 키보드가 떠 있는지
+    private var hideOnKeyboard = true
+    private var keyboardShown = false
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!loopRunning) return
@@ -96,7 +104,15 @@ class PetOverlayManager(
                 if (petView === v) lost()
             }
         })
+        // 키보드가 뜨고 닫히는 것을 알아챈다 (Android 11 이상에서만 가능)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            view.setOnApplyWindowInsetsListener { v, insets ->
+                onKeyboardChanged(insets.isVisible(WindowInsets.Type.ime()))
+                v.onApplyWindowInsets(insets)
+            }
+        }
         currentFrame = Frame(Anim.IDLE, 0)
+        keyboardShown = false
 
         val lp = WindowManager.LayoutParams(
             widthPx,
@@ -133,6 +149,8 @@ class PetOverlayManager(
     /** 펫을 정리한다. 여러 번 불러도 안전하다 */
     fun hide() {
         stopLoop()
+        velocityTracker?.recycle()
+        velocityTracker = null
         val view = petView
         petView = null          // 먼저 비워서 '강제로 없어짐'으로 오해하지 않게 한다
         params = null
@@ -192,6 +210,40 @@ class PetOverlayManager(
     fun setWalkFrequency(frequency: Int) {
         controller.walkFrequency = frequency
         startLoop()
+    }
+
+    /** ‘키보드가 뜨면 숨기기’ 설정이 바뀌었을 때 */
+    fun setHideOnKeyboard(enabled: Boolean) {
+        hideOnKeyboard = enabled
+        applyKeyboardVisibility()
+    }
+
+    // ---------- 키보드 ----------
+
+    private fun onKeyboardChanged(shown: Boolean) {
+        if (shown == keyboardShown) return
+        keyboardShown = shown
+        applyKeyboardVisibility()
+    }
+
+    /**
+     * 키보드가 떠 있으면 펫을 투명하게 만들고, 터치도 아래 앱으로 넘긴다.
+     * 창을 없애지 않고 투명하게만 해야 키보드가 닫히는 것도 계속 알 수 있다.
+     */
+    private fun applyKeyboardVisibility() {
+        val view = petView ?: return
+        val lp = params ?: return
+        val hidden = hideOnKeyboard && keyboardShown
+        view.alpha = if (hidden) 0f else 1f
+        val newFlags = if (hidden) {
+            lp.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        } else {
+            lp.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        }
+        if (newFlags != lp.flags) {
+            lp.flags = newFlags
+            relayout()
+        }
     }
 
     // ---------- 움직임 반복 ----------
@@ -338,20 +390,47 @@ class PetOverlayManager(
             MotionEvent.ACTION_DOWN -> {
                 touchOffsetX = event.rawX - lp.x
                 touchOffsetY = event.rawY - lp.y
+                velocityTracker?.recycle()
+                velocityTracker = VelocityTracker.obtain()
+                trackVelocity(event)
                 controller.startDrag()
                 applyFrame()
                 startLoop()      // 잠들어 있었다면 깨운다
             }
             MotionEvent.ACTION_MOVE -> {
+                trackVelocity(event)
                 controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
                 applyPosition()
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_UP -> {
+                trackVelocity(event)
+                // 놓는 순간 손가락 속도(초당 px)로 던진다. 천천히 놓으면 그냥 떨어진다
+                val tracker = velocityTracker
+                tracker?.computeCurrentVelocity(1000)
+                controller.release(tracker?.xVelocity ?: 0f, tracker?.yVelocity ?: 0f)
+                tracker?.recycle()
+                velocityTracker = null
+                startLoop()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                velocityTracker?.recycle()
+                velocityTracker = null
                 controller.release()
                 startLoop()
             }
         }
         return true
+    }
+
+    /**
+     * 펫 창이 손가락을 따라 움직이므로, 창 안 좌표 대신 화면 전체 좌표로 속도를 잰다.
+     */
+    private fun trackVelocity(event: MotionEvent) {
+        val tracker = velocityTracker ?: return
+        val copy = MotionEvent.obtain(event)
+        copy.setLocation(event.rawX, event.rawY)
+        tracker.addMovement(copy)
+        copy.recycle()
     }
 
     // ---------- 위치 ----------

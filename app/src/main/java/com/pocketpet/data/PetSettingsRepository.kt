@@ -41,6 +41,23 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putInt(KEY_WALK_FREQ, value.coerceAtLeast(0)).apply()
         }
 
+    /** 키보드가 떠 있는 동안 펫을 숨길지 */
+    var hideOnKeyboard: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_ON_KEYBOARD, DEFAULT_HIDE_ON_KEYBOARD)
+        set(value) {
+            prefs.edit().putBoolean(KEY_HIDE_ON_KEYBOARD, value).apply()
+        }
+
+    /** 설정 화면의 값을 모두 기본값으로 되돌린다 (선택한 펫은 그대로 둔다) */
+    fun resetToDefaults() {
+        prefs.edit()
+            .remove(KEY_SIZE)
+            .remove(KEY_FLOOR)
+            .remove(KEY_WALK_FREQ)
+            .remove(KEY_HIDE_ON_KEYBOARD)
+            .apply()
+    }
+
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }
@@ -55,6 +72,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_SIZE = "size_percent"
         const val KEY_FLOOR = "floor_dp"
         const val KEY_WALK_FREQ = "walk_frequency"
+        const val KEY_HIDE_ON_KEYBOARD = "hide_on_keyboard"
 
         const val DEFAULT_PET = "shiro"
 
@@ -64,5 +82,6 @@ class PetSettingsRepository(context: Context) {
 
         const val DEFAULT_FLOOR_DP = 0
         const val DEFAULT_WALK_FREQ = 5
+        const val DEFAULT_HIDE_ON_KEYBOARD = true
     }
 }

@@ -182,5 +182,33 @@
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
 
+        <!-- 키보드가 뜨면 숨기기 -->
+        <Switch
+            android:id="@+id/hideKeyboardSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/settings_hide_keyboard"
+            android:textColor="#3B2F2F"
+            android:textSize="18sp"
+            android:thumbTint="#F28C38" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/settings_hide_keyboard_hint"
+            android:textColor="#7A6A5A"
+            android:textSize="14sp" />
+
+        <!-- 설정 초기화 -->
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="40dp"
+            android:text="@string/settings_reset"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </ScrollView>
