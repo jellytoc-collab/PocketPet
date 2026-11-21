@@ -1,118 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF8EE"
-    android:fillViewport="true"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <!-- 본문 -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <!-- 상단: 제목 + 설정 버튼 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- 상단: 메뉴 버튼 + 제목 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/menuButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="≡"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/main_title"
+                    android:textColor="#3B2F2F"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/prevPetButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="◀"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/petPreview"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp" />
+
+                <Button
+                    android:id="@+id/nextPetButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="▶"
+                    android:textSize="20sp" />
+            </LinearLayout>
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/petName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="펫 선택"
+                android:layout_marginTop="8dp"
                 android:textColor="#3B2F2F"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/settingsButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:text="⚙"
-                android:textSize="22sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/prevPetButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:text="◀"
                 android:textSize="20sp" />
 
-            <ImageView
-                android:id="@+id/petPreview"
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp" />
+            <TextView
+                android:id="@+id/petStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="#3B2F2F"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/permissionStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textColor="#7A6A5A"
+                android:textSize="14sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1" />
 
             <Button
-                android:id="@+id/nextPetButton"
-                android:layout_width="56dp"
+                android:id="@+id/summonButton"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="▶"
-                android:textSize="20sp" />
+                android:backgroundTint="#F28C38"
+                android:text="@string/summon"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
+            <Button
+                android:id="@+id/dismissButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/dismiss"
+                android:textSize="18sp" />
         </LinearLayout>
+    </ScrollView>
+
+    <!-- 메뉴가 열렸을 때 뒤를 어둡게 덮는 배경 -->
+    <View
+        android:id="@+id/drawerScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <!-- 옆에서 밀려 나오는 메뉴 -->
+    <LinearLayout
+        android:id="@+id/drawer"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#FFFFFF"
+        android:clickable="true"
+        android:elevation="16dp"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/petName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#3B2F2F"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/petStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textColor="#3B2F2F"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/permissionStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textColor="#7A6A5A"
-            android:textSize="14sp" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="24dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/summonButton"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:backgroundTint="#F28C38"
-            android:text="소환하기"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:layout_height="wrap_content"
+            android:paddingStart="24dp"
+            android:paddingTop="32dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="20dp"
+            android:text="@string/app_name"
+            android:textColor="#3B2F2F"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/dismissButton"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:text="소환 해제"
-            android:textSize="18sp" />
+            android:layout_height="1dp"
+            android:background="#EEE4D8" />
 
+        <TextView
+            android:id="@+id/menuSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_settings"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/menuLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_language"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/menuHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_help"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/menuAbout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_about"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="#EEE4D8" />
+
+        <TextView
+            android:id="@+id/menuContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_contact"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/menuReview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_review"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/menuPrivacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_privacy"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
     </LinearLayout>
-</ScrollView>
+
+</FrameLayout>
