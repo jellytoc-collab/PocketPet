@@ -182,40 +182,6 @@
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
 
-        <!-- 바탕화면에서만 보이기 -->
-        <Switch
-            android:id="@+id/homeOnlySwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="@string/settings_home_only"
-            android:textColor="#3B2F2F"
-            android:textSize="18sp"
-            android:thumbTint="#F28C38" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/settings_home_only_hint"
-            android:textColor="#7A6A5A"
-            android:textSize="14sp" />
-
-        <!-- 켜져 있는데 권한이 없으면 보이는 빨간 안내. 누르면 권한 설정으로 이동 -->
-        <TextView
-            android:id="@+id/usageWarning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:text="@string/warn_usage_permission"
-            android:textColor="#D93025"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
         <!-- 설정 초기화 -->
         <Button
             android:id="@+id/resetButton"

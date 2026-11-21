@@ -69,9 +69,6 @@ class PetOverlayManager(
     // 손가락을 놓는 순간의 속도를 재서 던지기에 쓴다
     private var velocityTracker: VelocityTracker? = null
 
-    // 바탕화면이 아닌 다른 앱이 열려 있어서 숨긴 상태인지
-    private var hiddenByApp = false
-
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!loopRunning) return
@@ -132,7 +129,6 @@ class PetOverlayManager(
         petView = view
         params = lp
         lostReported = false
-        applyHiddenByApp()   // 소환 전에 이미 숨김 상태였다면 반영한다
 
         startLoop()
         return true
@@ -202,33 +198,6 @@ class PetOverlayManager(
     fun setWalkFrequency(frequency: Int) {
         controller.walkFrequency = frequency
         startLoop()
-    }
-
-    /** 다른 앱이 열려 있어서 숨겨야 하면 true (‘바탕화면에서만 보이기’) */
-    fun setHiddenByApp(hidden: Boolean) {
-        if (hidden == hiddenByApp) return
-        hiddenByApp = hidden
-        applyHiddenByApp()
-    }
-
-    /**
-     * 숨길 때는 펫을 투명하게 만들고, 터치도 아래 앱으로 넘긴다.
-     * 창을 없애지 않으므로 다시 보일 때 위치가 그대로다.
-     */
-    private fun applyHiddenByApp() {
-        val view = petView ?: return
-        val lp = params ?: return
-        val hidden = hiddenByApp
-        view.alpha = if (hidden) 0f else 1f
-        val newFlags = if (hidden) {
-            lp.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        } else {
-            lp.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
-        }
-        if (newFlags != lp.flags) {
-            lp.flags = newFlags
-            relayout()
-        }
     }
 
     // ---------- 움직임 반복 ----------

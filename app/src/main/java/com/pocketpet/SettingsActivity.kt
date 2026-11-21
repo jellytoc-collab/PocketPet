@@ -2,20 +2,16 @@ package com.pocketpet
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import com.pocketpet.data.ForegroundApp
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
 import kotlin.math.roundToInt
@@ -24,7 +20,6 @@ class SettingsActivity : Activity() {
 
     private lateinit var settings: PetSettingsRepository
     private lateinit var floorWarning: TextView
-    private lateinit var usageWarning: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,45 +59,7 @@ class SettingsActivity : Activity() {
             initial = settings.walkFrequency
         ) { settings.walkFrequency = it }
 
-        usageWarning = findViewById(R.id.usageWarning)
-        usageWarning.setOnClickListener { openUsageAccessSettings() }
-        findViewById<Switch>(R.id.homeOnlySwitch).apply {
-            isChecked = settings.homeOnly
-            setOnCheckedChangeListener { _, checked ->
-                settings.homeOnly = checked
-                updateUsageWarning()
-                // 켰는데 권한이 없으면 왜 필요한지 설명하고 설정 화면으로 안내한다
-                if (checked && !ForegroundApp.hasPermission(this@SettingsActivity)) {
-                    explainUsagePermission()
-                }
-            }
-        }
-
         findViewById<Button>(R.id.resetButton).setOnClickListener { confirmReset() }
-    }
-
-    /** ‘사용 정보 접근’ 권한이 왜 필요한지 알려 준다 */
-    private fun explainUsagePermission() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.usage_dialog_title)
-            .setMessage(R.string.usage_dialog_message)
-            .setPositiveButton(R.string.open_settings) { _, _ -> openUsageAccessSettings() }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    private fun openUsageAccessSettings() {
-        try {
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, R.string.toast_no_app, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    /** 바탕화면에서만 보이기가 켜져 있는데 권한이 없으면 빨간 안내를 보여 준다 */
-    private fun updateUsageWarning() {
-        val needed = settings.homeOnly && !ForegroundApp.hasPermission(this)
-        usageWarning.visibility = if (needed) View.VISIBLE else View.GONE
     }
 
     /** 정말 초기화할지 한 번 물어본 뒤 기본값으로 되돌린다 */
@@ -125,7 +82,6 @@ class SettingsActivity : Activity() {
     override fun onResume() {
         super.onResume()
         updateFloorWarning()
-        updateUsageWarning()   // 권한 설정에서 돌아왔을 때 다시 확인
     }
 
     /** 펫이 화면 밖으로 완전히 나가면 빨간 경고를 보여 준다 */

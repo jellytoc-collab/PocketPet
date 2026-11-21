@@ -34,15 +34,9 @@
     <string name="settings_floor">바닥 높이</string>
     <string name="settings_walk_freq">걷는 빈도</string>
     <string name="settings_walk_freq_hint">숫자가 클수록 자주 걸어요. 0이면 걷지 않고 서 있어요.</string>
-    <string name="settings_home_only">바탕화면에서만 보이기</string>
-    <string name="settings_home_only_hint">바탕화면과 Pocket Pet 앱에서만 펫이 보이고, 다른 앱을 쓰는 동안에는 숨어요.</string>
-    <string name="warn_usage_permission">⚠ ‘사용 정보 접근’ 권한이 필요해요. 여기를 눌러 Pocket Pet을 허용해 주세요.</string>
-    <string name="usage_dialog_title">권한이 필요해요</string>
-    <string name="usage_dialog_message">바탕화면에서만 펫을 보여 주려면 지금 어떤 앱이 열려 있는지 알아야 해요. 다음 화면에서 Pocket Pet을 찾아 ‘사용 정보 접근’을 허용해 주세요.\n\n이 정보는 폰 밖으로 나가지 않아요.</string>
-    <string name="open_settings">설정 열기</string>
     <string name="settings_reset">설정 초기화</string>
     <string name="reset_confirm_title">설정을 초기화할까요?</string>
-    <string name="reset_confirm_message">크기, 바닥 높이, 걷는 빈도, 바탕화면에서만 보이기가 처음 값으로 돌아가요.</string>
+    <string name="reset_confirm_message">크기, 바닥 높이, 걷는 빈도가 처음 값으로 돌아가요.</string>
     <string name="reset_confirm_ok">초기화</string>
     <string name="cancel">취소</string>
     <string name="toast_reset_done">설정을 초기화했어요</string>
@@ -80,11 +74,11 @@
     <string name="pet_maren">마렌</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요. ‘바탕화면에서만 보이기’를 켜면 다른 앱을 쓰는 동안 펫이 숨어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
+    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\n버전 %1$s\n\n화면 위를 돌아다니는 작은 친구들과 함께하세요.\n\n만든 사람: jellytoc</string>
 
     <!-- 개인정보처리방침 -->
-    <string name="privacy_body">시행일: 2026년 11월 21일\n\nPocket Pet(이하 ‘앱’)은 이용자의 개인정보를 소중히 여깁니다.\n\n1. 수집하는 정보\n앱은 이름, 연락처, 위치 등 개인정보를 수집하지 않으며, 외부 서버로 어떤 정보도 전송하지 않습니다.\n\n2. 기기에 저장되는 정보\n선택한 펫, 크기, 바닥 높이, 걷는 빈도 같은 설정값은 이용자의 기기 안에만 저장되며, 앱을 삭제하면 함께 지워집니다.\n\n3. 사용하는 권한\n• 다른 앱 위에 표시: 펫을 화면 위에 보여 주기 위해 사용합니다.\n• 알림: 펫이 실행 중임을 알려 주기 위해 사용합니다.\n• 포그라운드 서비스: 앱을 닫아도 펫이 화면에 남아 있도록 하기 위해 사용합니다.\n• 사용 정보 접근(선택): ‘바탕화면에서만 보이기’를 켠 경우에만, 지금 바탕화면이 떠 있는지 확인하는 데 사용합니다. 이 정보는 저장하거나 전송하지 않습니다.\n\n4. 결제\n유료 콘텐츠 구매는 Google Play 결제를 통해 처리되며, 앱은 카드 번호 등 결제 정보를 받거나 저장하지 않습니다.\n\n5. 문의\n%1$s</string>
+    <string name="privacy_body">시행일: 2026년 11월 21일\n\nPocket Pet(이하 ‘앱’)은 이용자의 개인정보를 소중히 여깁니다.\n\n1. 수집하는 정보\n앱은 이름, 연락처, 위치 등 개인정보를 수집하지 않으며, 외부 서버로 어떤 정보도 전송하지 않습니다.\n\n2. 기기에 저장되는 정보\n선택한 펫, 크기, 바닥 높이, 걷는 빈도 같은 설정값은 이용자의 기기 안에만 저장되며, 앱을 삭제하면 함께 지워집니다.\n\n3. 사용하는 권한\n• 다른 앱 위에 표시: 펫을 화면 위에 보여 주기 위해 사용합니다.\n• 알림: 펫이 실행 중임을 알려 주기 위해 사용합니다.\n• 포그라운드 서비스: 앱을 닫아도 펫이 화면에 남아 있도록 하기 위해 사용합니다.\n\n4. 결제\n유료 콘텐츠 구매는 Google Play 결제를 통해 처리되며, 앱은 카드 번호 등 결제 정보를 받거나 저장하지 않습니다.\n\n5. 문의\n%1$s</string>
 </resources>

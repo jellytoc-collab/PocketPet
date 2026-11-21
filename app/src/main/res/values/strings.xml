@@ -34,15 +34,9 @@
     <string name="settings_floor">Floor height</string>
     <string name="settings_walk_freq">Walking frequency</string>
     <string name="settings_walk_freq_hint">Higher numbers mean more walking. At 0 the pet just stands still.</string>
-    <string name="settings_home_only">Show only on home screen</string>
-    <string name="settings_home_only_hint">Your pet appears only on the home screen and in Pocket Pet, and hides while you use other apps.</string>
-    <string name="warn_usage_permission">⚠ ‘Usage access’ is needed for this. Tap here and allow it for Pocket Pet.</string>
-    <string name="usage_dialog_title">Permission needed</string>
-    <string name="usage_dialog_message">To show your pet only on the home screen, Pocket Pet needs to know which app is open. On the next screen, find Pocket Pet and allow ‘Usage access’.\n\nThis information never leaves your phone.</string>
-    <string name="open_settings">Open settings</string>
     <string name="settings_reset">Reset settings</string>
     <string name="reset_confirm_title">Reset settings?</string>
-    <string name="reset_confirm_message">Size, floor height, walking frequency and ‘Show only on home screen’ will go back to their defaults.</string>
+    <string name="reset_confirm_message">Size, floor height and walking frequency will go back to their defaults.</string>
     <string name="reset_confirm_ok">Reset</string>
     <string name="cancel">Cancel</string>
     <string name="toast_reset_done">Settings were reset</string>
@@ -80,11 +74,11 @@
     <string name="pet_maren">Maren</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. Flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height, walking frequency in ≡ → Settings. Turn on ‘Show only on home screen’ to keep your pet out of the way while you use other apps.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. Flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
 
     <!-- 개인정보처리방침 -->
-    <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n• Usage access (optional): used only when ‘Show only on home screen’ is on, to check whether the home screen is showing. This information is not stored or sent anywhere.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
+    <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
 </resources>

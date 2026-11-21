@@ -41,21 +41,12 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putInt(KEY_WALK_FREQ, value.coerceAtLeast(0)).apply()
         }
 
-    /** 바탕화면과 이 앱에서만 펫을 보여 줄지 (다른 앱을 쓰는 동안은 숨김) */
-    var homeOnly: Boolean
-        get() = prefs.getBoolean(KEY_HOME_ONLY, DEFAULT_HOME_ONLY)
-        set(value) {
-            prefs.edit().putBoolean(KEY_HOME_ONLY, value).apply()
-        }
-
     /** 설정 화면의 값을 모두 기본값으로 되돌린다 (선택한 펫은 그대로 둔다) */
     fun resetToDefaults() {
         prefs.edit()
             .remove(KEY_SIZE)
             .remove(KEY_FLOOR)
             .remove(KEY_WALK_FREQ)
-            .remove(KEY_HOME_ONLY)
-            .remove(OLD_KEY_HIDE_ON_KEYBOARD)
             .apply()
     }
 
@@ -73,8 +64,6 @@ class PetSettingsRepository(context: Context) {
         const val KEY_SIZE = "size_percent"
         const val KEY_FLOOR = "floor_dp"
         const val KEY_WALK_FREQ = "walk_frequency"
-        const val KEY_HOME_ONLY = "home_only"
-        private const val OLD_KEY_HIDE_ON_KEYBOARD = "hide_on_keyboard"   // 지금은 안 쓰는 옛 설정
 
         const val DEFAULT_PET = "shiro"
 
@@ -84,6 +73,5 @@ class PetSettingsRepository(context: Context) {
 
         const val DEFAULT_FLOOR_DP = 0
         const val DEFAULT_WALK_FREQ = 5
-        const val DEFAULT_HOME_ONLY = false
     }
 }
