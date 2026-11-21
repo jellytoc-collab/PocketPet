@@ -17,6 +17,7 @@ import android.widget.Toast
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import com.pocketpet.data.PetSettingsRepository
+import com.pocketpet.data.ScreenInfo
 import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
 
@@ -24,6 +25,7 @@ class MainActivity : Activity() {
 
     private lateinit var permissionStatus: TextView
     private lateinit var petStatus: TextView
+    private lateinit var hiddenWarning: TextView
     private lateinit var petPreview: ImageView
     private lateinit var petName: TextView
     private lateinit var drawer: View
@@ -42,6 +44,7 @@ class MainActivity : Activity() {
         settings = PetSettingsRepository(this)
         permissionStatus = findViewById(R.id.permissionStatus)
         petStatus = findViewById(R.id.petStatus)
+        hiddenWarning = findViewById(R.id.hiddenWarning)
         petPreview = findViewById(R.id.petPreview)
         petName = findViewById(R.id.petName)
         drawer = findViewById(R.id.drawer)
@@ -57,7 +60,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        // 설정 화면에서 권한을 바꾸고 돌아왔을 때 상태를 다시 표시한다
+        // 설정 화면에서 권한·바닥 높이를 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
     }
 
@@ -262,6 +265,9 @@ class MainActivity : Activity() {
             if (PetService.isRunning) R.string.pet_status_running
             else R.string.pet_status_idle
         )
+        // 바닥이 너무 높아서 펫이 화면 밖에 있으면 빨간 경고를 보여 준다
+        val hidden = ScreenInfo.isPetHidden(this, settings.floorDp)
+        hiddenWarning.visibility = if (hidden) View.VISIBLE else View.GONE
     }
 
     private fun requestNotificationPermissionIfNeeded() {
