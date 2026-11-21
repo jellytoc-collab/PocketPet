@@ -34,11 +34,11 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putInt(KEY_FLOOR, value.coerceAtLeast(0)).apply()
         }
 
-    /** 한 번 걷고 나서 쉬는 시간 (초) */
-    var restSec: Float
-        get() = prefs.getFloat(KEY_REST, DEFAULT_REST_SEC)
+    /** 걷는 빈도: 클수록 자주 걷는다. 0이면 걷지 않는다 */
+    var walkFrequency: Int
+        get() = prefs.getInt(KEY_WALK_FREQ, DEFAULT_WALK_FREQ)
         set(value) {
-            prefs.edit().putFloat(KEY_REST, value.coerceAtLeast(0f)).apply()
+            prefs.edit().putInt(KEY_WALK_FREQ, value.coerceAtLeast(0)).apply()
         }
 
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -54,7 +54,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_PET = "selected_pet"
         const val KEY_SIZE = "size_percent"
         const val KEY_FLOOR = "floor_dp"
-        const val KEY_REST = "rest_sec"
+        const val KEY_WALK_FREQ = "walk_frequency"
 
         const val DEFAULT_PET = "shiro"
 
@@ -63,6 +63,6 @@ class PetSettingsRepository(context: Context) {
         const val MIN_SIZE_PERCENT = 10
 
         const val DEFAULT_FLOOR_DP = 0
-        const val DEFAULT_REST_SEC = 3f
+        const val DEFAULT_WALK_FREQ = 5
     }
 }
