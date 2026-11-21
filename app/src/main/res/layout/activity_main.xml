@@ -97,6 +97,19 @@
                 android:textColor="#7A6A5A"
                 android:textSize="14sp" />
 
+            <!-- 펫이 화면 밖으로 나가면 보이는 빨간 경고 -->
+            <TextView
+                android:id="@+id/hiddenWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/warn_pet_hidden_main"
+                android:textColor="#D93025"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <Space
                 android:layout_width="0dp"
                 android:layout_height="24dp"
