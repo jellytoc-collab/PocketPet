@@ -214,3 +214,194 @@ class PetOverlayManager(
         loopRunning = false
         Choreographer.getInstance().removeFrameCallback(frameCallback)
         sleepSec = sec
+        handler.postDelayed(wakeRunnable, (sec * 1000).toLong())
+    }
+
+    private fun onWake() {
+        if (petView == null || paused) return
+        controller.passTime(sleepSec)
+        if (!checkPermission()) return
+        startLoop()
+    }
+
+    private fun onFrame(frameTimeNanos: Long) {
+        if (lastFrameTimeNanos == 0L) {
+            lastFrameTimeNanos = frameTimeNanos
+            return
+        }
+        // 프레임 사이 시간(초). 잠시 멈췄다 돌아와도 순간이동하지 않도록 최대 0.1초로 제한
+        val dt = ((frameTimeNanos - lastFrameTimeNanos) / 1_000_000_000f).coerceAtMost(0.1f)
+        lastFrameTimeNanos = frameTimeNanos
+
+        controller.update(dt)
+        applyFrame()
+        if (!applyPosition()) return
+
+        // 2초마다 권한이 아직 있는지 확인한다
+        sinceCheckSec += dt
+        if (sinceCheckSec >= PERMISSION_CHECK_SEC) {
+            sinceCheckSec = 0f
+            if (!checkPermission()) return
+        }
+
+        // 쉬는 중이면 잠든다. 권한 확인을 위해 한 번에 최대 2초씩만 잔다
+        val rest = controller.restTimeLeft
+        if (rest > MIN_SLEEP_SEC) {
+            sleep(minOf(rest, PERMISSION_CHECK_SEC))
+        }
+    }
+
+    // ---------- 권한·오류 처리 ----------
+
+    /** 권한이 있으면 true. 없으면 펫을 정리하고 알린다 */
+    private fun checkPermission(): Boolean {
+        if (Settings.canDrawOverlays(context)) return true
+        lost()
+        return false
+    }
+
+    private fun lost() {
+        if (lostReported) return
+        lostReported = true
+        hide()
+        onLost()
+    }
+
+    /** 창 위치·크기를 반영한다. 실패하면(창이 사라짐) 정리하고 false */
+    private fun relayout(): Boolean {
+        val view = petView ?: return false
+        val lp = params ?: return false
+        return try {
+            windowManager.updateViewLayout(view, lp)
+            true
+        } catch (e: IllegalArgumentException) {
+            lost()
+            false
+        }
+    }
+
+    // ---------- 그림 ----------
+
+    private fun loadFrames() {
+        if (idleDrawable != null) return
+        idleDrawable = context.getDrawable(definition.idle)
+        walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
+        flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+    }
+
+    /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
+    private fun loadStrip(res: Int, count: Int): List<Drawable> {
+        val options = BitmapFactory.Options().apply { inScaled = false }
+        val sheet = BitmapFactory.decodeResource(context.resources, res, options)
+            ?: return emptyList()
+        val frameWidth = sheet.width / count
+        val frames = (0 until count).map { i ->
+            val bitmap = Bitmap.createBitmap(sheet, i * frameWidth, 0, frameWidth, sheet.height)
+            BitmapDrawable(context.resources, bitmap)
+        }
+        sheet.recycle()
+        return frames
+    }
+
+    /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
+    private fun computeSize() {
+        val d = idleDrawable ?: context.getDrawable(definition.idle) ?: return
+        if (d.intrinsicHeight <= 0) return
+        heightPx = (sizeDp * density).toInt()
+        widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
+    }
+
+    private fun applyFrame() {
+        val view = petView ?: return
+        val frame = controller.currentFrame()
+        if (frame != currentFrame) {
+            drawableFor(frame)?.let { view.setImageDrawable(it) }
+            currentFrame = frame
+        }
+        // 걷기 그림은 오른쪽을 보고 있으므로, 왼쪽으로 걸을 때만 좌우를 뒤집는다
+        view.scaleX = if (controller.state == PetState.WALK && !controller.facingRight) -1f else 1f
+    }
+
+    private fun drawableFor(frame: Frame): Drawable? = when (frame.anim) {
+        Anim.IDLE -> idleDrawable
+        Anim.WALK -> walkFrames.getOrNull(frame.index)
+        Anim.FLAP -> flapFrames.getOrNull(frame.index)
+    }
+
+    // ---------- 터치 ----------
+
+    private fun onPetTouch(event: MotionEvent): Boolean {
+        val lp = params ?: return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchOffsetX = event.rawX - lp.x
+                touchOffsetY = event.rawY - lp.y
+                controller.startDrag()
+                applyFrame()
+                startLoop()      // 잠들어 있었다면 깨운다
+            }
+            MotionEvent.ACTION_MOVE -> {
+                controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
+                applyPosition()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                controller.release()
+                startLoop()
+            }
+        }
+        return true
+    }
+
+    // ---------- 위치 ----------
+
+    /** 위치를 창에 반영한다. 창이 사라졌으면 false */
+    private fun applyPosition(): Boolean {
+        val lp = params ?: return false
+        val newX = controller.x.toInt()
+        val newY = controller.y.toInt()
+        // 위치가 그대로면 창을 다시 배치하지 않는다
+        if (newX == lp.x && newY == lp.y) return true
+        lp.x = newX
+        lp.y = newY
+        return relayout()
+    }
+
+    private fun updateBounds() {
+        val area = usableArea()
+        val bottomMargin = ((BOTTOM_MARGIN_DP + floorDp) * density).toInt()
+        controller.setBounds(
+            minX = area.left.toFloat(),
+            maxX = (area.right - widthPx).toFloat(),
+            minY = area.top.toFloat(),
+            groundY = (area.bottom - heightPx - bottomMargin).toFloat()
+        )
+    }
+
+    /** 상태 표시줄, 내비게이션 바, 카메라 구멍을 뺀 화면 영역 */
+    private fun usableArea(): Rect {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics = windowManager.currentWindowMetrics
+            val insets = metrics.windowInsets.getInsetsIgnoringVisibility(
+                WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
+            )
+            val b = metrics.bounds
+            Rect(
+                b.left + insets.left,
+                b.top + insets.top,
+                b.right - insets.right,
+                b.bottom - insets.bottom
+            )
+        } else {
+            // Android 10 이하: 시스템 바 크기를 대략적으로 뺀다
+            @Suppress("DEPRECATION")
+            val dm = DisplayMetrics().also { windowManager.defaultDisplay.getRealMetrics(it) }
+            Rect(0, (24 * density).toInt(), dm.widthPixels, dm.heightPixels - (48 * density).toInt())
+        }
+    }
+
+    companion object {
+        private const val BOTTOM_MARGIN_DP = 8
+        private const val PERMISSION_CHECK_SEC = 2f
+        private const val MIN_SLEEP_SEC = 0.3f
+    }
+}
