@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Pocket Pet"
+        android:text="@string/app_name"
         android:textColor="#3B2F2F"
         android:textSize="36sp"
         android:textStyle="bold" />
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="내 화면 위를 돌아다니는 작은 친구"
+        android:text="@string/landing_tagline"
         android:textColor="#7A6A5A"
         android:textSize="16sp" />
 
@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:backgroundTint="#F28C38"
-        android:text="시작하기"
+        android:text="@string/landing_start"
         android:textColor="#FFFFFF"
         android:textSize="18sp" />
 
