@@ -2,16 +2,20 @@ package com.pocketpet
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
@@ -22,9 +26,13 @@ class MainActivity : Activity() {
     private lateinit var petStatus: TextView
     private lateinit var petPreview: ImageView
     private lateinit var petName: TextView
+    private lateinit var drawer: View
+    private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
 
     private var petIndex = 0
+    private var drawerOpen = false
+    private var backCallback: Any? = null   // Android 13 이상에서 쓰는 뒤로가기 처리
     private val refreshStatus = Runnable { updateStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,13 +44,13 @@ class MainActivity : Activity() {
         petStatus = findViewById(R.id.petStatus)
         petPreview = findViewById(R.id.petPreview)
         petName = findViewById(R.id.petName)
+        drawer = findViewById(R.id.drawer)
+        scrim = findViewById(R.id.drawerScrim)
 
         findViewById<Button>(R.id.summonButton).setOnClickListener { summonPet() }
         findViewById<Button>(R.id.dismissButton).setOnClickListener { dismissPet() }
-        findViewById<Button>(R.id.settingsButton).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
 
+        setupDrawer()
         setupPetSelector()
         requestNotificationPermissionIfNeeded()
     }
@@ -55,7 +63,140 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         petStatus.removeCallbacks(refreshStatus)
+        unregisterBackCallback()
         super.onDestroy()
+    }
+
+    // Android 12 이하에서의 뒤로가기: 메뉴가 열려 있으면 메뉴만 닫는다
+    @Deprecated("Android 13 이상은 OnBackInvokedCallback을 쓴다")
+    override fun onBackPressed() {
+        if (drawerOpen) closeDrawer() else super.onBackPressed()
+    }
+
+    // ---------- 메뉴 ----------
+
+    private fun setupDrawer() {
+        findViewById<Button>(R.id.menuButton).setOnClickListener { openDrawer() }
+        scrim.setOnClickListener { closeDrawer() }
+
+        menuItem(R.id.menuSettings) {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+        menuItem(R.id.menuLanguage) { openLanguageSettings() }
+        menuItem(R.id.menuHelp) {
+            startActivity(InfoActivity.intent(this, InfoActivity.TYPE_HELP))
+        }
+        menuItem(R.id.menuAbout) {
+            startActivity(InfoActivity.intent(this, InfoActivity.TYPE_ABOUT))
+        }
+        menuItem(R.id.menuContact) { openContactMail() }
+        menuItem(R.id.menuReview) { openStorePage() }
+        menuItem(R.id.menuPrivacy) {
+            startActivity(InfoActivity.intent(this, InfoActivity.TYPE_PRIVACY))
+        }
+    }
+
+    /** 메뉴 항목을 누르면 메뉴를 닫은 뒤 action을 실행한다 */
+    private fun menuItem(id: Int, action: () -> Unit) {
+        findViewById<View>(id).setOnClickListener { closeDrawer(action) }
+    }
+
+    private fun openDrawer() {
+        if (drawerOpen) return
+        drawerOpen = true
+        val width = DRAWER_WIDTH_DP * resources.displayMetrics.density
+
+        drawer.visibility = View.VISIBLE
+        drawer.translationX = -width
+        drawer.animate().translationX(0f).setDuration(OPEN_MS).start()
+
+        scrim.visibility = View.VISIBLE
+        scrim.alpha = 0f
+        scrim.animate().alpha(1f).setDuration(OPEN_MS).start()
+
+        registerBackCallback()
+    }
+
+    private fun closeDrawer(after: (() -> Unit)? = null) {
+        if (!drawerOpen) {
+            after?.invoke()
+            return
+        }
+        drawerOpen = false
+        val width = DRAWER_WIDTH_DP * resources.displayMetrics.density
+
+        drawer.animate().translationX(-width).setDuration(CLOSE_MS).withEndAction {
+            drawer.visibility = View.GONE
+            after?.invoke()
+        }.start()
+        scrim.animate().alpha(0f).setDuration(CLOSE_MS).withEndAction {
+            scrim.visibility = View.GONE
+        }.start()
+
+        unregisterBackCallback()
+    }
+
+    private fun registerBackCallback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val callback = OnBackInvokedCallback { closeDrawer() }
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                callback
+            )
+            backCallback = callback
+        }
+    }
+
+    private fun unregisterBackCallback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            (backCallback as? OnBackInvokedCallback)?.let {
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
+            }
+        }
+        backCallback = null
+    }
+
+    /** Android 13 이상은 이 앱만의 언어 설정, 그 아래는 폰 전체 언어 설정을 연다 */
+    private fun openLanguageSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Intent(
+                Settings.ACTION_APP_LOCALE_SETTINGS,
+                Uri.fromParts("package", packageName, null)
+            )
+        } else {
+            Intent(Settings.ACTION_LOCALE_SETTINGS)
+        }
+        safeStart(intent)
+    }
+
+    private fun openContactMail() {
+        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(CONTACT_EMAIL))
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.contact_subject))
+        }
+        safeStart(intent)
+    }
+
+    /** 플레이스토어 앱 페이지. 스토어 앱이 없으면 웹으로 연다 */
+    private fun openStorePage() {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+        } catch (e: ActivityNotFoundException) {
+            safeStart(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                )
+            )
+        }
+    }
+
+    private fun safeStart(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.toast_no_app, Toast.LENGTH_SHORT).show()
+        }
     }
 
     // ---------- 펫 선택 ----------
@@ -77,7 +218,7 @@ class MainActivity : Activity() {
     private fun showSelectedPet() {
         val pet = Pets.ALL[petIndex]
         petPreview.setImageResource(pet.idle)
-        petName.text = pet.name
+        petName.setText(pet.nameRes)
     }
 
     // ---------- 소환 ----------
@@ -88,7 +229,7 @@ class MainActivity : Activity() {
             return
         }
         startForegroundService(Intent(this, PetService::class.java))
-        petStatus.text = "펫 상태: 부르는 중..."
+        petStatus.setText(R.string.pet_status_starting)
         refreshStatusSoon()
     }
 
@@ -104,25 +245,23 @@ class MainActivity : Activity() {
     }
 
     private fun openOverlaySettings() {
-        Toast.makeText(
-            this,
-            "목록에서 Pocket Pet을 찾아 '다른 앱 위에 표시'를 허용해 주세요",
-            Toast.LENGTH_LONG
-        ).show()
+        Toast.makeText(this, R.string.permission_guide, Toast.LENGTH_LONG).show()
         val intent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
             Uri.parse("package:$packageName")
         )
-        startActivity(intent)
+        safeStart(intent)
     }
 
     private fun updateStatus() {
-        permissionStatus.text = if (Settings.canDrawOverlays(this)) {
-            "다른 앱 위에 표시 권한: 허용됨 ✅"
-        } else {
-            "다른 앱 위에 표시 권한: 필요함 ⚠️\n소환하기를 누르면 설정 화면으로 이동해요"
-        }
-        petStatus.text = if (PetService.isRunning) "펫 상태: 소환됨" else "펫 상태: 쉬는 중"
+        permissionStatus.setText(
+            if (Settings.canDrawOverlays(this)) R.string.permission_granted
+            else R.string.permission_needed
+        )
+        petStatus.setText(
+            if (PetService.isRunning) R.string.pet_status_running
+            else R.string.pet_status_idle
+        )
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -135,6 +274,12 @@ class MainActivity : Activity() {
     }
 
     companion object {
+        /** 문의 메일을 받을 주소 — 본인 이메일로 바꿔 주세요 */
+        const val CONTACT_EMAIL = "your-email@example.com"
+
         private const val STATUS_DELAY_MS = 700L
+        private const val DRAWER_WIDTH_DP = 280
+        private const val OPEN_MS = 220L
+        private const val CLOSE_MS = 180L
     }
 }
