@@ -25,6 +25,7 @@ class MainActivity : Activity() {
     private lateinit var settings: PetSettingsRepository
 
     private var petIndex = 0
+    private val refreshStatus = Runnable { updateStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +51,11 @@ class MainActivity : Activity() {
         super.onResume()
         // 설정 화면에서 권한을 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
+    }
+
+    override fun onDestroy() {
+        petStatus.removeCallbacks(refreshStatus)
+        super.onDestroy()
     }
 
     // ---------- 펫 선택 ----------
@@ -82,12 +88,19 @@ class MainActivity : Activity() {
             return
         }
         startForegroundService(Intent(this, PetService::class.java))
-        petStatus.text = "펫 상태: 소환됨"
+        petStatus.text = "펫 상태: 부르는 중..."
+        refreshStatusSoon()
     }
 
     private fun dismissPet() {
         stopService(Intent(this, PetService::class.java))
-        petStatus.text = "펫 상태: 쉬는 중"
+        refreshStatusSoon()
+    }
+
+    /** 서비스가 실제로 시작·종료될 시간을 조금 기다린 뒤 상태를 다시 표시한다 */
+    private fun refreshStatusSoon() {
+        petStatus.removeCallbacks(refreshStatus)
+        petStatus.postDelayed(refreshStatus, STATUS_DELAY_MS)
     }
 
     private fun openOverlaySettings() {
@@ -119,5 +132,9 @@ class MainActivity : Activity() {
         ) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
+    }
+
+    companion object {
+        private const val STATUS_DELAY_MS = 700L
     }
 }
