@@ -26,10 +26,14 @@ class PetController(
     var facingRight = true
         private set
 
-    /** 한 번 걷고 나서 쉬는 시간 (초) */
-    var restSec = 3f
+    /** 걷는 빈도: 클수록 자주 걷는다. 0이면 걷지 않는다 */
+    var walkFrequency = 5
         set(value) {
-            field = value.coerceAtLeast(0f)
+            val newValue = value.coerceAtLeast(0)
+            if (newValue == field) return
+            field = newValue
+            // 쉬는 도중에 바뀌면 새 빈도로 쉬는 시간을 다시 정한다
+            if (state == PetState.IDLE) stateTimeLeft = randomRest()
         }
 
     /** 쉬는 중이면 남은 쉬는 시간(초), 아니면 0 */
@@ -160,14 +164,28 @@ class PetController(
         enter(PetState.WALK)
     }
 
+    /**
+     * 쉬는 시간을 무작위로 정한다.
+     * 평균은 (15 ÷ 빈도)초이고, 매번 그 0.5 ~ 1.5배 사이에서 달라진다.
+     * 빈도가 0이면 걷지 않고 계속 쉰다.
+     */
+    private fun randomRest(): Float {
+        if (walkFrequency <= 0) return Float.POSITIVE_INFINITY
+        val average = REST_BASE_SEC / walkFrequency
+        return average * (0.5f + random.nextFloat())
+    }
+
     private fun enter(newState: PetState) {
         state = newState
         animTime = 0f
         stateTimeLeft = when (newState) {
-            // 쉬는 시간: 설정값의 0.6 ~ 1.4배 사이에서 조금씩 달라진다
-            PetState.IDLE -> restSec * (0.6f + random.nextFloat() * 0.8f)
+            PetState.IDLE -> randomRest()
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
             PetState.DRAGGED, PetState.FALL -> 0f               // 시간 제한 없음
         }
+    }
+
+    companion object {
+        private const val REST_BASE_SEC = 15f
     }
 }
