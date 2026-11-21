@@ -42,20 +42,25 @@ class PetController(
 
     private var minX = 0f
     private var maxX = 0f
-    private var minY = 0f
-    private var groundY = 0f
+    private var minY = 0f            // 화면에서 보이는 맨 위 (상태 표시줄 바로 아래)
+    private var groundY = 0f         // 바닥. 화면 맨 위보다 높을 수도 있다
     private var velocityY = 0f       // 떨어지는 속도 (초당 px)
     private var stateTimeLeft = 0f   // 현재 행동의 남은 시간 (초)
     private var animTime = 0f        // 현재 행동을 시작한 뒤 지난 시간 (초)
+
+    /** 끌 수 있는 가장 높은 위치: 화면 맨 위와 바닥 중 더 높은 쪽 */
+    private val topLimit: Float
+        get() = minOf(minY, groundY)
 
     fun setBounds(minX: Float, maxX: Float, minY: Float, groundY: Float) {
         this.minX = minX
         this.maxX = maxOf(minX, maxX)
         this.minY = minY
-        this.groundY = maxOf(minY, groundY)   // 바닥이 화면보다 높으면 화면 맨 위가 바닥
+        // 바닥 높이에 제한을 두지 않는다. 화면 위로 넘어가면 점점 가려진다
+        this.groundY = groundY
         x = x.coerceIn(this.minX, this.maxX)
         y = if (state == PetState.DRAGGED || state == PetState.FALL) {
-            y.coerceIn(this.minY, this.groundY)
+            y.coerceIn(topLimit, this.groundY)
         } else {
             this.groundY
         }
@@ -82,7 +87,7 @@ class PetController(
     fun dragTo(newX: Float, newY: Float) {
         if (state != PetState.DRAGGED) return
         x = newX.coerceIn(minX, maxX)
-        y = newY.coerceIn(minY, groundY)
+        y = newY.coerceIn(topLimit, groundY)
     }
 
     /** 손가락을 뗀 순간: 바닥으로 떨어지기 시작 */
