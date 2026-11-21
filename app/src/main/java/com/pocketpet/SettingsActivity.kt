@@ -26,27 +26,27 @@ class SettingsActivity : Activity() {
             barId = R.id.sizeSeekBar,
             barMin = 50,
             barMax = 200,
-            minValue = PetSettingsRepository.MIN_SIZE_PERCENT.toFloat(),
-            initial = settings.sizePercent.toFloat()
-        ) { settings.sizePercent = it.roundToInt() }
+            minValue = PetSettingsRepository.MIN_SIZE_PERCENT,
+            initial = settings.sizePercent
+        ) { settings.sizePercent = it }
 
         bindRow(
             inputId = R.id.floorInput,
             barId = R.id.floorSeekBar,
             barMin = 0,
             barMax = 500,
-            minValue = 0f,
-            initial = settings.floorDp.toFloat()
-        ) { settings.floorDp = it.roundToInt() }
+            minValue = 0,
+            initial = settings.floorDp
+        ) { settings.floorDp = it }
 
         bindRow(
-            inputId = R.id.restInput,
-            barId = R.id.restSeekBar,
+            inputId = R.id.walkFreqInput,
+            barId = R.id.walkFreqSeekBar,
             barMin = 0,
-            barMax = 20,
-            minValue = 0f,
-            initial = settings.restSec
-        ) { settings.restSec = it }
+            barMax = 10,
+            minValue = 0,
+            initial = settings.walkFrequency
+        ) { settings.walkFrequency = it }
     }
 
     /**
@@ -58,9 +58,9 @@ class SettingsActivity : Activity() {
         barId: Int,
         barMin: Int,
         barMax: Int,
-        minValue: Float,
-        initial: Float,
-        save: (Float) -> Unit
+        minValue: Int,
+        initial: Int,
+        save: (Int) -> Unit
     ) {
         val input = findViewById<EditText>(inputId)
         val bar = findViewById<SeekBar>(barId)
@@ -68,8 +68,8 @@ class SettingsActivity : Activity() {
 
         bar.min = barMin
         bar.max = barMax
-        bar.progress = initial.roundToInt().coerceIn(barMin, barMax)
-        input.setText(format(initial))
+        bar.progress = initial.coerceIn(barMin, barMax)
+        input.setText(initial.toString())
 
         bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -78,7 +78,7 @@ class SettingsActivity : Activity() {
                 input.setText(progress.toString())
                 input.setSelection(input.text.length)
                 syncing = false
-                save(progress.toFloat())
+                save(progress)
             }
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
@@ -88,9 +88,9 @@ class SettingsActivity : Activity() {
             override fun afterTextChanged(s: Editable?) {
                 if (syncing) return
                 val typed = s?.toString()?.toFloatOrNull() ?: return   // 비어 있으면 무시
-                val value = maxOf(typed, minValue)
+                val value = maxOf(typed.roundToInt(), minValue)
                 syncing = true
-                bar.progress = value.roundToInt().coerceIn(barMin, barMax)
+                bar.progress = value.coerceIn(barMin, barMax)
                 syncing = false
                 save(value)
             }
@@ -98,8 +98,4 @@ class SettingsActivity : Activity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
-
-    /** 3.0은 3으로, 2.5는 2.5로 보여 준다 */
-    private fun format(value: Float): String =
-        if (value == value.roundToInt().toFloat()) value.roundToInt().toString() else value.toString()
 }
