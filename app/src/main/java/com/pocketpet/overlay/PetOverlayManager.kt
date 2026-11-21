@@ -8,10 +8,14 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.Choreographer
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ImageView
@@ -21,15 +25,21 @@ import com.pocketpet.pet.PetController
 import com.pocketpet.pet.PetDefinition
 import com.pocketpet.pet.PetState
 
+/**
+ * 펫 오버레이 창을 만들고, 움직이고, 정리한다.
+ * onLost: 권한이 꺼지는 등 펫을 더 이상 표시할 수 없게 됐을 때 한 번 호출된다.
+ */
 class PetOverlayManager(
     private val context: Context,
-    private val definition: PetDefinition
+    private val definition: PetDefinition,
+    private val onLost: () -> Unit
 ) {
 
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val density = context.resources.displayMetrics.density
     private val controller = PetController(definition, density)
+    private val handler = Handler(Looper.getMainLooper())
 
     // 그림은 처음 소환할 때 한 번만 불러온다
     private var idleDrawable: Drawable? = null
@@ -43,8 +53,13 @@ class PetOverlayManager(
     private var sizeDp = definition.heightDp
     private var floorDp = 0
     private var currentFrame: Frame? = null
+
+    private var loopRunning = false      // 매 프레임 갱신 중인지
+    private var paused = false           // 화면이 꺼져서 멈춘 상태인지
+    private var sleepSec = 0f            // 잠든 시간 (초)
     private var lastFrameTimeNanos = 0L
-    private var running = false
+    private var sinceCheckSec = 0f       // 마지막 권한 확인 후 지난 시간
+    private var lostReported = false
 
     // 누른 지점과 펫 왼쪽 위 모서리 사이의 거리 (순간이동 방지)
     private var touchOffsetX = 0f
@@ -52,24 +67,35 @@ class PetOverlayManager(
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
-            if (!running) return
+            if (!loopRunning) return
             onFrame(frameTimeNanos)
-            Choreographer.getInstance().postFrameCallback(this)
+            if (loopRunning) Choreographer.getInstance().postFrameCallback(this)
         }
     }
 
-    fun show() {
+    private val wakeRunnable = Runnable { onWake() }
+
+    /** 펫을 띄운다. 성공하면 true */
+    fun show(): Boolean {
         // 이미 펫이 떠 있으면 새로 만들지 않는다 (중복 생성 방지)
-        if (petView != null) return
+        if (petView != null) return true
+        if (!Settings.canDrawOverlays(context)) return false
 
         loadFrames()
-        val idle = idleDrawable ?: return
+        val idle = idleDrawable ?: return false
         computeSize()
 
         val view = ImageView(context).apply {
             setImageDrawable(idle)
             setOnTouchListener { _, event -> onPetTouch(event) }
         }
+        // 시스템이 창을 강제로 없애면 알아챈다
+        view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {}
+            override fun onViewDetachedFromWindow(v: View) {
+                if (petView === v) lost()
+            }
+        })
         currentFrame = Frame(Anim.IDLE, 0)
 
         val lp = WindowManager.LayoutParams(
@@ -88,27 +114,48 @@ class PetOverlayManager(
         lp.x = controller.x.toInt()
         lp.y = controller.y.toInt()
 
-        windowManager.addView(view, lp)
+        try {
+            windowManager.addView(view, lp)
+        } catch (e: RuntimeException) {
+            // 권한이 막 꺼졌거나 창을 만들 수 없는 경우
+            return false
+        }
         petView = view
         params = lp
+        lostReported = false
 
-        running = true
-        lastFrameTimeNanos = 0L
-        Choreographer.getInstance().postFrameCallback(frameCallback)
+        startLoop()
+        return true
     }
 
+    /** 펫을 정리한다. 여러 번 불러도 안전하다 */
     fun hide() {
-        running = false
-        Choreographer.getInstance().removeFrameCallback(frameCallback)
-        petView?.let { view ->
+        stopLoop()
+        val view = petView
+        petView = null          // 먼저 비워서 '강제로 없어짐'으로 오해하지 않게 한다
+        params = null
+        view?.let {
             try {
-                windowManager.removeView(view)
+                windowManager.removeView(it)
             } catch (e: IllegalArgumentException) {
                 // 이미 제거된 경우는 무시한다
             }
         }
-        petView = null
-        params = null
+    }
+
+    /** 화면이 꺼졌을 때: 계산을 멈춘다 */
+    fun pause() {
+        paused = true
+        stopLoop()
+    }
+
+    /** 화면이 켜졌을 때: 권한을 확인하고 다시 움직인다 */
+    fun resume() {
+        if (!paused) return
+        paused = false
+        if (petView == null) return
+        if (!checkPermission()) return
+        startLoop()
     }
 
     /** 화면 크기가 바뀌었을 때(회전 등) 이동 범위를 다시 계산한다 */
@@ -121,21 +168,20 @@ class PetOverlayManager(
     /** 크기 설정이 바뀌었을 때 창 크기와 이동 범위를 다시 계산한다 */
     fun setSize(newSizeDp: Int) {
         sizeDp = newSizeDp
-        val view = petView ?: return   // 아직 소환 전이면 값만 기억해 둔다
-        val lp = params ?: return
+        val lp = params ?: return     // 아직 소환 전이면 값만 기억해 둔다
         computeSize()
         lp.width = widthPx
         lp.height = heightPx
         updateBounds()
         lp.x = controller.x.toInt()
         lp.y = controller.y.toInt()
-        windowManager.updateViewLayout(view, lp)
+        relayout()
     }
 
     /** 바닥 높이 설정이 바뀌었을 때 바닥 위치를 다시 계산한다 */
     fun setFloor(newFloorDp: Int) {
         floorDp = newFloorDp
-        if (petView == null) return    // 아직 소환 전이면 값만 기억해 둔다
+        if (petView == null) return   // 아직 소환 전이면 값만 기억해 둔다
         updateBounds()
         applyPosition()
     }
@@ -144,51 +190,36 @@ class PetOverlayManager(
         controller.restSec = sec
     }
 
-    private fun loadFrames() {
-        if (idleDrawable != null) return
-        idleDrawable = context.getDrawable(definition.idle)
-        walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
-        flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+    // ---------- 움직임 반복 ----------
+
+    private fun startLoop() {
+        if (petView == null || paused) return
+        handler.removeCallbacks(wakeRunnable)
+        if (loopRunning) return
+        loopRunning = true
+        lastFrameTimeNanos = 0L
+        Choreographer.getInstance().postFrameCallback(frameCallback)
     }
 
-    /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
-    private fun loadStrip(res: Int, count: Int): List<Drawable> {
-        val options = BitmapFactory.Options().apply { inScaled = false }
-        val sheet = BitmapFactory.decodeResource(context.resources, res, options)
-        val frameWidth = sheet.width / count
-        val frames = (0 until count).map { i ->
-            val bitmap = Bitmap.createBitmap(sheet, i * frameWidth, 0, frameWidth, sheet.height)
-            BitmapDrawable(context.resources, bitmap)
-        }
-        sheet.recycle()
-        return frames
+    private fun stopLoop() {
+        loopRunning = false
+        Choreographer.getInstance().removeFrameCallback(frameCallback)
+        handler.removeCallbacks(wakeRunnable)
     }
 
-    /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
-    private fun computeSize() {
-        val d = idleDrawable ?: context.getDrawable(definition.idle) ?: return
-        heightPx = (sizeDp * density).toInt()
-        widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
+    /** 쉬는 동안은 매 프레임 계산하지 않고 잠든다 (배터리 절약) */
+    private fun sleep(sec: Float) {
+        loopRunning = false
+        Choreographer.getInstance().removeFrameCallback(frameCallback)
+        sleepSec = sec
+        handler.postDelayed(wakeRunnable, (sec * 1000).toLong())
     }
 
-    private fun onPetTouch(event: MotionEvent): Boolean {
-        val lp = params ?: return false
-        when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                touchOffsetX = event.rawX - lp.x
-                touchOffsetY = event.rawY - lp.y
-                controller.startDrag()
-                applyFrame()
-            }
-            MotionEvent.ACTION_MOVE -> {
-                controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
-                applyPosition()
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                controller.release()
-            }
-        }
-        return true
+    private fun onWake() {
+        if (petView == null || paused) return
+        controller.passTime(sleepSec)
+        if (!checkPermission()) return
+        startLoop()
     }
 
     private fun onFrame(frameTimeNanos: Long) {
@@ -202,7 +233,80 @@ class PetOverlayManager(
 
         controller.update(dt)
         applyFrame()
-        applyPosition()
+        if (!applyPosition()) return
+
+        // 2초마다 권한이 아직 있는지 확인한다
+        sinceCheckSec += dt
+        if (sinceCheckSec >= PERMISSION_CHECK_SEC) {
+            sinceCheckSec = 0f
+            if (!checkPermission()) return
+        }
+
+        // 쉬는 중이면 잠든다. 권한 확인을 위해 한 번에 최대 2초씩만 잔다
+        val rest = controller.restTimeLeft
+        if (rest > MIN_SLEEP_SEC) {
+            sleep(minOf(rest, PERMISSION_CHECK_SEC))
+        }
+    }
+
+    // ---------- 권한·오류 처리 ----------
+
+    /** 권한이 있으면 true. 없으면 펫을 정리하고 알린다 */
+    private fun checkPermission(): Boolean {
+        if (Settings.canDrawOverlays(context)) return true
+        lost()
+        return false
+    }
+
+    private fun lost() {
+        if (lostReported) return
+        lostReported = true
+        hide()
+        onLost()
+    }
+
+    /** 창 위치·크기를 반영한다. 실패하면(창이 사라짐) 정리하고 false */
+    private fun relayout(): Boolean {
+        val view = petView ?: return false
+        val lp = params ?: return false
+        return try {
+            windowManager.updateViewLayout(view, lp)
+            true
+        } catch (e: IllegalArgumentException) {
+            lost()
+            false
+        }
+    }
+
+    // ---------- 그림 ----------
+
+    private fun loadFrames() {
+        if (idleDrawable != null) return
+        idleDrawable = context.getDrawable(definition.idle)
+        walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
+        flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+    }
+
+    /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
+    private fun loadStrip(res: Int, count: Int): List<Drawable> {
+        val options = BitmapFactory.Options().apply { inScaled = false }
+        val sheet = BitmapFactory.decodeResource(context.resources, res, options)
+            ?: return emptyList()
+        val frameWidth = sheet.width / count
+        val frames = (0 until count).map { i ->
+            val bitmap = Bitmap.createBitmap(sheet, i * frameWidth, 0, frameWidth, sheet.height)
+            BitmapDrawable(context.resources, bitmap)
+        }
+        sheet.recycle()
+        return frames
+    }
+
+    /** 그림의 가로세로 비율을 유지해서 창 크기를 정한다 */
+    private fun computeSize() {
+        val d = idleDrawable ?: context.getDrawable(definition.idle) ?: return
+        if (d.intrinsicHeight <= 0) return
+        heightPx = (sizeDp * density).toInt()
+        widthPx = heightPx * d.intrinsicWidth / d.intrinsicHeight
     }
 
     private fun applyFrame() {
@@ -222,16 +326,42 @@ class PetOverlayManager(
         Anim.FLAP -> flapFrames.getOrNull(frame.index)
     }
 
-    private fun applyPosition() {
-        val view = petView ?: return
-        val lp = params ?: return
+    // ---------- 터치 ----------
+
+    private fun onPetTouch(event: MotionEvent): Boolean {
+        val lp = params ?: return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchOffsetX = event.rawX - lp.x
+                touchOffsetY = event.rawY - lp.y
+                controller.startDrag()
+                applyFrame()
+                startLoop()      // 잠들어 있었다면 깨운다
+            }
+            MotionEvent.ACTION_MOVE -> {
+                controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
+                applyPosition()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                controller.release()
+                startLoop()
+            }
+        }
+        return true
+    }
+
+    // ---------- 위치 ----------
+
+    /** 위치를 창에 반영한다. 창이 사라졌으면 false */
+    private fun applyPosition(): Boolean {
+        val lp = params ?: return false
         val newX = controller.x.toInt()
         val newY = controller.y.toInt()
         // 위치가 그대로면 창을 다시 배치하지 않는다
-        if (newX == lp.x && newY == lp.y) return
+        if (newX == lp.x && newY == lp.y) return true
         lp.x = newX
         lp.y = newY
-        windowManager.updateViewLayout(view, lp)
+        return relayout()
     }
 
     private fun updateBounds() {
@@ -269,5 +399,7 @@ class PetOverlayManager(
 
     companion object {
         private const val BOTTOM_MARGIN_DP = 8
+        private const val PERMISSION_CHECK_SEC = 2f
+        private const val MIN_SLEEP_SEC = 0.3f
     }
 }
