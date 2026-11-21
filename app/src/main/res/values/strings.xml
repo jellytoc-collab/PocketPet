@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pocket Pet</string>
+
+    <!-- 랜딩 -->
+    <string name="landing_tagline">Little friends that wander your screen</string>
+    <string name="landing_start">Start</string>
+
+    <!-- 펫 선택 화면 -->
+    <string name="main_title">Choose a pet</string>
+    <string name="summon">Summon</string>
+    <string name="dismiss">Send back</string>
+    <string name="pet_status_running">Status: on screen</string>
+    <string name="pet_status_idle">Status: resting</string>
+    <string name="pet_status_starting">Status: calling…</string>
+    <string name="permission_granted">Display over other apps: allowed ✅</string>
+    <string name="permission_needed">Display over other apps: needed ⚠️\nTap Summon to open the settings</string>
+    <string name="permission_guide">Find Pocket Pet in the list and allow ‘Display over other apps’</string>
+
+    <!-- 메뉴 -->
+    <string name="menu_settings">⚙  Settings</string>
+    <string name="menu_language">🌐  Language</string>
+    <string name="menu_help">❓  How to use</string>
+    <string name="menu_about">ℹ  About</string>
+    <string name="menu_contact">✉  Contact us</string>
+    <string name="menu_review">⭐  Write a review</string>
+    <string name="menu_privacy">🔒  Privacy policy</string>
+
+    <!-- 설정 -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_size">Size</string>
+    <string name="settings_floor">Floor height</string>
+    <string name="settings_walk_freq">Walking frequency</string>
+    <string name="settings_walk_freq_hint">Higher numbers mean more walking. At 0 the pet just stands still.</string>
+
+    <!-- 정보 화면 제목 -->
+    <string name="title_help">How to use</string>
+    <string name="title_about">About</string>
+    <string name="title_privacy">Privacy policy</string>
+
+    <!-- 알림·안내 -->
+    <string name="notification_channel">Pet status</string>
+    <string name="notification_text">%1$s is on your screen</string>
+    <string name="toast_permission_lost">Your pet went home because ‘Display over other apps’ was turned off</string>
+    <string name="toast_cannot_show">The pet cannot be shown on the screen</string>
+    <string name="toast_no_app">No app found to open this</string>
+    <string name="contact_subject">[Pocket Pet] Question</string>
+
+    <!-- 펫 이름 -->
+    <string name="pet_shiro">Shiro</string>
+    <string name="pet_kuro">Kuro</string>
+    <string name="pet_momo">Momo</string>
+    <string name="pet_luna">Luna</string>
+    <string name="pet_tashu">Tashu</string>
+    <string name="pet_mashi">Mashi</string>
+    <string name="pet_hari">Hari</string>
+    <string name="pet_miru">Miru</string>
+    <string name="pet_leon">Leon</string>
+    <string name="pet_noel">Noel</string>
+    <string name="pet_neon">Neon</string>
+    <string name="pet_yuki">Yuki</string>
+    <string name="pet_maren">Maren</string>
+
+    <!-- 사용법 -->
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app. You can also tap the notification to open the app.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+
+    <!-- 앱 정보 -->
+    <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
+
+    <!-- 개인정보처리방침 -->
+    <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
+</resources>
