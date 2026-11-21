@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="설정"
+                android:text="@string/settings_title"
                 android:textColor="#3B2F2F"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -48,7 +48,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="크기"
+                android:text="@string/settings_size"
                 android:textColor="#3B2F2F"
                 android:textSize="18sp" />
 
@@ -91,7 +91,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="바닥 높이"
+                android:text="@string/settings_floor"
                 android:textColor="#3B2F2F"
                 android:textSize="18sp" />
 
@@ -134,7 +134,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="걷는 빈도"
+                android:text="@string/settings_walk_freq"
                 android:textColor="#3B2F2F"
                 android:textSize="18sp" />
 
@@ -166,7 +166,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="숫자가 클수록 자주 걸어요. 0이면 걷지 않고 서 있어요."
+            android:text="@string/settings_walk_freq_hint"
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
 
