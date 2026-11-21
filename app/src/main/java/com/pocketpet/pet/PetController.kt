@@ -32,6 +32,10 @@ class PetController(
             field = value.coerceAtLeast(0f)
         }
 
+    /** 쉬는 중이면 남은 쉬는 시간(초), 아니면 0 */
+    val restTimeLeft: Float
+        get() = if (state == PetState.IDLE) stateTimeLeft.coerceAtLeast(0f) else 0f
+
     private var minX = 0f
     private var maxX = 0f
     private var minY = 0f
@@ -57,6 +61,11 @@ class PetController(
         x = (minX + maxX) / 2f
         y = groundY
         enter(PetState.IDLE)
+    }
+
+    /** 잠들어 있던 동안 흐른 시간을 쉬는 시간에서 뺀다 */
+    fun passTime(sec: Float) {
+        if (state == PetState.IDLE) stateTimeLeft -= sec
     }
 
     /** 손가락으로 누른 순간: 공중에서 휘적거리기 시작 */
