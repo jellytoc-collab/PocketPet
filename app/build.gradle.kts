@@ -6,16 +6,19 @@ plugins {
 // GitHub 비밀 금고에서 꺼낸 도장 파일 위치 (없으면 null)
 val keystorePath: String? = System.getenv("KEYSTORE_PATH")
 
+// GitHub 빌드 번호를 버전 번호로 쓴다 (플레이스토어는 매번 더 큰 번호가 필요)
+val buildNumber: Int = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+
 android {
     namespace = "com.pocketpet"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.pocketpet"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "0.1"
+        targetSdk = 36
+        versionCode = buildNumber
+        versionName = "0.1.$buildNumber"
     }
 
     signingConfigs {
@@ -37,6 +40,8 @@ android {
             }
         }
         getByName("release") {
+            // 플레이스토어에 올릴 버전
+            isMinifyEnabled = false
             if (keystorePath != null) {
                 signingConfig = signingConfigs.getByName("upload")
             }
