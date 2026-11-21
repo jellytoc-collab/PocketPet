@@ -118,9 +118,9 @@ class PetService : Service() {
         stopping = true
         isRunning = false
         val message = if (!Settings.canDrawOverlays(this)) {
-            "'다른 앱 위에 표시' 권한이 꺼져서 펫이 돌아갔어요"
+            R.string.toast_permission_lost
         } else {
-            "펫을 화면에 표시할 수 없어요"
+            R.string.toast_cannot_show
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         stopSelf()
@@ -171,7 +171,7 @@ class PetService : Service() {
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "펫 실행 상태",
+            getString(R.string.notification_channel),
             NotificationManager.IMPORTANCE_LOW
         )
         getSystemService(NotificationManager::class.java)
@@ -185,10 +185,11 @@ class PetService : Service() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
+        val petName = getString(currentPet.nameRes)
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Pocket Pet")
-            .setContentText("${currentPet.name}가 화면 위에 나와 있어요")
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.notification_text, petName))
             .setContentIntent(openApp)
             .setOngoing(true)
             .build()
