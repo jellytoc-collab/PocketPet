@@ -5,7 +5,7 @@ import com.pocketpet.R
 /** 펫 한 마리의 외형과 행동 설정 */
 data class PetDefinition(
     val id: String,
-    val name: String,
+    val nameRes: Int,               // 이름 (폰 언어에 따라 바뀜)
     val idle: Int,                  // 가만히 있기 그림 (1장)
     val walkStrip: Int,             // 걷기 컷을 가로로 이어 붙인 그림
     val flapStrip: Int,             // 팔 휘적거리기 컷을 가로로 이어 붙인 그림
@@ -20,19 +20,19 @@ data class PetDefinition(
 
 object Pets {
     val ALL = listOf(
-        PetDefinition("shiro", "시로", R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap),
-        PetDefinition("kuro", "쿠로", R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap),
-        PetDefinition("momo", "모모", R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap),
-        PetDefinition("luna", "루나", R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap),
-        PetDefinition("tashu", "타슈", R.drawable.tashu_idle, R.drawable.tashu_walk, R.drawable.tashu_flap),
-        PetDefinition("mashi", "마시", R.drawable.mashi_idle, R.drawable.mashi_walk, R.drawable.mashi_flap),
-        PetDefinition("hari", "하리", R.drawable.hari_idle, R.drawable.hari_walk, R.drawable.hari_flap),
-        PetDefinition("miru", "미루", R.drawable.miru_idle, R.drawable.miru_walk, R.drawable.miru_flap),
-        PetDefinition("leon", "레온", R.drawable.leon_idle, R.drawable.leon_walk, R.drawable.leon_flap),
-        PetDefinition("noel", "노엘", R.drawable.noel_idle, R.drawable.noel_walk, R.drawable.noel_flap),
-        PetDefinition("neon", "네온", R.drawable.neon_idle, R.drawable.neon_walk, R.drawable.neon_flap),
-        PetDefinition("yuki", "유키", R.drawable.yuki_idle, R.drawable.yuki_walk, R.drawable.yuki_flap),
-        PetDefinition("maren", "마렌", R.drawable.maren_idle, R.drawable.maren_walk, R.drawable.maren_flap)
+        PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap),
+        PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap),
+        PetDefinition("momo", R.string.pet_momo, R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap),
+        PetDefinition("luna", R.string.pet_luna, R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap),
+        PetDefinition("tashu", R.string.pet_tashu, R.drawable.tashu_idle, R.drawable.tashu_walk, R.drawable.tashu_flap),
+        PetDefinition("mashi", R.string.pet_mashi, R.drawable.mashi_idle, R.drawable.mashi_walk, R.drawable.mashi_flap),
+        PetDefinition("hari", R.string.pet_hari, R.drawable.hari_idle, R.drawable.hari_walk, R.drawable.hari_flap),
+        PetDefinition("miru", R.string.pet_miru, R.drawable.miru_idle, R.drawable.miru_walk, R.drawable.miru_flap),
+        PetDefinition("leon", R.string.pet_leon, R.drawable.leon_idle, R.drawable.leon_walk, R.drawable.leon_flap),
+        PetDefinition("noel", R.string.pet_noel, R.drawable.noel_idle, R.drawable.noel_walk, R.drawable.noel_flap),
+        PetDefinition("neon", R.string.pet_neon, R.drawable.neon_idle, R.drawable.neon_walk, R.drawable.neon_flap),
+        PetDefinition("yuki", R.string.pet_yuki, R.drawable.yuki_idle, R.drawable.yuki_walk, R.drawable.yuki_flap),
+        PetDefinition("maren", R.string.pet_maren, R.drawable.maren_idle, R.drawable.maren_walk, R.drawable.maren_flap)
     )
 
     fun byId(id: String?): PetDefinition = ALL.firstOrNull { it.id == id } ?: ALL.first()
