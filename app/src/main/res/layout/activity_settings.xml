@@ -122,7 +122,7 @@
             android:progressTint="#F28C38"
             android:thumbTint="#F28C38" />
 
-        <!-- 걷는 주기 -->
+        <!-- 걷는 빈도 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -134,31 +134,28 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="걷는 주기"
+                android:text="걷는 빈도"
                 android:textColor="#3B2F2F"
                 android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/restInput"
+                android:id="@+id/walkFreqInput"
                 android:layout_width="96dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:inputType="numberDecimal"
+                android:inputType="number"
                 android:maxLength="5"
                 android:selectAllOnFocus="true"
                 android:textSize="18sp" />
 
-            <TextView
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="초"
-                android:textColor="#7A6A5A"
-                android:textSize="16sp" />
+            <!-- 다른 줄과 숫자 칸 위치를 맞추기 위한 빈 공간 -->
+            <Space
+                android:layout_width="44dp"
+                android:layout_height="0dp" />
         </LinearLayout>
 
         <SeekBar
-            android:id="@+id/restSeekBar"
+            android:id="@+id/walkFreqSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -169,7 +166,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="한 번 걷고 나서 쉬는 시간이에요. 0이면 쉬지 않고 걸어요."
+            android:text="숫자가 클수록 자주 걸어요. 0이면 걷지 않고 서 있어요."
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
 
