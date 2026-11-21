@@ -5,13 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
+import android.widget.Toast
 import com.pocketpet.MainActivity
 import com.pocketpet.R
 import com.pocketpet.data.PetSettingsRepository
@@ -24,6 +28,7 @@ class PetService : Service() {
     private lateinit var settings: PetSettingsRepository
     private lateinit var currentPet: PetDefinition
     private lateinit var overlayManager: PetOverlayManager
+    private var stopping = false
 
     // 설정 화면에서 값이 바뀌면 실행 중인 펫에 바로 반영한다
     private val settingsListener =
@@ -40,25 +45,41 @@ class PetService : Service() {
             }
         }
 
+    // 화면이 꺼지면 멈추고, 켜지면 다시 움직인다 (배터리 절약)
+    private val screenReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                Intent.ACTION_SCREEN_OFF -> overlayManager.pause()
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> overlayManager.resume()
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         settings = PetSettingsRepository(this)
         currentPet = Pets.byId(settings.selectedPetId)
         overlayManager = createOverlay(currentPet)
         settings.registerListener(settingsListener)
+        registerScreenReceiver()
         createNotificationChannel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startAsForeground()
-
-        if (!Settings.canDrawOverlays(this)) {
-            // 권한이 없으면 펫을 띄우지 않고 서비스를 끝낸다
+        try {
+            startAsForeground()
+        } catch (e: Exception) {
+            // 시스템이 포그라운드 실행을 허용하지 않은 경우
             stopSelf()
             return START_NOT_STICKY
         }
 
-        overlayManager.show()
+        if (!overlayManager.show()) {
+            // 권한이 없거나 창을 만들 수 없으면 정리한다
+            onPetLost()
+            return START_NOT_STICKY
+        }
+
         isRunning = true
         return START_NOT_STICKY
     }
@@ -71,6 +92,11 @@ class PetService : Service() {
 
     override fun onDestroy() {
         settings.unregisterListener(settingsListener)
+        try {
+            unregisterReceiver(screenReceiver)
+        } catch (e: IllegalArgumentException) {
+            // 이미 해제된 경우는 무시한다
+        }
         overlayManager.hide()
         isRunning = false
         super.onDestroy()
@@ -79,11 +105,25 @@ class PetService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createOverlay(pet: PetDefinition): PetOverlayManager {
-        return PetOverlayManager(this, pet).apply {
+        return PetOverlayManager(this, pet) { onPetLost() }.apply {
             setSize(settings.sizeDp)
             setFloor(settings.floorDp)
             setRestSec(settings.restSec)
         }
+    }
+
+    /** 펫을 더 이상 표시할 수 없을 때: 안내하고 서비스를 끝낸다 */
+    private fun onPetLost() {
+        if (stopping) return
+        stopping = true
+        isRunning = false
+        val message = if (!Settings.canDrawOverlays(this)) {
+            "'다른 앱 위에 표시' 권한이 꺼져서 펫이 돌아갔어요"
+        } else {
+            "펫을 화면에 표시할 수 없어요"
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        stopSelf()
     }
 
     /** 펫이 나와 있는 동안 다른 펫을 고르면 바로 바꿔 띄운다 */
@@ -93,9 +133,25 @@ class PetService : Service() {
         currentPet = pet
         overlayManager = createOverlay(pet)
         if (isRunning) {
-            overlayManager.show()
+            if (!overlayManager.show()) {
+                onPetLost()
+                return
+            }
             getSystemService(NotificationManager::class.java)
                 .notify(NOTIFICATION_ID, buildNotification())
+        }
+    }
+
+    private fun registerScreenReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(screenReceiver, filter)
         }
     }
 
@@ -130,7 +186,7 @@ class PetService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         return Notification.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.shiro_idle)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Pocket Pet")
             .setContentText("${currentPet.name}가 화면 위에 나와 있어요")
             .setContentIntent(openApp)
