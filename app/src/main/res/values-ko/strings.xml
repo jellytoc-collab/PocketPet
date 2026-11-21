@@ -46,6 +46,10 @@
     <string name="toast_no_app">이 기능을 열 수 있는 앱이 없어요</string>
     <string name="contact_subject">[Pocket Pet] 문의</string>
 
+    <!-- 경고 -->
+    <string name="warn_pet_hidden">⚠ 바닥이 너무 높아서 펫이 화면 밖에 있어요. 소환해도 보이지 않아요.</string>
+    <string name="warn_pet_hidden_main">⚠ 바닥 높이가 너무 높아서 펫이 화면 밖에 있어요.\n≡ → 설정에서 바닥 높이를 낮춰 주세요.</string>
+
     <!-- 펫 이름 -->
     <string name="pet_shiro">시로</string>
     <string name="pet_kuro">쿠로</string>
@@ -62,7 +66,7 @@
     <string name="pet_maren">마렌</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱에서 ‘소환 해제’를 눌러요. 알림을 누르면 앱이 바로 열려요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
+    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱에서 ‘소환 해제’를 눌러요. 알림을 누르면 앱이 바로 열려요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\n버전 %1$s\n\n화면 위를 돌아다니는 작은 친구들과 함께하세요.\n\n만든 사람: jellytoc</string>
