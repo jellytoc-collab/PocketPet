@@ -14,7 +14,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.pocketpet"
+        applicationId = "com.jellytoc.pocketpet"
         minSdk = 26
         targetSdk = 36
         versionCode = buildNumber
