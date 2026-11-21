@@ -62,6 +62,9 @@ class MainActivity : Activity() {
         super.onResume()
         // 설정 화면에서 권한·바닥 높이를 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
+        // 펫 목록에서 다른 펫을 고르고 돌아왔으면 그 펫을 보여 준다
+        petIndex = Pets.ALL.indexOfFirst { it.id == settings.selectedPetId }.coerceAtLeast(0)
+        showSelectedPet()
     }
 
     override fun onDestroy() {
@@ -82,6 +85,9 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.menuButton).setOnClickListener { openDrawer() }
         scrim.setOnClickListener { closeDrawer() }
 
+        menuItem(R.id.menuPetList) {
+            startActivity(Intent(this, PetListActivity::class.java))
+        }
         menuItem(R.id.menuSettings) {
             startActivity(Intent(this, SettingsActivity::class.java))
         }

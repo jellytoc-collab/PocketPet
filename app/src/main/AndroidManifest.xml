@@ -36,6 +36,10 @@
             android:name=".InfoActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".PetListActivity"
+            android:exported="false" />
+
         <service
             android:name=".service.PetService"
             android:exported="false"

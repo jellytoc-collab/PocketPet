@@ -175,6 +175,21 @@
             android:background="#EEE4D8" />
 
         <TextView
+            android:id="@+id/menuPetList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_pet_list"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp" />
+
+        <TextView
             android:id="@+id/menuSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
