@@ -41,6 +41,15 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putInt(KEY_WALK_FREQ, value.coerceAtLeast(0)).apply()
         }
 
+    /** 설정 화면의 값을 모두 기본값으로 되돌린다 (선택한 펫은 그대로 둔다) */
+    fun resetToDefaults() {
+        prefs.edit()
+            .remove(KEY_SIZE)
+            .remove(KEY_FLOOR)
+            .remove(KEY_WALK_FREQ)
+            .apply()
+    }
+
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }

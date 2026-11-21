@@ -15,6 +15,7 @@ import android.util.DisplayMetrics
 import android.view.Choreographer
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -64,6 +65,9 @@ class PetOverlayManager(
     // 누른 지점과 펫 왼쪽 위 모서리 사이의 거리 (순간이동 방지)
     private var touchOffsetX = 0f
     private var touchOffsetY = 0f
+
+    // 손가락을 놓는 순간의 속도를 재서 던지기에 쓴다
+    private var velocityTracker: VelocityTracker? = null
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
@@ -133,6 +137,8 @@ class PetOverlayManager(
     /** 펫을 정리한다. 여러 번 불러도 안전하다 */
     fun hide() {
         stopLoop()
+        velocityTracker?.recycle()
+        velocityTracker = null
         val view = petView
         petView = null          // 먼저 비워서 '강제로 없어짐'으로 오해하지 않게 한다
         params = null
@@ -338,20 +344,47 @@ class PetOverlayManager(
             MotionEvent.ACTION_DOWN -> {
                 touchOffsetX = event.rawX - lp.x
                 touchOffsetY = event.rawY - lp.y
+                velocityTracker?.recycle()
+                velocityTracker = VelocityTracker.obtain()
+                trackVelocity(event)
                 controller.startDrag()
                 applyFrame()
                 startLoop()      // 잠들어 있었다면 깨운다
             }
             MotionEvent.ACTION_MOVE -> {
+                trackVelocity(event)
                 controller.dragTo(event.rawX - touchOffsetX, event.rawY - touchOffsetY)
                 applyPosition()
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_UP -> {
+                trackVelocity(event)
+                // 놓는 순간 손가락 속도(초당 px)로 던진다. 천천히 놓으면 그냥 떨어진다
+                val tracker = velocityTracker
+                tracker?.computeCurrentVelocity(1000)
+                controller.release(tracker?.xVelocity ?: 0f, tracker?.yVelocity ?: 0f)
+                tracker?.recycle()
+                velocityTracker = null
+                startLoop()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                velocityTracker?.recycle()
+                velocityTracker = null
                 controller.release()
                 startLoop()
             }
         }
         return true
+    }
+
+    /**
+     * 펫 창이 손가락을 따라 움직이므로, 창 안 좌표 대신 화면 전체 좌표로 속도를 잰다.
+     */
+    private fun trackVelocity(event: MotionEvent) {
+        val tracker = velocityTracker ?: return
+        val copy = MotionEvent.obtain(event)
+        copy.setLocation(event.rawX, event.rawY)
+        tracker.addMovement(copy)
+        copy.recycle()
     }
 
     // ---------- 위치 ----------

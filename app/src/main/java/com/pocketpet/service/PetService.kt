@@ -12,6 +12,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
@@ -41,8 +42,7 @@ class PetService : Service() {
                 PetSettingsRepository.KEY_FLOOR ->
                     overlayManager.setFloor(settings.floorDp)
                 PetSettingsRepository.KEY_WALK_FREQ ->
-                    overlayManager.setWalkFrequency(settings.walkFrequency)
-            }
+                    overlayManager.setWalkFrequency(settings.walkFrequency)            }
         }
 
     // 화면이 꺼지면 멈추고, 켜지면 다시 움직인다 (배터리 절약)
@@ -66,6 +66,12 @@ class PetService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // 알림의 ‘소환 해제’ 버튼을 누른 경우
+        if (intent?.action == ACTION_STOP) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         try {
             startAsForeground()
         } catch (e: Exception) {
@@ -108,8 +114,7 @@ class PetService : Service() {
         return PetOverlayManager(this, pet) { onPetLost() }.apply {
             setSize(settings.sizeDp)
             setFloor(settings.floorDp)
-            setWalkFrequency(settings.walkFrequency)
-        }
+            setWalkFrequency(settings.walkFrequency)        }
     }
 
     /** 펫을 더 이상 표시할 수 없을 때: 안내하고 서비스를 끝낸다 */
@@ -185,12 +190,26 @@ class PetService : Service() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
+        // 알림에 붙는 ‘소환 해제’ 버튼: 앱을 열지 않고 바로 펫을 돌려보낸다
+        val stopPet = PendingIntent.getService(
+            this,
+            1,
+            Intent(this, PetService::class.java).setAction(ACTION_STOP),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        val stopAction = Notification.Action.Builder(
+            Icon.createWithResource(this, R.drawable.ic_notification),
+            getString(R.string.dismiss),
+            stopPet
+        ).build()
+
         val petName = getString(currentPet.nameRes)
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.notification_text, petName))
             .setContentIntent(openApp)
+            .addAction(stopAction)
             .setOngoing(true)
             .build()
     }
@@ -198,6 +217,7 @@ class PetService : Service() {
     companion object {
         private const val CHANNEL_ID = "pet_service"
         private const val NOTIFICATION_ID = 1
+        private const val ACTION_STOP = "com.pocketpet.action.STOP_PET"
 
         @Volatile
         var isRunning = false

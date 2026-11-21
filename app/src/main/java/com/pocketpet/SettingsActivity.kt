@@ -1,6 +1,8 @@
 package com.pocketpet
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
 import kotlin.math.roundToInt
@@ -55,6 +58,25 @@ class SettingsActivity : Activity() {
             minValue = 0,
             initial = settings.walkFrequency
         ) { settings.walkFrequency = it }
+
+        findViewById<Button>(R.id.resetButton).setOnClickListener { confirmReset() }
+    }
+
+    /** 정말 초기화할지 한 번 물어본 뒤 기본값으로 되돌린다 */
+    private fun confirmReset() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.reset_confirm_title)
+            .setMessage(R.string.reset_confirm_message)
+            .setPositiveButton(R.string.reset_confirm_ok) { _, _ ->
+                settings.resetToDefaults()
+                Toast.makeText(this, R.string.toast_reset_done, Toast.LENGTH_SHORT).show()
+                // 화면을 새로 열어서 기본값을 보여 준다
+                // (recreate()는 칸에 적힌 옛 숫자를 되살려서 다시 저장해 버린다)
+                startActivity(Intent(this, SettingsActivity::class.java))
+                finish()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     override fun onResume() {

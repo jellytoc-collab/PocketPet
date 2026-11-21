@@ -18,6 +18,7 @@
     <string name="permission_guide">Find Pocket Pet in the list and allow ‘Display over other apps’</string>
 
     <!-- 메뉴 -->
+    <string name="menu_pet_list">🐾  Pet list</string>
     <string name="menu_settings">⚙  Settings</string>
     <string name="menu_language">🌐  Language</string>
     <string name="menu_help">❓  How to use</string>
@@ -27,11 +28,18 @@
     <string name="menu_privacy">🔒  Privacy policy</string>
 
     <!-- 설정 -->
+    <string name="pet_list_title">Pet list</string>
     <string name="settings_title">Settings</string>
     <string name="settings_size">Size</string>
     <string name="settings_floor">Floor height</string>
     <string name="settings_walk_freq">Walking frequency</string>
     <string name="settings_walk_freq_hint">Higher numbers mean more walking. At 0 the pet just stands still.</string>
+    <string name="settings_reset">Reset settings</string>
+    <string name="reset_confirm_title">Reset settings?</string>
+    <string name="reset_confirm_message">Size, floor height and walking frequency will go back to their defaults.</string>
+    <string name="reset_confirm_ok">Reset</string>
+    <string name="cancel">Cancel</string>
+    <string name="toast_reset_done">Settings were reset</string>
 
     <!-- 정보 화면 제목 -->
     <string name="title_help">How to use</string>
@@ -66,7 +74,7 @@
     <string name="pet_maren">Maren</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app. You can also tap the notification to open the app.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. Flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>

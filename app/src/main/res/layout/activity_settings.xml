@@ -182,5 +182,14 @@
             android:textColor="#7A6A5A"
             android:textSize="14sp" />
 
+        <!-- 설정 초기화 -->
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="40dp"
+            android:text="@string/settings_reset"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </ScrollView>
