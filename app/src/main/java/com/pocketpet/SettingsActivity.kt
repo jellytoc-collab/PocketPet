@@ -4,20 +4,25 @@ import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
+import android.widget.TextView
 import com.pocketpet.data.PetSettingsRepository
+import com.pocketpet.data.ScreenInfo
 import kotlin.math.roundToInt
 
 class SettingsActivity : Activity() {
 
     private lateinit var settings: PetSettingsRepository
+    private lateinit var floorWarning: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         settings = PetSettingsRepository(this)
+        floorWarning = findViewById(R.id.floorWarning)
 
         findViewById<Button>(R.id.backButton).setOnClickListener { finish() }
 
@@ -37,7 +42,10 @@ class SettingsActivity : Activity() {
             barMax = 500,
             minValue = 0,
             initial = settings.floorDp
-        ) { settings.floorDp = it }
+        ) {
+            settings.floorDp = it
+            updateFloorWarning()
+        }
 
         bindRow(
             inputId = R.id.walkFreqInput,
@@ -47,6 +55,17 @@ class SettingsActivity : Activity() {
             minValue = 0,
             initial = settings.walkFrequency
         ) { settings.walkFrequency = it }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateFloorWarning()
+    }
+
+    /** 펫이 화면 밖으로 완전히 나가면 빨간 경고를 보여 준다 */
+    private fun updateFloorWarning() {
+        val hidden = ScreenInfo.isPetHidden(this, settings.floorDp)
+        floorWarning.visibility = if (hidden) View.VISIBLE else View.GONE
     }
 
     /**
