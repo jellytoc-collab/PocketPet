@@ -122,6 +122,18 @@
             android:progressTint="#F28C38"
             android:thumbTint="#F28C38" />
 
+        <!-- 펫이 화면 밖으로 나가면 보이는 빨간 경고 -->
+        <TextView
+            android:id="@+id/floorWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/warn_pet_hidden"
+            android:textColor="#D93025"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <!-- 걷는 빈도 -->
         <LinearLayout
             android:layout_width="match_parent"
