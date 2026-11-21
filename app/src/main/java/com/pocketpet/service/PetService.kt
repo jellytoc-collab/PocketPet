@@ -14,11 +14,14 @@ import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.provider.Settings
 import android.widget.Toast
 import com.pocketpet.MainActivity
 import com.pocketpet.R
+import com.pocketpet.data.ForegroundApp
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.overlay.PetOverlayManager
 import com.pocketpet.pet.PetDefinition
@@ -43,8 +46,7 @@ class PetService : Service() {
                     overlayManager.setFloor(settings.floorDp)
                 PetSettingsRepository.KEY_WALK_FREQ ->
                     overlayManager.setWalkFrequency(settings.walkFrequency)
-                PetSettingsRepository.KEY_HIDE_ON_KEYBOARD ->
-                    overlayManager.setHideOnKeyboard(settings.hideOnKeyboard)
+                PetSettingsRepository.KEY_HOME_ONLY -> startAppCheck()
             }
         }
 
@@ -52,10 +54,55 @@ class PetService : Service() {
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_SCREEN_OFF -> overlayManager.pause()
-                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> overlayManager.resume()
+                Intent.ACTION_SCREEN_OFF -> {
+                    screenOn = false
+                    handler.removeCallbacks(appCheck)
+                    overlayManager.pause()
+                }
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
+                    screenOn = true
+                    overlayManager.resume()
+                    startAppCheck()
+                }
             }
         }
+    }
+
+    // ---------- 바탕화면에서만 보이기 ----------
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val foregroundApp by lazy { ForegroundApp(this) }
+    private var screenOn = true
+    private var hiddenByApp = false
+
+    /** 1초마다 지금 떠 있는 앱을 확인해서, 바탕화면·이 앱이 아니면 펫을 숨긴다 */
+    private val appCheck = object : Runnable {
+        override fun run() {
+            if (!settings.homeOnly) {
+                setHiddenByApp(false)
+                return
+            }
+            // 권한이 없으면 확인할 수 없으니 그냥 보여 준다
+            val hidden = ForegroundApp.hasPermission(this@PetService) &&
+                !foregroundApp.isPetAllowed()
+            setHiddenByApp(hidden)
+            handler.postDelayed(this, APP_CHECK_MS)
+        }
+    }
+
+    private fun startAppCheck() {
+        handler.removeCallbacks(appCheck)
+        if (!isRunning || !screenOn) return
+        if (settings.homeOnly) {
+            handler.post(appCheck)
+        } else {
+            setHiddenByApp(false)
+        }
+    }
+
+    private fun setHiddenByApp(hidden: Boolean) {
+        hiddenByApp = hidden
+        overlayManager.setHiddenByApp(hidden)
     }
 
     override fun onCreate() {
@@ -90,6 +137,7 @@ class PetService : Service() {
         }
 
         isRunning = true
+        startAppCheck()
         return START_NOT_STICKY
     }
 
@@ -100,6 +148,7 @@ class PetService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(appCheck)
         settings.unregisterListener(settingsListener)
         try {
             unregisterReceiver(screenReceiver)
@@ -118,7 +167,7 @@ class PetService : Service() {
             setSize(settings.sizeDp)
             setFloor(settings.floorDp)
             setWalkFrequency(settings.walkFrequency)
-            setHideOnKeyboard(settings.hideOnKeyboard)
+            setHiddenByApp(hiddenByApp)   // 펫을 바꿔도 숨김 상태는 그대로
         }
     }
 
@@ -223,6 +272,7 @@ class PetService : Service() {
         private const val CHANNEL_ID = "pet_service"
         private const val NOTIFICATION_ID = 1
         private const val ACTION_STOP = "com.pocketpet.action.STOP_PET"
+        private const val APP_CHECK_MS = 1000L   // 떠 있는 앱을 확인하는 간격
 
         @Volatile
         var isRunning = false

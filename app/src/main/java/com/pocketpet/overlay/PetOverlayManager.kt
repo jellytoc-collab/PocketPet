@@ -69,9 +69,8 @@ class PetOverlayManager(
     // 손가락을 놓는 순간의 속도를 재서 던지기에 쓴다
     private var velocityTracker: VelocityTracker? = null
 
-    // 키보드가 떠 있는 동안 펫을 숨길지, 지금 키보드가 떠 있는지
-    private var hideOnKeyboard = true
-    private var keyboardShown = false
+    // 바탕화면이 아닌 다른 앱이 열려 있어서 숨긴 상태인지
+    private var hiddenByApp = false
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
@@ -104,15 +103,7 @@ class PetOverlayManager(
                 if (petView === v) lost()
             }
         })
-        // 키보드가 뜨고 닫히는 것을 알아챈다 (Android 11 이상에서만 가능)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            view.setOnApplyWindowInsetsListener { v, insets ->
-                onKeyboardChanged(insets.isVisible(WindowInsets.Type.ime()))
-                v.onApplyWindowInsets(insets)
-            }
-        }
         currentFrame = Frame(Anim.IDLE, 0)
-        keyboardShown = false
 
         val lp = WindowManager.LayoutParams(
             widthPx,
@@ -141,6 +132,7 @@ class PetOverlayManager(
         petView = view
         params = lp
         lostReported = false
+        applyHiddenByApp()   // 소환 전에 이미 숨김 상태였다면 반영한다
 
         startLoop()
         return true
@@ -212,28 +204,21 @@ class PetOverlayManager(
         startLoop()
     }
 
-    /** ‘키보드가 뜨면 숨기기’ 설정이 바뀌었을 때 */
-    fun setHideOnKeyboard(enabled: Boolean) {
-        hideOnKeyboard = enabled
-        applyKeyboardVisibility()
-    }
-
-    // ---------- 키보드 ----------
-
-    private fun onKeyboardChanged(shown: Boolean) {
-        if (shown == keyboardShown) return
-        keyboardShown = shown
-        applyKeyboardVisibility()
+    /** 다른 앱이 열려 있어서 숨겨야 하면 true (‘바탕화면에서만 보이기’) */
+    fun setHiddenByApp(hidden: Boolean) {
+        if (hidden == hiddenByApp) return
+        hiddenByApp = hidden
+        applyHiddenByApp()
     }
 
     /**
-     * 키보드가 떠 있으면 펫을 투명하게 만들고, 터치도 아래 앱으로 넘긴다.
-     * 창을 없애지 않고 투명하게만 해야 키보드가 닫히는 것도 계속 알 수 있다.
+     * 숨길 때는 펫을 투명하게 만들고, 터치도 아래 앱으로 넘긴다.
+     * 창을 없애지 않으므로 다시 보일 때 위치가 그대로다.
      */
-    private fun applyKeyboardVisibility() {
+    private fun applyHiddenByApp() {
         val view = petView ?: return
         val lp = params ?: return
-        val hidden = hideOnKeyboard && keyboardShown
+        val hidden = hiddenByApp
         view.alpha = if (hidden) 0f else 1f
         val newFlags = if (hidden) {
             lp.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
