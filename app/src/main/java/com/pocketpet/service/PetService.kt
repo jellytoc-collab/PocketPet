@@ -40,8 +40,8 @@ class PetService : Service() {
                     overlayManager.setSize(settings.sizeDp)
                 PetSettingsRepository.KEY_FLOOR ->
                     overlayManager.setFloor(settings.floorDp)
-                PetSettingsRepository.KEY_REST ->
-                    overlayManager.setRestSec(settings.restSec)
+                PetSettingsRepository.KEY_WALK_FREQ ->
+                    overlayManager.setWalkFrequency(settings.walkFrequency)
             }
         }
 
@@ -108,7 +108,7 @@ class PetService : Service() {
         return PetOverlayManager(this, pet) { onPetLost() }.apply {
             setSize(settings.sizeDp)
             setFloor(settings.floorDp)
-            setRestSec(settings.restSec)
+            setWalkFrequency(settings.walkFrequency)
         }
     }
 
