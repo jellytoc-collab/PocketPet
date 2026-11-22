@@ -60,7 +60,6 @@ class MainActivity : Activity() {
         setupPetSelector()
         requestNotificationPermissionIfNeeded()
 
-        Ads.init(this)
         banner = BannerSlot(this, findViewById(R.id.bannerContainer))
     }
 
@@ -204,6 +203,7 @@ class MainActivity : Activity() {
     /** 플레이스토어 앱 페이지. 스토어 앱이 없으면 웹으로 연다 */
     private fun openStorePage() {
         try {
+            Ads.skipNextAppOpenAd()
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
         } catch (e: ActivityNotFoundException) {
             safeStart(
@@ -216,6 +216,7 @@ class MainActivity : Activity() {
     }
 
     private fun safeStart(intent: Intent) {
+        Ads.skipNextAppOpenAd()   // 바깥 화면에서 돌아올 때는 복귀 광고를 띄우지 않는다
         try {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {

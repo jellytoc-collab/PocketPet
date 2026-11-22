@@ -1,7 +1,7 @@
 package com.pocketpet.ads
 
 import android.app.Activity
-import android.content.Context
+import android.app.Application
 import android.view.View
 import android.widget.FrameLayout
 import com.google.android.gms.ads.AdRequest
@@ -17,13 +17,19 @@ import com.google.android.gms.ads.MobileAds
 object Ads {
 
     private var initStarted = false
+    private var appOpen: AppOpenAdManager? = null
 
-    /** 광고 준비. 앱이 느려지지 않도록 다른 스레드에서 한 번만 한다 */
-    fun init(context: Context) {
+    /** 광고 준비. 앱이 켜질 때 한 번만 한다 (무거운 준비는 다른 스레드에서) */
+    fun init(app: Application) {
         if (initStarted) return
         initStarted = true
-        val app = context.applicationContext
         Thread { MobileAds.initialize(app) {} }.start()
+        appOpen = AppOpenAdManager(app).also { it.start() }
+    }
+
+    /** 앱이 직접 바깥 화면(권한 설정·메일·스토어 등)을 열기 전에 부른다 → 돌아올 때 복귀 광고를 건너뛴다 */
+    fun skipNextAppOpenAd() {
+        appOpen?.skipNext()
     }
 }
 
