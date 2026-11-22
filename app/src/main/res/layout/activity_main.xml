@@ -5,10 +5,16 @@
     android:background="#FFF8EE"
     android:fitsSystemWindows="true">
 
-    <!-- 본문 -->
-    <ScrollView
+    <!-- 본문 + 아래 배너 광고 자리 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <LinearLayout
@@ -133,6 +139,14 @@
                 android:textSize="18sp" />
         </LinearLayout>
     </ScrollView>
+
+    <!-- 배너 광고: VIP+가 아니면 여기에 붙는다 -->
+    <FrameLayout
+        android:id="@+id/bannerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+    </LinearLayout>
 
     <!-- 메뉴가 열렸을 때 뒤를 어둡게 덮는 배경 -->
     <View

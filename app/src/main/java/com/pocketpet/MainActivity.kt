@@ -16,6 +16,8 @@ import android.widget.TextView
 import android.widget.Toast
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
+import com.pocketpet.ads.Ads
+import com.pocketpet.ads.BannerSlot
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
 import com.pocketpet.pet.Pets
@@ -31,6 +33,7 @@ class MainActivity : Activity() {
     private lateinit var drawer: View
     private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
+    private lateinit var banner: BannerSlot
 
     private var petIndex = 0
     private var drawerOpen = false
@@ -56,10 +59,16 @@ class MainActivity : Activity() {
         setupDrawer()
         setupPetSelector()
         requestNotificationPermissionIfNeeded()
+
+        Ads.init(this)
+        banner = BannerSlot(this, findViewById(R.id.bannerContainer))
     }
 
     override fun onResume() {
         super.onResume()
+        // 등급이 바뀌었을 수 있으니 돌아올 때마다 배너를 다시 정한다 (VIP+는 배너 없음)
+        if (settings.tier.showBanner) banner.show() else banner.hide()
+        banner.resume()
         // 설정 화면에서 권한·바닥 높이를 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
         // 펫 목록에서 다른 펫을 고르고 돌아왔으면 그 펫을 보여 준다
@@ -67,7 +76,13 @@ class MainActivity : Activity() {
         showSelectedPet()
     }
 
+    override fun onPause() {
+        banner.pause()
+        super.onPause()
+    }
+
     override fun onDestroy() {
+        banner.hide()
         petStatus.removeCallbacks(refreshStatus)
         unregisterBackCallback()
         super.onDestroy()
