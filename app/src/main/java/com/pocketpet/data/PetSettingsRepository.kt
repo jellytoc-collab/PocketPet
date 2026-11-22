@@ -16,6 +16,13 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putString(KEY_PET, value).apply()
         }
 
+    /** 이용 등급 (일반 / VIP / VIP+) */
+    var tier: Tier
+        get() = Tier.fromName(prefs.getString(KEY_TIER, null))
+        set(value) {
+            prefs.edit().putString(KEY_TIER, value.name).apply()
+        }
+
     /** 크기 (기본 크기 대비 %) — 최솟값만 있고 최댓값은 없다 */
     var sizePercent: Int
         get() = prefs.getInt(KEY_SIZE, DEFAULT_SIZE_PERCENT)
@@ -64,6 +71,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_SIZE = "size_percent"
         const val KEY_FLOOR = "floor_dp"
         const val KEY_WALK_FREQ = "walk_frequency"
+        const val KEY_TIER = "tier"
 
         const val DEFAULT_PET = "shiro"
 

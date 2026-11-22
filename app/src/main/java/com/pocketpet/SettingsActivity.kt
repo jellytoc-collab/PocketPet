@@ -3,17 +3,20 @@ package com.pocketpet
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
+import com.pocketpet.data.Tier
 import kotlin.math.roundToInt
 
 class SettingsActivity : Activity() {
@@ -60,6 +63,25 @@ class SettingsActivity : Activity() {
         ) { settings.walkFrequency = it }
 
         findViewById<Button>(R.id.resetButton).setOnClickListener { confirmReset() }
+        setupTierTestSwitch()
+    }
+
+    /** 테스트 빌드에서만: 결제 없이 등급을 바꿔 보는 스위치 */
+    private fun setupTierTestSwitch() {
+        val debuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!debuggable) return
+        findViewById<View>(R.id.tierTestSection).visibility = View.VISIBLE
+
+        val group = findViewById<RadioGroup>(R.id.tierTestGroup)
+        val ids = mapOf(
+            Tier.FREE to R.id.tierFree,
+            Tier.VIP to R.id.tierVip,
+            Tier.VIP_PLUS to R.id.tierVipPlus
+        )
+        group.check(ids.getValue(settings.tier))
+        group.setOnCheckedChangeListener { _, checkedId ->
+            settings.tier = ids.entries.first { it.value == checkedId }.key
+        }
     }
 
     /** 정말 초기화할지 한 번 물어본 뒤 기본값으로 되돌린다 */

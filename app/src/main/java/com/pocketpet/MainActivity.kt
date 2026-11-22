@@ -227,12 +227,21 @@ class MainActivity : Activity() {
     private fun showSelectedPet() {
         val pet = Pets.ALL[petIndex]
         petPreview.setImageResource(pet.idle)
-        petName.setText(pet.nameRes)
+        // 잠긴 펫은 흐리게 보여 주고 이름 앞에 자물쇠를 붙인다 (구경은 할 수 있다)
+        val unlocked = Pets.isUnlocked(pet, settings.tier)
+        petPreview.alpha = if (unlocked) 1f else LOCKED_ALPHA
+        petName.text = if (unlocked) getString(pet.nameRes)
+        else getString(R.string.locked_pet_name, getString(pet.nameRes))
     }
 
     // ---------- 소환 ----------
 
     private fun summonPet() {
+        // 잠긴 펫은 소환할 수 없다
+        if (!Pets.isUnlocked(Pets.ALL[petIndex], settings.tier)) {
+            Toast.makeText(this, R.string.toast_pet_locked, Toast.LENGTH_SHORT).show()
+            return
+        }
         if (!Settings.canDrawOverlays(this)) {
             openOverlaySettings()
             return
@@ -293,5 +302,6 @@ class MainActivity : Activity() {
         private const val DRAWER_WIDTH_DP = 280
         private const val OPEN_MS = 220L
         private const val CLOSE_MS = 180L
+        private const val LOCKED_ALPHA = 0.45f   // 잠긴 펫 미리보기의 투명도
     }
 }

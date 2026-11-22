@@ -74,11 +74,18 @@
     <string name="pet_maren">Maren</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. Flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. Pets marked 🔒 are available from VIP. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. With VIP, flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
 
     <!-- 개인정보처리방침 -->
     <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
+    <!-- Tiers -->
+    <string name="locked_pet_name">🔒 %1$s</string>
+    <string name="toast_pet_locked">🔒 This pet is available from VIP</string>
+    <string name="tier_test_title">🧪 Test tier (only in test builds)</string>
+    <string name="tier_free">Free</string>
+    <string name="tier_vip">VIP</string>
+    <string name="tier_vip_plus">VIP+</string>
 </resources>

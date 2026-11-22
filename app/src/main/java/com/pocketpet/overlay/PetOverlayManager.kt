@@ -69,6 +69,9 @@ class PetOverlayManager(
     // 손가락을 놓는 순간의 속도를 재서 던지기에 쓴다
     private var velocityTracker: VelocityTracker? = null
 
+    // 던지기는 VIP부터. 일반 등급이면 놓았을 때 그냥 떨어진다
+    private var canThrow = false
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!loopRunning) return
@@ -198,6 +201,11 @@ class PetOverlayManager(
     fun setWalkFrequency(frequency: Int) {
         controller.walkFrequency = frequency
         startLoop()
+    }
+
+    /** 던질 수 있는지 (등급에 따라 바뀐다) */
+    fun setCanThrow(allowed: Boolean) {
+        canThrow = allowed
     }
 
     // ---------- 움직임 반복 ----------
@@ -361,7 +369,11 @@ class PetOverlayManager(
                 // 놓는 순간 손가락 속도(초당 px)로 던진다. 천천히 놓으면 그냥 떨어진다
                 val tracker = velocityTracker
                 tracker?.computeCurrentVelocity(1000)
-                controller.release(tracker?.xVelocity ?: 0f, tracker?.yVelocity ?: 0f)
+                if (canThrow) {
+                    controller.release(tracker?.xVelocity ?: 0f, tracker?.yVelocity ?: 0f)
+                } else {
+                    controller.release()
+                }
                 tracker?.recycle()
                 velocityTracker = null
                 startLoop()

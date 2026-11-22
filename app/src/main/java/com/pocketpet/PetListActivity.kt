@@ -30,13 +30,14 @@ class PetListActivity : Activity() {
 
         val list = findViewById<LinearLayout>(R.id.petList)
         val selectedId = settings.selectedPetId
+        val tier = settings.tier
         Pets.ALL.forEach { pet ->
-            list.addView(createRow(pet, pet.id == selectedId))
+            list.addView(createRow(pet, pet.id == selectedId, Pets.isUnlocked(pet, tier)))
         }
     }
 
     /** 목록 한 줄: 왼쪽에 펫 그림, 오른쪽에 이름 */
-    private fun createRow(pet: PetDefinition, selected: Boolean): View {
+    private fun createRow(pet: PetDefinition, selected: Boolean, unlocked: Boolean): View {
         val density = resources.displayMetrics.density
         fun dp(value: Int) = (value * density).toInt()
 
@@ -68,12 +69,14 @@ class PetListActivity : Activity() {
             ImageView(this).apply {
                 setImageResource(pet.idle)
                 scaleType = ImageView.ScaleType.FIT_CENTER
+                alpha = if (unlocked) 1f else LOCKED_ALPHA   // 잠긴 펫은 흐리게
             },
             LinearLayout.LayoutParams(dp(ROW_IMAGE_DP), dp(ROW_IMAGE_DP))
         )
         row.addView(
             TextView(this).apply {
-                setText(pet.nameRes)
+                text = if (unlocked) getString(pet.nameRes)
+                else getString(R.string.locked_pet_name, getString(pet.nameRes))
                 setTextColor(0xFF3B2F2F.toInt())
                 textSize = 20f
             },
@@ -92,5 +95,6 @@ class PetListActivity : Activity() {
 
     companion object {
         private const val ROW_IMAGE_DP = 72   // 목록의 펫 그림 크기
+        private const val LOCKED_ALPHA = 0.45f   // 잠긴 펫 그림의 투명도
     }
 }
