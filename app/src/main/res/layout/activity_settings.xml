@@ -191,5 +191,50 @@
             android:text="@string/settings_reset"
             android:textSize="16sp" />
 
+        <!-- 시험용 등급 스위치: 테스트 빌드에서만 보인다 (결제 연결 전 확인용) -->
+        <LinearLayout
+            android:id="@+id/tierTestSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tier_test_title"
+                android:textColor="#7A6A5A"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/tierTestGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/tierFree"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tier_free" />
+
+                <RadioButton
+                    android:id="@+id/tierVip"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tier_vip" />
+
+                <RadioButton
+                    android:id="@+id/tierVipPlus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tier_vip_plus" />
+            </RadioGroup>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

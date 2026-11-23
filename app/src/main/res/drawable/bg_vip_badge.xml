@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ‘추천’ 배지: 주황 알약 모양 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F28C38" />
+    <corners android:radius="999dp" />
+</shape>

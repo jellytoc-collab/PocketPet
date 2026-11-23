@@ -16,8 +16,11 @@ import android.widget.TextView
 import android.widget.Toast
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
+import com.pocketpet.ads.Ads
+import com.pocketpet.ads.BannerSlot
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
+import com.pocketpet.data.Tier
 import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
 
@@ -31,6 +34,9 @@ class MainActivity : Activity() {
     private lateinit var drawer: View
     private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
+    private lateinit var banner: BannerSlot
+    private var showVipOnResume = false
+    private var notificationAsked = false
 
     private var petIndex = 0
     private var drawerOpen = false
@@ -55,11 +61,26 @@ class MainActivity : Activity() {
 
         setupDrawer()
         setupPetSelector()
-        requestNotificationPermissionIfNeeded()
+
+        banner = BannerSlot(this, findViewById(R.id.bannerContainer))
+
+        // 앱을 새로 켰을 때(화면 회전 등이 아닐 때) VIP 소개 화면을 띄운다. VIP+는 띄우지 않는다
+        showVipOnResume = savedInstanceState == null && settings.tier != Tier.VIP_PLUS
     }
 
     override fun onResume() {
         super.onResume()
+        if (showVipOnResume) {
+            showVipOnResume = false
+            openVipPage()
+        } else if (!notificationAsked) {
+            // 알림 권한은 VIP 화면이 닫힌 뒤에 물어본다 (두 창이 겹치지 않게)
+            notificationAsked = true
+            requestNotificationPermissionIfNeeded()
+        }
+        // 등급이 바뀌었을 수 있으니 돌아올 때마다 배너를 다시 정한다 (VIP+는 배너 없음)
+        if (settings.tier.showBanner) banner.show() else banner.hide()
+        banner.resume()
         // 설정 화면에서 권한·바닥 높이를 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
         // 펫 목록에서 다른 펫을 고르고 돌아왔으면 그 펫을 보여 준다
@@ -67,7 +88,13 @@ class MainActivity : Activity() {
         showSelectedPet()
     }
 
+    override fun onPause() {
+        banner.pause()
+        super.onPause()
+    }
+
     override fun onDestroy() {
+        banner.hide()
         petStatus.removeCallbacks(refreshStatus)
         unregisterBackCallback()
         super.onDestroy()
@@ -189,6 +216,7 @@ class MainActivity : Activity() {
     /** 플레이스토어 앱 페이지. 스토어 앱이 없으면 웹으로 연다 */
     private fun openStorePage() {
         try {
+            Ads.skipNextAppOpenAd()
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
         } catch (e: ActivityNotFoundException) {
             safeStart(
@@ -201,6 +229,7 @@ class MainActivity : Activity() {
     }
 
     private fun safeStart(intent: Intent) {
+        Ads.skipNextAppOpenAd()   // 바깥 화면에서 돌아올 때는 복귀 광고를 띄우지 않는다
         try {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
@@ -227,12 +256,21 @@ class MainActivity : Activity() {
     private fun showSelectedPet() {
         val pet = Pets.ALL[petIndex]
         petPreview.setImageResource(pet.idle)
-        petName.setText(pet.nameRes)
+        // 잠긴 펫은 흐리게 보여 주고 이름 앞에 자물쇠를 붙인다 (구경은 할 수 있다)
+        val unlocked = Pets.isUnlocked(pet, settings.tier)
+        petPreview.alpha = if (unlocked) 1f else LOCKED_ALPHA
+        petName.text = if (unlocked) getString(pet.nameRes)
+        else getString(R.string.locked_pet_name, getString(pet.nameRes))
     }
 
     // ---------- 소환 ----------
 
     private fun summonPet() {
+        // 잠긴 펫을 누르면 VIP 소개 화면을 보여 준다
+        if (!Pets.isUnlocked(Pets.ALL[petIndex], settings.tier)) {
+            openVipPage()
+            return
+        }
         if (!Settings.canDrawOverlays(this)) {
             openOverlaySettings()
             return
@@ -240,6 +278,10 @@ class MainActivity : Activity() {
         startForegroundService(Intent(this, PetService::class.java))
         petStatus.setText(R.string.pet_status_starting)
         refreshStatusSoon()
+    }
+
+    private fun openVipPage() {
+        startActivity(Intent(this, VipActivity::class.java))
     }
 
     private fun dismissPet() {
@@ -293,5 +335,6 @@ class MainActivity : Activity() {
         private const val DRAWER_WIDTH_DP = 280
         private const val OPEN_MS = 220L
         private const val CLOSE_MS = 180L
+        private const val LOCKED_ALPHA = 0.45f   // 잠긴 펫 미리보기의 투명도
     }
 }

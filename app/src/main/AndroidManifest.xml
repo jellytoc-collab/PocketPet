@@ -7,12 +7,18 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".PocketPetApp"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config"
         android:enableOnBackInvokedCallback="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <!-- AdMob 앱 ID. 지금은 구글이 주는 테스트용 ID — 출시 전에 내 AdMob 앱 ID로 바꾼다 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
 
         <activity
             android:name=".LandingActivity"
@@ -38,6 +44,10 @@
 
         <activity
             android:name=".PetListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".VipActivity"
             android:exported="false" />
 
         <service

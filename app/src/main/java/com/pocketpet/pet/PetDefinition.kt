@@ -1,6 +1,7 @@
 package com.pocketpet.pet
 
 import com.pocketpet.R
+import com.pocketpet.data.Tier
 
 /** 펫 한 마리의 외형과 행동 설정 */
 data class PetDefinition(
@@ -15,13 +16,14 @@ data class PetDefinition(
     val walkFps: Float = 6f,        // 걷기 그림이 바뀌는 속도 (초당 장수)
     val flapFps: Float = 12f,       // 휘적거리기 그림이 바뀌는 속도 (초당 장수)
     val gravityDp: Float = 2500f,   // 떨어질 때 중력 가속도
-    val heightDp: Int = 120         // 화면에 표시되는 키
+    val heightDp: Int = 120,        // 화면에 표시되는 키
+    val free: Boolean = false       // 일반 등급에서도 쓸 수 있는 펫인지
 )
 
 object Pets {
     val ALL = listOf(
-        PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap),
-        PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap),
+        PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap, free = true),
+        PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap, free = true),
         PetDefinition("momo", R.string.pet_momo, R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap),
         PetDefinition("luna", R.string.pet_luna, R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap),
         PetDefinition("tashu", R.string.pet_tashu, R.drawable.tashu_idle, R.drawable.tashu_walk, R.drawable.tashu_flap),
@@ -36,4 +38,13 @@ object Pets {
     )
 
     fun byId(id: String?): PetDefinition = ALL.firstOrNull { it.id == id } ?: ALL.first()
+
+    /** 이 등급에서 쓸 수 있는 펫인지 (잠기지 않았는지) */
+    fun isUnlocked(pet: PetDefinition, tier: Tier): Boolean = pet.free || tier.allPets
+
+    /** 고른 펫이 잠겨 있으면 첫 번째 무료 펫(시로)을 대신 돌려준다 */
+    fun usable(id: String?, tier: Tier): PetDefinition {
+        val pet = byId(id)
+        return if (isUnlocked(pet, tier)) pet else ALL.first { it.free }
+    }
 }

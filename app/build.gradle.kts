@@ -9,6 +9,11 @@ val keystorePath: String? = System.getenv("KEYSTORE_PATH")
 // GitHub 빌드 번호를 버전 번호로 쓴다 (플레이스토어는 매번 더 큰 번호가 필요)
 val buildNumber: Int = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
 
+// 외부 라이브러리 예외: 구글 광고(AdMob). 결제 라이브러리와 함께 허용된 유일한 예외
+dependencies {
+    implementation("com.google.android.gms:play-services-ads:24.4.0")
+}
+
 android {
     namespace = "com.pocketpet"
     compileSdk = 36

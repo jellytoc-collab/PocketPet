@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VIP+ 카드 배경: 연한 주황 바탕 + 진한 주황 테두리 (추천 강조) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFE9D2" />
+    <stroke android:width="2dp" android:color="#F28C38" />
+    <corners android:radius="16dp" />
+</shape>

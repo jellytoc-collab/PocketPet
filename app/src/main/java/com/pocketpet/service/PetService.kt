@@ -35,14 +35,23 @@ class PetService : Service() {
     private val settingsListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
-                PetSettingsRepository.KEY_PET ->
-                    switchPet(Pets.byId(settings.selectedPetId))
+                PetSettingsRepository.KEY_PET -> {
+                    // 잠긴 펫을 구경만 하는 중이면 지금 펫을 그대로 둔다
+                    val pet = Pets.byId(settings.selectedPetId)
+                    if (Pets.isUnlocked(pet, settings.tier)) switchPet(pet)
+                }
+                PetSettingsRepository.KEY_TIER -> {
+                    // 등급이 바뀌면 던지기 가능 여부와 펫 잠금을 다시 적용한다
+                    overlayManager.setCanThrow(settings.tier.canThrow)
+                    switchPet(Pets.usable(settings.selectedPetId, settings.tier))
+                }
                 PetSettingsRepository.KEY_SIZE ->
                     overlayManager.setSize(settings.sizeDp)
                 PetSettingsRepository.KEY_FLOOR ->
                     overlayManager.setFloor(settings.floorDp)
                 PetSettingsRepository.KEY_WALK_FREQ ->
-                    overlayManager.setWalkFrequency(settings.walkFrequency)            }
+                    overlayManager.setWalkFrequency(settings.walkFrequency)
+            }
         }
 
     // 화면이 꺼지면 멈추고, 켜지면 다시 움직인다 (배터리 절약)
@@ -58,7 +67,7 @@ class PetService : Service() {
     override fun onCreate() {
         super.onCreate()
         settings = PetSettingsRepository(this)
-        currentPet = Pets.byId(settings.selectedPetId)
+        currentPet = Pets.usable(settings.selectedPetId, settings.tier)
         overlayManager = createOverlay(currentPet)
         settings.registerListener(settingsListener)
         registerScreenReceiver()
@@ -114,7 +123,9 @@ class PetService : Service() {
         return PetOverlayManager(this, pet) { onPetLost() }.apply {
             setSize(settings.sizeDp)
             setFloor(settings.floorDp)
-            setWalkFrequency(settings.walkFrequency)        }
+            setWalkFrequency(settings.walkFrequency)
+            setCanThrow(settings.tier.canThrow)
+        }
     }
 
     /** 펫을 더 이상 표시할 수 없을 때: 안내하고 서비스를 끝낸다 */
