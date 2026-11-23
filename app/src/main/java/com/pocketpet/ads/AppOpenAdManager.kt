@@ -4,6 +4,8 @@ import android.app.Activity
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import com.google.android.gms.ads.AdActivity
 import com.google.android.gms.ads.AdError
@@ -36,6 +38,8 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
     private var loading = false
     private var showing = false
     private var lastShownAt = 0L
+    private var retryCount = 0
+    private val handler = Handler(Looper.getMainLooper())
 
     private var startedCount = 0          // 지금 보이는 우리 화면 수
     private var wentToBackground = false  // 화면이 모두 사라졌다가(다른 앱으로 감) 돌아오는 중인지
@@ -69,11 +73,18 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
                     adLoadedAt = SystemClock.elapsedRealtime()
                     Ads.debugToast(app, "🧪 복귀 광고 준비됨")
                     loading = false
+                    retryCount = 0
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
-                    loading = false   // 다음에 다시 시도한다
+                    loading = false
                     Ads.debugToast(app, "🧪 복귀 광고 실패 (코드 ${error.code}): ${error.message}")
+                    // 잠깐 뒤에 다시 시도한다 (30초 → 1분 → 2분, 최대 3번)
+                    if (retryCount < MAX_RETRY) {
+                        val delay = RETRY_BASE_MS shl retryCount
+                        retryCount++
+                        handler.postDelayed({ preload() }, delay)
+                    }
                 }
             }
         )
@@ -161,5 +172,9 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
 
         /** 받아 둔 광고를 쓸 수 있는 시간: 4시간 (구글 규칙) */
         private const val AD_EXPIRE_MS = 4 * 60 * 60 * 1000L
+
+        /** 광고를 못 받았을 때 다시 시도: 30초부터 두 배씩, 최대 3번 */
+        private const val RETRY_BASE_MS = 30 * 1000L
+        private const val MAX_RETRY = 3
     }
 }

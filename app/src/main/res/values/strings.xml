@@ -100,7 +100,6 @@
     <string name="vip_current">Current plan</string>
     <string name="vip_included">Included in VIP+</string>
     <string name="vip_terms">Subscriptions renew automatically every month. You can cancel anytime in Google Play.</string>
-    <string name="vip_later">Maybe later</string>
-    <string name="vip_close">Close</string>
+    <string name="vip_later">Exit</string>
     <string name="vip_not_ready">Payments are coming soon</string>
 </resources>

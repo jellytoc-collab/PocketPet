@@ -59,6 +59,7 @@ object Ads {
 class BannerSlot(private val activity: Activity, private val container: FrameLayout) {
 
     private var adView: AdView? = null
+    private var retryCount = 0
 
     fun show() {
         container.visibility = View.VISIBLE
@@ -72,11 +73,20 @@ class BannerSlot(private val activity: Activity, private val container: FrameLay
         }
         view.adListener = object : AdListener() {
             override fun onAdLoaded() {
+                retryCount = 0
                 Ads.debugToast(activity, "🧪 배너 광고 받음")
             }
 
             override fun onAdFailedToLoad(error: LoadAdError) {
                 Ads.debugToast(activity, "🧪 배너 광고 실패 (코드 ${error.code}): ${error.message}")
+                // 잠깐 뒤에 다시 시도한다 (30초 → 1분 → 2분, 최대 3번)
+                if (retryCount < MAX_RETRY) {
+                    val delay = RETRY_BASE_MS shl retryCount
+                    retryCount++
+                    container.postDelayed({
+                        if (adView === view) view.loadAd(AdRequest.Builder().build())
+                    }, delay)
+                }
             }
         }
         container.addView(view)
@@ -97,5 +107,8 @@ class BannerSlot(private val activity: Activity, private val container: FrameLay
     companion object {
         /** 배너 광고 ID (지금은 테스트용) */
         private const val BANNER_UNIT_ID = "ca-app-pub-3940256099942544/9214589741"
+
+        private const val RETRY_BASE_MS = 30 * 1000L
+        private const val MAX_RETRY = 3
     }
 }

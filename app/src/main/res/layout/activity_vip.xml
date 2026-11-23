@@ -1,176 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- VIP / VIP+ 소개 화면: 앱을 켤 때, 잠긴 펫을 소환하려 할 때 나온다 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    VIP / VIP+ 소개 화면: 앱을 켤 때, 잠긴 펫을 소환하려 할 때 나온다.
+    카드를 옆으로 밀어서 넘긴다 (VIP+ → VIP). 나가기 버튼은 1초 뒤에 나타난다.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF8EE"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_marginTop="28dp"
+        android:text="@string/vip_title"
+        android:textColor="#3B2F2F"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
-        <!-- 오른쪽 위 닫기 -->
-        <Button
-            android:id="@+id/closeButton"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="end"
-            android:contentDescription="@string/vip_close"
-            android:text="✕"
-            android:textSize="20sp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="@string/vip_subtitle"
+        android:textColor="#7A6A5A"
+        android:textSize="16sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/vip_title"
-            android:textColor="#3B2F2F"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+    <!-- 옆으로 넘기는 카드들. 카드 너비와 넘김 위치는 코드에서 맞춘다 -->
+    <HorizontalScrollView
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:gravity="center"
-            android:text="@string/vip_subtitle"
-            android:textColor="#7A6A5A"
-            android:textSize="16sp" />
-
-        <!-- VIP 카드 -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_vip_card"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:id="@+id/pages"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
+            <!-- VIP+ 카드 (추천, 먼저 보인다) -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/tier_vip"
-                    android:textColor="#3B2F2F"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                android:id="@+id/cardPlus"
+                android:layout_width="300dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_vip_plus_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/vip_price"
-                    android:textColor="#F28C38"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:lineSpacingExtra="6dp"
-                android:text="@string/vip_benefits"
-                android:textColor="#3B2F2F"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/vipButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/vip_subscribe"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <!-- VIP+ 카드 (추천) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_vip_plus_card"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                    android:text="👑"
+                    android:textSize="56sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:text="@string/tier_vip_plus"
                     android:textColor="#3B2F2F"
-                    android:textSize="22sp"
+                    android:textSize="30sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_vip_badge"
+                    android:paddingStart="12dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="3dp"
                     android:text="@string/vip_recommended"
-                    android:textColor="#F28C38"
+                    android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:lineSpacingExtra="8dp"
+                    android:text="@string/vip_plus_benefits"
+                    android:textColor="#3B2F2F"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:text="@string/vip_plus_price"
                     android:textColor="#F28C38"
-                    android:textSize="18sp"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/vipPlusButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#F28C38"
+                    android:text="@string/vip_plus_subscribe"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:lineSpacingExtra="6dp"
-                android:text="@string/vip_plus_benefits"
-                android:textColor="#3B2F2F"
-                android:textSize="16sp" />
+            <!-- VIP 카드 -->
+            <LinearLayout
+                android:id="@+id/cardVip"
+                android:layout_width="300dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_vip_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
 
-            <Button
-                android:id="@+id/vipPlusButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/vip_plus_subscribe"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⭐"
+                    android:textSize="56sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/tier_vip"
+                    android:textColor="#3B2F2F"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:lineSpacingExtra="8dp"
+                    android:text="@string/vip_benefits"
+                    android:textColor="#3B2F2F"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/vip_price"
+                    android:textColor="#F28C38"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/vipButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#F28C38"
+                    android:text="@string/vip_subscribe"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
+    </HorizontalScrollView>
 
-        <!-- 구독 안내 (스토어 규칙상 꼭 보여야 하는 내용) -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/vip_terms"
-            android:textColor="#7A6A5A"
-            android:textSize="13sp" />
+    <!-- 지금 몇 번째 카드인지 보여 주는 점 -->
+    <LinearLayout
+        android:id="@+id/dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal" />
 
-        <Button
-            android:id="@+id/laterButton"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/vip_later"
-            android:textColor="#7A6A5A"
-            android:textSize="16sp" />
+    <!-- 구독 안내 (스토어 규칙상 꼭 보여야 하는 내용) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="@string/vip_terms"
+        android:textColor="#7A6A5A"
+        android:textSize="13sp" />
 
-    </LinearLayout>
-</ScrollView>
+    <!-- 나가기: 1초 뒤에 나타난다 -->
+    <Button
+        android:id="@+id/laterButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/vip_later"
+        android:textColor="#7A6A5A"
+        android:textSize="16sp"
+        android:visibility="invisible" />
+
+</LinearLayout>
