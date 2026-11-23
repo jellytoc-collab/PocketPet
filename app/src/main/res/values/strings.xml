@@ -83,9 +83,24 @@
     <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
     <!-- Tiers -->
     <string name="locked_pet_name">🔒 %1$s</string>
-    <string name="toast_pet_locked">🔒 This pet is available from VIP</string>
     <string name="tier_test_title">🧪 Test tier (only in test builds)</string>
     <string name="tier_free">Free</string>
     <string name="tier_vip">VIP</string>
     <string name="tier_vip_plus">VIP+</string>
+    <!-- VIP page -->
+    <string name="vip_title">👑 Pocket Pet VIP</string>
+    <string name="vip_subtitle">More friends, more fun</string>
+    <string name="vip_price">₩3,300 / month</string>
+    <string name="vip_plus_price">₩6,600 / month</string>
+    <string name="vip_recommended">Best</string>
+    <string name="vip_benefits">✓ Unlock all pets\n✓ Throwing\n✓ No ads when you come back to the app</string>
+    <string name="vip_plus_benefits">✓ Everything in VIP\n✓ No ads at all, banner included\n✓ Speech bubbles (coming soon)\n✓ Sleeping (coming soon)\n✓ Summon several pets (coming soon)</string>
+    <string name="vip_subscribe">Subscribe to VIP</string>
+    <string name="vip_plus_subscribe">Subscribe to VIP+</string>
+    <string name="vip_current">Current plan</string>
+    <string name="vip_included">Included in VIP+</string>
+    <string name="vip_terms">Subscriptions renew automatically every month. You can cancel anytime in Google Play.</string>
+    <string name="vip_later">Maybe later</string>
+    <string name="vip_close">Close</string>
+    <string name="vip_not_ready">Payments are coming soon</string>
 </resources>

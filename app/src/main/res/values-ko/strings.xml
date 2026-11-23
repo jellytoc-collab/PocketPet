@@ -83,9 +83,24 @@
     <string name="privacy_body">시행일: 2026년 11월 21일\n\nPocket Pet(이하 ‘앱’)은 이용자의 개인정보를 소중히 여깁니다.\n\n1. 수집하는 정보\n앱은 이름, 연락처, 위치 등 개인정보를 수집하지 않으며, 외부 서버로 어떤 정보도 전송하지 않습니다.\n\n2. 기기에 저장되는 정보\n선택한 펫, 크기, 바닥 높이, 걷는 빈도 같은 설정값은 이용자의 기기 안에만 저장되며, 앱을 삭제하면 함께 지워집니다.\n\n3. 사용하는 권한\n• 다른 앱 위에 표시: 펫을 화면 위에 보여 주기 위해 사용합니다.\n• 알림: 펫이 실행 중임을 알려 주기 위해 사용합니다.\n• 포그라운드 서비스: 앱을 닫아도 펫이 화면에 남아 있도록 하기 위해 사용합니다.\n\n4. 결제\n유료 콘텐츠 구매는 Google Play 결제를 통해 처리되며, 앱은 카드 번호 등 결제 정보를 받거나 저장하지 않습니다.\n\n5. 문의\n%1$s</string>
     <!-- 등급 -->
     <string name="locked_pet_name">🔒 %1$s</string>
-    <string name="toast_pet_locked">🔒 VIP부터 쓸 수 있는 펫이에요</string>
     <string name="tier_test_title">🧪 시험용 등급 (테스트 빌드에만 보여요)</string>
     <string name="tier_free">일반</string>
     <string name="tier_vip">VIP</string>
     <string name="tier_vip_plus">VIP+</string>
+    <!-- VIP 소개 화면 -->
+    <string name="vip_title">👑 Pocket Pet VIP</string>
+    <string name="vip_subtitle">더 많은 친구와 더 즐겁게 놀아요</string>
+    <string name="vip_price">월 3,300원</string>
+    <string name="vip_plus_price">월 6,600원</string>
+    <string name="vip_recommended">추천</string>
+    <string name="vip_benefits">✓ 모든 펫 잠금 해제\n✓ 던지기\n✓ 앱 복귀 광고 없음</string>
+    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 잠자기 (곧 추가)\n✓ 여러 마리 소환 (곧 추가)</string>
+    <string name="vip_subscribe">VIP 구독하기</string>
+    <string name="vip_plus_subscribe">VIP+ 구독하기</string>
+    <string name="vip_current">이용 중</string>
+    <string name="vip_included">VIP+에 포함</string>
+    <string name="vip_terms">구독은 매달 자동으로 갱신돼요. Google Play에서 언제든 해지할 수 있어요.</string>
+    <string name="vip_later">나중에 할게요</string>
+    <string name="vip_close">닫기</string>
+    <string name="vip_not_ready">결제는 곧 연결될 예정이에요</string>
 </resources>

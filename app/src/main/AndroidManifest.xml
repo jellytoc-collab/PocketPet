@@ -46,6 +46,10 @@
             android:name=".PetListActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".VipActivity"
+            android:exported="false" />
+
         <service
             android:name=".service.PetService"
             android:exported="false"

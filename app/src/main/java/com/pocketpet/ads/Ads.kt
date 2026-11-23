@@ -2,11 +2,18 @@ package com.pocketpet.ads
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Toast
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 
 /**
@@ -31,6 +38,18 @@ object Ads {
     fun skipNextAppOpenAd() {
         appOpen?.skipNext()
     }
+
+    /**
+     * 테스트 빌드에서만: 광고 상태를 화면에 짧게 알려 준다 (광고가 안 뜰 때 원인 찾기용).
+     * 플레이스토어 버전에서는 아무것도 보이지 않는다.
+     */
+    fun debugToast(context: Context, message: String) {
+        val debuggable = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!debuggable) return
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()
+        }
+    }
 }
 
 /**
@@ -50,6 +69,15 @@ class BannerSlot(private val activity: Activity, private val container: FrameLay
             adUnitId = BANNER_UNIT_ID
             // 화면 너비에 맞춘 배너 크기
             setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp))
+        }
+        view.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                Ads.debugToast(activity, "🧪 배너 광고 받음")
+            }
+
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                Ads.debugToast(activity, "🧪 배너 광고 실패 (코드 ${error.code}): ${error.message}")
+            }
         }
         container.addView(view)
         view.loadAd(AdRequest.Builder().build())

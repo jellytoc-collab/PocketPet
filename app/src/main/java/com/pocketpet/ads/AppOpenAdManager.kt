@@ -67,11 +67,13 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
                 override fun onAdLoaded(loaded: AppOpenAd) {
                     ad = loaded
                     adLoadedAt = SystemClock.elapsedRealtime()
+                    Ads.debugToast(app, "🧪 복귀 광고 준비됨")
                     loading = false
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     loading = false   // 다음에 다시 시도한다
+                    Ads.debugToast(app, "🧪 복귀 광고 실패 (코드 ${error.code}): ${error.message}")
                 }
             }
         )

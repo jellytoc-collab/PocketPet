@@ -20,6 +20,7 @@ import com.pocketpet.ads.Ads
 import com.pocketpet.ads.BannerSlot
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
+import com.pocketpet.data.Tier
 import com.pocketpet.pet.Pets
 import com.pocketpet.service.PetService
 
@@ -34,6 +35,8 @@ class MainActivity : Activity() {
     private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
     private lateinit var banner: BannerSlot
+    private var showVipOnResume = false
+    private var notificationAsked = false
 
     private var petIndex = 0
     private var drawerOpen = false
@@ -58,13 +61,23 @@ class MainActivity : Activity() {
 
         setupDrawer()
         setupPetSelector()
-        requestNotificationPermissionIfNeeded()
 
         banner = BannerSlot(this, findViewById(R.id.bannerContainer))
+
+        // 앱을 새로 켰을 때(화면 회전 등이 아닐 때) VIP 소개 화면을 띄운다. VIP+는 띄우지 않는다
+        showVipOnResume = savedInstanceState == null && settings.tier != Tier.VIP_PLUS
     }
 
     override fun onResume() {
         super.onResume()
+        if (showVipOnResume) {
+            showVipOnResume = false
+            openVipPage()
+        } else if (!notificationAsked) {
+            // 알림 권한은 VIP 화면이 닫힌 뒤에 물어본다 (두 창이 겹치지 않게)
+            notificationAsked = true
+            requestNotificationPermissionIfNeeded()
+        }
         // 등급이 바뀌었을 수 있으니 돌아올 때마다 배너를 다시 정한다 (VIP+는 배너 없음)
         if (settings.tier.showBanner) banner.show() else banner.hide()
         banner.resume()
@@ -253,9 +266,9 @@ class MainActivity : Activity() {
     // ---------- 소환 ----------
 
     private fun summonPet() {
-        // 잠긴 펫은 소환할 수 없다
+        // 잠긴 펫을 누르면 VIP 소개 화면을 보여 준다
         if (!Pets.isUnlocked(Pets.ALL[petIndex], settings.tier)) {
-            Toast.makeText(this, R.string.toast_pet_locked, Toast.LENGTH_SHORT).show()
+            openVipPage()
             return
         }
         if (!Settings.canDrawOverlays(this)) {
@@ -265,6 +278,10 @@ class MainActivity : Activity() {
         startForegroundService(Intent(this, PetService::class.java))
         petStatus.setText(R.string.pet_status_starting)
         refreshStatusSoon()
+    }
+
+    private fun openVipPage() {
+        startActivity(Intent(this, VipActivity::class.java))
     }
 
     private fun dismissPet() {
