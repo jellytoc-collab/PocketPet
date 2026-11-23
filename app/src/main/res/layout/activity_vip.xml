@@ -14,10 +14,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:text="@string/vip_title"
         android:textColor="#3B2F2F"
-        android:textSize="28sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
     <TextView
@@ -32,11 +32,11 @@
         android:textSize="16sp" />
 
     <!-- 옆으로 넘기는 카드들. 카드 너비와 넘김 위치는 코드에서 맞춘다 -->
-    <HorizontalScrollView
+    <com.pocketpet.SnapPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:layout_weight="1"
         android:overScrollMode="never"
         android:scrollbars="none">
@@ -55,13 +55,13 @@
                 android:background="@drawable/bg_vip_plus_card"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="👑"
-                    android:textSize="56sp" />
+                    android:textSize="40sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
                     android:layout_marginTop="4dp"
                     android:text="@string/tier_vip_plus"
                     android:textColor="#3B2F2F"
-                    android:textSize="30sp"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -89,30 +89,30 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:lineSpacingExtra="8dp"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="4dp"
                     android:text="@string/vip_plus_benefits"
                     android:textColor="#3B2F2F"
-                    android:textSize="17sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="12dp"
                     android:text="@string/vip_plus_price"
                     android:textColor="#F28C38"
-                    android:textSize="26sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/vipPlusButton"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="12dp"
                     android:backgroundTint="#F28C38"
                     android:text="@string/vip_plus_subscribe"
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -124,13 +124,13 @@
                 android:background="@drawable/bg_vip_card"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="⭐"
-                    android:textSize="56sp" />
+                    android:textSize="40sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -138,40 +138,40 @@
                     android:layout_marginTop="4dp"
                     android:text="@string/tier_vip"
                     android:textColor="#3B2F2F"
-                    android:textSize="30sp"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:lineSpacingExtra="8dp"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="4dp"
                     android:text="@string/vip_benefits"
                     android:textColor="#3B2F2F"
-                    android:textSize="17sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="12dp"
                     android:text="@string/vip_price"
                     android:textColor="#F28C38"
-                    android:textSize="26sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/vipButton"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="12dp"
                     android:backgroundTint="#F28C38"
                     android:text="@string/vip_subscribe"
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-    </HorizontalScrollView>
+    </com.pocketpet.SnapPager>
 
     <!-- 지금 몇 번째 카드인지 보여 주는 점 -->
     <LinearLayout

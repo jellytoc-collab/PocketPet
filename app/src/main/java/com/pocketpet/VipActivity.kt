@@ -1,18 +1,14 @@
 package com.pocketpet
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
-import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.Tier
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -23,11 +19,9 @@ import kotlin.math.roundToInt
  */
 class VipActivity : Activity() {
 
-    private lateinit var pager: HorizontalScrollView
+    private lateinit var pager: SnapPager
     private lateinit var dots: LinearLayout
-    private var pageWidth = 0
     private var currentPage = 0
-    private var downScrollX = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +34,14 @@ class VipActivity : Activity() {
         setupDots()
         // 화면 너비를 알아야 카드 크기를 정할 수 있어서, 화면이 그려진 뒤에 맞춘다
         pager.post { setupPages() }
-        setupSwipe()
+        // 넘길 때마다 아래 점을 바꾼다
+        pager.setOnScrollChangeListener { _, _, _, _, _ ->
+            val page = pager.currentPage
+            if (page != currentPage) {
+                currentPage = page
+                updateDots()
+            }
+        }
         showExitButtonLater()
     }
 
@@ -80,7 +81,9 @@ class VipActivity : Activity() {
     private fun setupPages() {
         val screenWidth = pager.width
         val gap = dp(8)
-        pageWidth = (screenWidth * PAGE_RATIO).roundToInt()
+        val pageWidth = (screenWidth * PAGE_RATIO).roundToInt()
+        pager.pageWidth = pageWidth
+        pager.pageCount = PAGE_COUNT
         val side = (screenWidth - pageWidth) / 2
 
         val pages = findViewById<LinearLayout>(R.id.pages)
@@ -93,41 +96,6 @@ class VipActivity : Activity() {
             params.marginEnd = gap
             card.layoutParams = params
         }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setupSwipe() {
-        pager.setOnTouchListener { _, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> downScrollX = pager.scrollX
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // 손을 떼면 가까운 카드로 딱 맞춰 넘긴다. 조금만 밀어도 다음 카드로 간다
-                    pager.post { snap() }
-                }
-            }
-            false
-        }
-        pager.setOnScrollChangeListener { _, scrollX, _, _, _ ->
-            if (pageWidth > 0) {
-                val page = (scrollX.toFloat() / pageWidth).roundToInt().coerceIn(0, PAGE_COUNT - 1)
-                if (page != currentPage) {
-                    currentPage = page
-                    updateDots()
-                }
-            }
-        }
-    }
-
-    private fun snap() {
-        if (pageWidth == 0) return
-        val moved = pager.scrollX - downScrollX
-        val startPage = (downScrollX.toFloat() / pageWidth).roundToInt()
-        val target = when {
-            abs(moved) < pageWidth * SWIPE_THRESHOLD -> startPage
-            moved > 0 -> startPage + 1
-            else -> startPage - 1
-        }.coerceIn(0, PAGE_COUNT - 1)
-        pager.smoothScrollTo(target * pageWidth, 0)
     }
 
     // ---------- 아래 점 표시 ----------
@@ -162,7 +130,6 @@ class VipActivity : Activity() {
     companion object {
         private const val PAGE_COUNT = 2            // VIP+, VIP
         private const val PAGE_RATIO = 0.84f         // 카드 한 장이 차지하는 화면 너비 비율
-        private const val SWIPE_THRESHOLD = 0.15f    // 이만큼 밀면 다음 카드로 넘어간다
         private const val EXIT_DELAY_MS = 1000L      // 나가기 버튼이 나타나기까지 시간
         private const val FADE_MS = 250L
     }
