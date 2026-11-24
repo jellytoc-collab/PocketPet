@@ -3,10 +3,10 @@ package com.pocketpet.pet
 import kotlin.math.hypot
 import kotlin.random.Random
 
-enum class PetState { IDLE, WALK, DRAGGED, FALL, THROWN }
+enum class PetState { IDLE, WALK, DRAGGED, FALL, THROWN, SLEEP, WAKE }
 
 /** 어떤 그림 묶음의 몇 번째 컷을 보여 줄지 */
-enum class Anim { IDLE, WALK, FLAP }
+enum class Anim { IDLE, WALK, FLAP, SLEEP }
 data class Frame(val anim: Anim, val index: Int)
 
 /**
@@ -37,9 +37,38 @@ class PetController(
             if (state == PetState.IDLE) stateTimeLeft = randomRest()
         }
 
-    /** 쉬는 중이면 남은 쉬는 시간(초), 아니면 0 */
+    /** 잠자기를 쓸 수 있는지 (VIP+). 꺼지면 자던 펫은 바로 깬다 */
+    var canSleep = false
+        set(value) {
+            if (value == field) return
+            field = value
+            if (!value && (state == PetState.SLEEP || state == PetState.WAKE)) enter(PetState.IDLE)
+            else if (state == PetState.IDLE) stateTimeLeft = randomRest()
+        }
+
+    /** 이 펫이 지금 잠들 수 있는지 (잠자기 그림이 있고 등급이 허락할 때) */
+    private val sleepPossible: Boolean
+        get() = canSleep && definition.sleepStrip != null
+
+    private val sleepFrames: Int get() = definition.sleepFrameCount
+    /** 잠드는 데 걸리는 시간: 모든 컷을 한 번씩 보여 준다 */
+    private val fallAsleepSec: Float get() = sleepFrames / SLEEP_FPS
+    /** 깨어나는 데 걸리는 시간: 잠든 컷 2장을 뺀 나머지를 거꾸로 */
+    private val wakeUpSec: Float get() = (sleepFrames - 2) / WAKE_FPS
+
+    /**
+     * 화면이 바뀌지 않고 가만히 있을 시간(초). 이 동안은 매 프레임 계산하지 않아도 된다.
+     * 쉬는 중: 남은 쉬는 시간. 잠든 중: 다음 숨쉬기 컷까지 남은 시간.
+     */
     val restTimeLeft: Float
-        get() = if (state == PetState.IDLE) stateTimeLeft.coerceAtLeast(0f) else 0f
+        get() = when {
+            state == PetState.IDLE -> stateTimeLeft.coerceAtLeast(0f)
+            state == PetState.SLEEP && animTime >= fallAsleepSec -> {
+                val toNextFrame = SLEEP_LOOP_SEC - (animTime - fallAsleepSec) % SLEEP_LOOP_SEC
+                minOf(toNextFrame, stateTimeLeft).coerceAtLeast(0f)
+            }
+            else -> 0f
+        }
 
     private var minX = 0f
     private var maxX = 0f
@@ -80,7 +109,14 @@ class PetController(
 
     /** 잠들어 있던 동안 흐른 시간을 쉬는 시간에서 뺀다 */
     fun passTime(sec: Float) {
-        if (state == PetState.IDLE) stateTimeLeft -= sec
+        when (state) {
+            PetState.IDLE -> stateTimeLeft -= sec
+            PetState.SLEEP -> {
+                stateTimeLeft -= sec
+                animTime += sec       // 숨쉬기 컷도 그만큼 넘어간다
+            }
+            else -> Unit
+        }
     }
 
     /** 손가락으로 누른 순간: 공중에서 휘적거리기 시작 */
@@ -130,7 +166,7 @@ class PetController(
                 return
             }
             PetState.WALK -> if (updateWalk(dt)) return
-            PetState.IDLE -> Unit
+            PetState.IDLE, PetState.SLEEP, PetState.WAKE -> Unit
         }
 
         stateTimeLeft -= dt
@@ -148,6 +184,20 @@ class PetController(
         PetState.DRAGGED, PetState.THROWN -> Frame(
             Anim.FLAP,
             (animTime * definition.flapFps).toInt() % definition.flapFrameCount
+        )
+        // 한 컷씩 점점 잠들고, 다 잠들면 마지막 두 컷을 번갈아 보여 준다 (숨쉬기)
+        PetState.SLEEP -> Frame(
+            Anim.SLEEP,
+            if (animTime < fallAsleepSec) {
+                (animTime * SLEEP_FPS).toInt().coerceAtMost(sleepFrames - 1)
+            } else {
+                sleepFrames - 2 + ((animTime - fallAsleepSec) / SLEEP_LOOP_SEC).toInt() % 2
+            }
+        )
+        // 깰 때는 잠드는 컷을 거꾸로 빠르게 보여 준다
+        PetState.WAKE -> Frame(
+            Anim.SLEEP,
+            (sleepFrames - 3 - (animTime * WAKE_FPS).toInt()).coerceAtLeast(0)
         )
     }
 
@@ -196,7 +246,14 @@ class PetController(
 
     private fun chooseNextState() {
         when (state) {
-            PetState.IDLE -> startWalk()          // 다 쉬었으면 걷는다
+            // 다 쉬었으면 걷는다. 잠자기를 쓸 수 있으면 가끔은 잠든다
+            PetState.IDLE ->
+                if (sleepPossible && (walkFrequency <= 0 || random.nextFloat() < SLEEP_CHANCE)) {
+                    enter(PetState.SLEEP)
+                } else {
+                    startWalk()
+                }
+            PetState.SLEEP -> enter(PetState.WAKE)   // 다 잤으면 깨어난다
             else -> enter(PetState.IDLE)
         }
     }
@@ -213,10 +270,13 @@ class PetController(
     /**
      * 쉬는 시간을 무작위로 정한다.
      * 평균은 (15 ÷ 빈도)초이고, 매번 그 0.5 ~ 1.5배 사이에서 달라진다.
-     * 빈도가 0이면 걷지 않고 계속 쉰다.
+     * 빈도가 0이면 걷지 않고 계속 쉰다. 잠자기를 쓸 수 있으면 한참 쉬다가 잠든다.
      */
     private fun randomRest(): Float {
-        if (walkFrequency <= 0) return Float.POSITIVE_INFINITY
+        if (walkFrequency <= 0) {
+            return if (sleepPossible) randomBetween(DOZE_OFF_MIN_SEC, DOZE_OFF_MAX_SEC)
+            else Float.POSITIVE_INFINITY
+        }
         val average = REST_BASE_SEC / walkFrequency
         return average * (0.5f + random.nextFloat())
     }
@@ -228,10 +288,22 @@ class PetController(
             PetState.IDLE -> randomRest()
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
             PetState.DRAGGED, PetState.FALL, PetState.THROWN -> 0f   // 시간 제한 없음
+            PetState.SLEEP -> fallAsleepSec + randomBetween(SLEEP_MIN_SEC, SLEEP_MAX_SEC)
+            PetState.WAKE -> wakeUpSec
         }
     }
 
+    private fun randomBetween(min: Float, max: Float): Float = min + random.nextFloat() * (max - min)
+
     companion object {
+        private const val SLEEP_CHANCE = 0.3f       // 쉬고 난 뒤 걷는 대신 잠들 확률
+        private const val SLEEP_FPS = 2f            // 잠드는 컷이 바뀌는 속도 (초당 장수)
+        private const val WAKE_FPS = 8f             // 깨어나는 컷이 바뀌는 속도
+        private const val SLEEP_LOOP_SEC = 1.2f     // 잠든 뒤 숨쉬기 컷이 바뀌는 간격
+        private const val SLEEP_MIN_SEC = 30f       // 잠자는 시간 (초)
+        private const val SLEEP_MAX_SEC = 60f
+        private const val DOZE_OFF_MIN_SEC = 20f    // 걷지 않는 펫이 잠들 때까지 쉬는 시간
+        private const val DOZE_OFF_MAX_SEC = 40f
         private const val REST_BASE_SEC = 15f
         private const val MIN_THROW_DP = 600f    // 이보다 느리게 놓으면 그냥 떨어진다 (초당 dp)
         private const val MAX_THROW_DP = 4000f   // 던지는 속도 최대치 (초당 dp)

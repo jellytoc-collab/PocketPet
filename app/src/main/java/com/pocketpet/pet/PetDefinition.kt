@@ -17,12 +17,14 @@ data class PetDefinition(
     val flapFps: Float = 12f,       // 휘적거리기 그림이 바뀌는 속도 (초당 장수)
     val gravityDp: Float = 2500f,   // 떨어질 때 중력 가속도
     val heightDp: Int = 120,        // 화면에 표시되는 키
-    val free: Boolean = false       // 일반 등급에서도 쓸 수 있는 펫인지
+    val free: Boolean = false,      // 일반 등급에서도 쓸 수 있는 펫인지
+    val sleepStrip: Int? = null,    // 잠드는 컷을 가로로 이어 붙인 그림 (없으면 잠자지 않음)
+    val sleepFrameCount: Int = 8    // 잠드는 컷 수
 )
 
 object Pets {
     val ALL = listOf(
-        PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap, free = true),
+        PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap, free = true, sleepStrip = R.drawable.shiro_sleep),
         PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap, free = true),
         PetDefinition("momo", R.string.pet_momo, R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap),
         PetDefinition("luna", R.string.pet_luna, R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap),

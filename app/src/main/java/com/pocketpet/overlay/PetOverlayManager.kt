@@ -46,6 +46,7 @@ class PetOverlayManager(
     private var idleDrawable: Drawable? = null
     private var walkFrames: List<Drawable> = emptyList()
     private var flapFrames: List<Drawable> = emptyList()
+    private var sleepFrames: List<Drawable> = emptyList()
 
     private var petView: ImageView? = null
     private var params: WindowManager.LayoutParams? = null
@@ -208,6 +209,12 @@ class PetOverlayManager(
         canThrow = allowed
     }
 
+    /** 잠잘 수 있는지 (VIP+). 바뀌면 쉬는 시간을 다시 계산하도록 깨운다 */
+    fun setCanSleep(allowed: Boolean) {
+        controller.canSleep = allowed
+        startLoop()
+    }
+
     // ---------- 움직임 반복 ----------
 
     private fun startLoop() {
@@ -260,7 +267,7 @@ class PetOverlayManager(
             if (!checkPermission()) return
         }
 
-        // 쉬는 중이면 잠든다. 권한 확인을 위해 한 번에 최대 2초씩만 잔다
+        // 쉬거나 자는 중이라 화면이 안 바뀌면 계산을 멈춘다. 권한 확인을 위해 한 번에 최대 2초씩만 멈춘다
         val rest = controller.restTimeLeft
         if (rest > MIN_SLEEP_SEC) {
             sleep(minOf(rest, PERMISSION_CHECK_SEC))
@@ -303,6 +310,8 @@ class PetOverlayManager(
         idleDrawable = context.getDrawable(definition.idle)
         walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
         flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+        sleepFrames = definition.sleepStrip?.let { loadStrip(it, definition.sleepFrameCount) }
+            ?: emptyList()
     }
 
     /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
@@ -342,6 +351,7 @@ class PetOverlayManager(
         Anim.IDLE -> idleDrawable
         Anim.WALK -> walkFrames.getOrNull(frame.index)
         Anim.FLAP -> flapFrames.getOrNull(frame.index)
+        Anim.SLEEP -> sleepFrames.getOrNull(frame.index) ?: idleDrawable
     }
 
     // ---------- 터치 ----------

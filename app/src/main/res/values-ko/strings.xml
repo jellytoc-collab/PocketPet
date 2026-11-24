@@ -94,7 +94,7 @@
     <string name="vip_plus_price">월 6,600원</string>
     <string name="vip_recommended">추천</string>
     <string name="vip_benefits">✓ 모든 펫 잠금 해제\n✓ 던지기\n✓ 앱 복귀 광고 없음</string>
-    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 잠자기 (곧 추가)\n✓ 여러 마리 소환 (곧 추가)</string>
+    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 잠자기 (시로부터, 다른 펫도 곧 추가)\n✓ 여러 마리 소환 (곧 추가)</string>
     <string name="vip_subscribe">VIP 구독하기</string>
     <string name="vip_plus_subscribe">VIP+ 구독하기</string>
     <string name="vip_current">이용 중</string>

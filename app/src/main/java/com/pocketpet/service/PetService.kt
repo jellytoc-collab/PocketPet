@@ -43,6 +43,7 @@ class PetService : Service() {
                 PetSettingsRepository.KEY_TIER -> {
                     // 등급이 바뀌면 던지기 가능 여부와 펫 잠금을 다시 적용한다
                     overlayManager.setCanThrow(settings.tier.canThrow)
+                    overlayManager.setCanSleep(settings.tier.plusFeatures)
                     switchPet(Pets.usable(settings.selectedPetId, settings.tier))
                 }
                 PetSettingsRepository.KEY_SIZE ->
@@ -125,6 +126,7 @@ class PetService : Service() {
             setFloor(settings.floorDp)
             setWalkFrequency(settings.walkFrequency)
             setCanThrow(settings.tier.canThrow)
+            setCanSleep(settings.tier.plusFeatures)
         }
     }
 
