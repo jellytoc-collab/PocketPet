@@ -25,18 +25,18 @@ data class PetDefinition(
 object Pets {
     val ALL = listOf(
         PetDefinition("shiro", R.string.pet_shiro, R.drawable.shiro_idle, R.drawable.shiro_walk, R.drawable.shiro_flap, free = true, sleepStrip = R.drawable.shiro_sleep),
-        PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap, free = true),
-        PetDefinition("momo", R.string.pet_momo, R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap),
-        PetDefinition("luna", R.string.pet_luna, R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap),
-        PetDefinition("tashu", R.string.pet_tashu, R.drawable.tashu_idle, R.drawable.tashu_walk, R.drawable.tashu_flap),
-        PetDefinition("mashi", R.string.pet_mashi, R.drawable.mashi_idle, R.drawable.mashi_walk, R.drawable.mashi_flap),
-        PetDefinition("hari", R.string.pet_hari, R.drawable.hari_idle, R.drawable.hari_walk, R.drawable.hari_flap),
-        PetDefinition("miru", R.string.pet_miru, R.drawable.miru_idle, R.drawable.miru_walk, R.drawable.miru_flap),
-        PetDefinition("leon", R.string.pet_leon, R.drawable.leon_idle, R.drawable.leon_walk, R.drawable.leon_flap),
-        PetDefinition("noel", R.string.pet_noel, R.drawable.noel_idle, R.drawable.noel_walk, R.drawable.noel_flap),
-        PetDefinition("neon", R.string.pet_neon, R.drawable.neon_idle, R.drawable.neon_walk, R.drawable.neon_flap),
-        PetDefinition("yuki", R.string.pet_yuki, R.drawable.yuki_idle, R.drawable.yuki_walk, R.drawable.yuki_flap),
-        PetDefinition("maren", R.string.pet_maren, R.drawable.maren_idle, R.drawable.maren_walk, R.drawable.maren_flap)
+        PetDefinition("kuro", R.string.pet_kuro, R.drawable.kuro_idle, R.drawable.kuro_walk, R.drawable.kuro_flap, free = true, sleepStrip = R.drawable.kuro_sleep),
+        PetDefinition("momo", R.string.pet_momo, R.drawable.momo_idle, R.drawable.momo_walk, R.drawable.momo_flap, sleepStrip = R.drawable.momo_sleep),
+        PetDefinition("luna", R.string.pet_luna, R.drawable.luna_idle, R.drawable.luna_walk, R.drawable.luna_flap, sleepStrip = R.drawable.luna_sleep),
+        PetDefinition("tashu", R.string.pet_tashu, R.drawable.tashu_idle, R.drawable.tashu_walk, R.drawable.tashu_flap, sleepStrip = R.drawable.tashu_sleep),
+        PetDefinition("mashi", R.string.pet_mashi, R.drawable.mashi_idle, R.drawable.mashi_walk, R.drawable.mashi_flap, sleepStrip = R.drawable.mashi_sleep),
+        PetDefinition("hari", R.string.pet_hari, R.drawable.hari_idle, R.drawable.hari_walk, R.drawable.hari_flap, sleepStrip = R.drawable.hari_sleep),
+        PetDefinition("miru", R.string.pet_miru, R.drawable.miru_idle, R.drawable.miru_walk, R.drawable.miru_flap, sleepStrip = R.drawable.miru_sleep),
+        PetDefinition("leon", R.string.pet_leon, R.drawable.leon_idle, R.drawable.leon_walk, R.drawable.leon_flap, sleepStrip = R.drawable.leon_sleep),
+        PetDefinition("noel", R.string.pet_noel, R.drawable.noel_idle, R.drawable.noel_walk, R.drawable.noel_flap, sleepStrip = R.drawable.noel_sleep),
+        PetDefinition("neon", R.string.pet_neon, R.drawable.neon_idle, R.drawable.neon_walk, R.drawable.neon_flap, sleepStrip = R.drawable.neon_sleep),
+        PetDefinition("yuki", R.string.pet_yuki, R.drawable.yuki_idle, R.drawable.yuki_walk, R.drawable.yuki_flap, sleepStrip = R.drawable.yuki_sleep),
+        PetDefinition("maren", R.string.pet_maren, R.drawable.maren_idle, R.drawable.maren_walk, R.drawable.maren_flap, sleepStrip = R.drawable.maren_sleep)
     )
 
     fun byId(id: String?): PetDefinition = ALL.firstOrNull { it.id == id } ?: ALL.first()
