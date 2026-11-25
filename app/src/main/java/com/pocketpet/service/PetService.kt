@@ -32,7 +32,7 @@ class PetService : Service() {
     private lateinit var overlayManager: PetOverlayManager
     private var stopping = false
     private var screenOn = true
-    // 폰을 흔들면 펫이 날아오른다 (VIP)
+    // 폰을 흔들면 펫이 날아오른다 (VIP+)
     private val shakeDetector by lazy { ShakeDetector(this) { overlayManager.fling() } }
 
     // 설정 화면에서 값이 바뀌면 실행 중인 펫에 바로 반영한다
