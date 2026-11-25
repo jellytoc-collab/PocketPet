@@ -1,6 +1,8 @@
 package com.pocketpet.pet
 
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 import kotlin.random.Random
 
 enum class PetState { IDLE, WALK, DRAGGED, FALL, THROWN, SLEEP, WAKE }
@@ -153,6 +155,26 @@ class PetController(
             velocityY = 0f
             enter(PetState.FALL)
         }
+    }
+
+    /** 시험용: 땅 위에 있으면 바로 잠들기 시작한다. 잠들었으면 true */
+    fun sleepNow(): Boolean {
+        if (definition.sleepStrip == null || isInAir) return false
+        enter(PetState.SLEEP)
+        return true
+    }
+
+    /**
+     * 폰을 흔들었을 때: 위쪽 아무 방향으로 휙 날아올라 벽·천장에 튕기다 내려온다.
+     * 계속 흔들면 공중에서 또 차올라서 계속 날아다닌다. 손가락으로 잡고 있을 때는 무시한다.
+     */
+    fun fling() {
+        if (state == PetState.DRAGGED) return
+        val speed = randomBetween(FLING_MIN_DP, FLING_MAX_DP) * density
+        val angle = Math.toRadians(randomBetween(FLING_MIN_ANGLE, FLING_MAX_ANGLE).toDouble())
+        velocityX = (cos(angle) * speed).toFloat()
+        velocityY = (-sin(angle) * speed).toFloat()   // 화면에서는 위쪽이 -
+        enter(PetState.THROWN)
     }
 
     /** dt: 지난 프레임 이후 흐른 시간 (초) */
@@ -308,5 +330,9 @@ class PetController(
         private const val MIN_THROW_DP = 600f    // 이보다 느리게 놓으면 그냥 떨어진다 (초당 dp)
         private const val MAX_THROW_DP = 4000f   // 던지는 속도 최대치 (초당 dp)
         private const val BOUNCE = 0.6f          // 벽에 튕길 때 남는 속도 비율
+        private const val FLING_MIN_DP = 1600f   // 폰을 흔들었을 때 날아오르는 속도 (초당 dp)
+        private const val FLING_MAX_DP = 2800f
+        private const val FLING_MIN_ANGLE = 30f  // 날아오르는 방향 (0도 = 오른쪽, 90도 = 바로 위)
+        private const val FLING_MAX_ANGLE = 150f
     }
 }

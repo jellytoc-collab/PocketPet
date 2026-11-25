@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import com.pocketpet.data.PetSettingsRepository
@@ -82,6 +83,11 @@ class SettingsActivity : Activity() {
         group.setOnCheckedChangeListener { _, checkedId ->
             settings.tier = ids.entries.first { it.value == checkedId }.key
         }
+
+        // 켜면 메인 화면에 ‘지금 잠들기’ 버튼이 생긴다
+        val sleepSwitch = findViewById<Switch>(R.id.testSleepSwitch)
+        sleepSwitch.isChecked = settings.testSleepButton
+        sleepSwitch.setOnCheckedChangeListener { _, on -> settings.testSleepButton = on }
     }
 
     /** 정말 초기화할지 한 번 물어본 뒤 기본값으로 되돌린다 */

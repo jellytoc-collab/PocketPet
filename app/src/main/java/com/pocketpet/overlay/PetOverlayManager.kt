@@ -217,6 +217,19 @@ class PetOverlayManager(
         startLoop()
     }
 
+    /** 시험용 잠들기 버튼: 땅에 있으면 바로 잠들기 시작한다 */
+    fun sleepNow() {
+        if (petView == null) return
+        if (controller.sleepNow()) startLoop()
+    }
+
+    /** 폰을 흔들었을 때: 펫이 휙 날아오른다 */
+    fun fling() {
+        if (petView == null || paused) return
+        controller.fling()
+        startLoop()
+    }
+
     // ---------- 움직임 반복 ----------
 
     private fun startLoop() {

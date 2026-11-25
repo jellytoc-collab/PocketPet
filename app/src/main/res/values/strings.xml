@@ -74,7 +74,7 @@
     <string name="pet_maren">Maren</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. Pets marked 🔒 are available from VIP. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. With VIP, flick it while letting go and it flies, bouncing off the edges of the screen.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. Pets marked 🔒 are available from VIP. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. With VIP, flick it while letting go and it flies, bouncing off the edges of the screen. With VIP you can also shake your phone hard to send it flying.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
@@ -87,13 +87,16 @@
     <string name="tier_free">Free</string>
     <string name="tier_vip">VIP</string>
     <string name="tier_vip_plus">VIP+</string>
+    <string name="test_sleep_switch">💤 Show the “Sleep now” button on the main screen</string>
+    <string name="test_sleep_now">💤 Sleep now (test)</string>
+    <string name="test_sleep_need_pet">Summon a pet first</string>
     <!-- VIP page -->
     <string name="vip_title">👑 Pocket Pet VIP</string>
     <string name="vip_subtitle">More friends, more fun</string>
     <string name="vip_price">₩3,300 / month</string>
     <string name="vip_plus_price">₩6,600 / month</string>
     <string name="vip_recommended">Best</string>
-    <string name="vip_benefits">✓ Unlock all pets\n✓ Throwing\n✓ No ads when you come back to the app</string>
+    <string name="vip_benefits">✓ Unlock all pets\n✓ Throwing\n✓ Shake your phone and your pet flies around\n✓ No ads when you come back to the app</string>
     <string name="vip_plus_benefits">✓ Everything in VIP\n✓ No ads at all, banner included\n✓ Speech bubbles (coming soon)\n✓ Dozing off to sleep\n✓ Summon several pets (coming soon)</string>
     <string name="vip_subscribe">Subscribe to VIP</string>
     <string name="vip_plus_subscribe">Subscribe to VIP+</string>

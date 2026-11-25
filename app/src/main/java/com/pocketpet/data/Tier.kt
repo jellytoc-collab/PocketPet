@@ -15,6 +15,9 @@ enum class Tier {
     /** 펫을 던질 수 있는지 (일반은 놓으면 그냥 떨어진다) */
     val canThrow: Boolean get() = this != FREE
 
+    /** 폰을 흔들면 펫이 날아다니는지 (던지기와 같은 VIP 기능) */
+    val canShakeFly: Boolean get() = this != FREE
+
     /** 앱에 돌아왔을 때 광고를 보여 줄지 */
     val showAppOpenAd: Boolean get() = this == FREE
 
