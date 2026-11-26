@@ -80,6 +80,8 @@ class PetController(
     private var velocityY = 0f       // 떨어지는 속도 (초당 px)
     private var stateTimeLeft = 0f   // 현재 행동의 남은 시간 (초)
     private var animTime = 0f        // 현재 행동을 시작한 뒤 지난 시간 (초)
+    private var floorBouncesLeft = 0 // 흔들어서 날 때 바닥에서 더 튕길 횟수
+    private var gentleFall = false   // 마지막 튕김 뒤 천천히 내려오는 중인지
 
     /** 끌려 다니거나 공중에 떠 있는 중인지 */
     private val isInAir: Boolean
@@ -167,6 +169,7 @@ class PetController(
     /**
      * 폰을 흔들었을 때: 위쪽 아무 방향으로 휙 날아올라 벽·천장에 튕기다 내려온다.
      * 계속 흔들면 공중에서 또 차올라서 계속 날아다닌다. 손가락으로 잡고 있을 때는 무시한다.
+     * 흔들기를 멈추면 바닥에서 3번 통통 튕긴 뒤, 마지막에는 천천히 내려앉는다.
      */
     fun fling() {
         if (state == PetState.DRAGGED) return
@@ -175,6 +178,7 @@ class PetController(
         velocityX = (cos(angle) * speed).toFloat()
         velocityY = (-sin(angle) * speed).toFloat()   // 화면에서는 위쪽이 -
         enter(PetState.THROWN)
+        floorBouncesLeft = FLING_FLOOR_BOUNCES
     }
 
     /** dt: 지난 프레임 이후 흐른 시간 (초) */
@@ -225,7 +229,13 @@ class PetController(
 
     /** 중력으로 떨어진다. 던져졌으면 옆으로도 날아가고 벽·천장에 튕긴다 */
     private fun updateFall(dt: Float) {
-        velocityY += definition.gravityDp * density * dt
+        if (gentleFall) {
+            // 마지막으로 내려앉을 때: 중력을 약하게 하고 떨어지는 속도도 제한해서 천천히
+            velocityY += definition.gravityDp * density * GENTLE_GRAVITY * dt
+            velocityY = velocityY.coerceAtMost(GENTLE_MAX_FALL_DP * density)
+        } else {
+            velocityY += definition.gravityDp * density * dt
+        }
         x += velocityX * dt
         y += velocityY * dt
 
@@ -241,6 +251,19 @@ class PetController(
         if (y < topLimit && velocityY < 0f) {
             y = topLimit
             velocityY = -velocityY * BOUNCE
+        }
+        // 흔들어서 날던 중이면 바닥에서 통통 튕긴다. 마지막 튕김 뒤에는 천천히 내려온다
+        if (y >= groundY && floorBouncesLeft > 0 && velocityY > 0f) {
+            y = groundY
+            floorBouncesLeft--
+            var up = (velocityY * FLOOR_BOUNCE).coerceAtLeast(MIN_FLOOR_BOUNCE_DP * density)
+            if (floorBouncesLeft == 0) {
+                gentleFall = true
+                up = up.coerceAtMost(LAST_BOUNCE_DP * density)
+                velocityX *= 0.5f
+            }
+            velocityY = -up
+            return
         }
         // 바닥에 닿으면 멈춘다
         if (y >= groundY) {
@@ -306,6 +329,8 @@ class PetController(
     private fun enter(newState: PetState) {
         state = newState
         animTime = 0f
+        floorBouncesLeft = 0      // 바닥 튕김은 fling()에서만 다시 채운다
+        gentleFall = false
         stateTimeLeft = when (newState) {
             PetState.IDLE -> randomRest()
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
@@ -334,5 +359,11 @@ class PetController(
         private const val FLING_MAX_DP = 2800f
         private const val FLING_MIN_ANGLE = 30f  // 날아오르는 방향 (0도 = 오른쪽, 90도 = 바로 위)
         private const val FLING_MAX_ANGLE = 150f
+        private const val FLING_FLOOR_BOUNCES = 3      // 흔들기를 멈춘 뒤 바닥에서 튕기는 횟수
+        private const val FLOOR_BOUNCE = 0.7f          // 바닥에서 튕길 때 남는 속도 비율
+        private const val MIN_FLOOR_BOUNCE_DP = 900f   // 바닥 튕김이 너무 작아 보이지 않게 하는 최소 속도
+        private const val LAST_BOUNCE_DP = 800f        // 마지막 튕김 속도 상한 (천천히 내려오니 너무 높이 뜨지 않게)
+        private const val GENTLE_GRAVITY = 0.4f        // 마지막에 내려올 때 중력 (보통의 40%)
+        private const val GENTLE_MAX_FALL_DP = 450f    // 마지막에 내려올 때 최고 속도 (초당 dp)
     }
 }
