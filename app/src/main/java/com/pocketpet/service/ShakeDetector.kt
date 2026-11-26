@@ -57,10 +57,10 @@ class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorE
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
 
     companion object {
-        private const val THRESHOLD_G = 2.5f        // 이만큼 세게 휘둘러야 한 번으로 친다 (중력의 배수)
-        private const val PEAKS_NEEDED = 3          // 이만큼 이어서 휘둘러야 흔든 것
-        private const val PEAK_MIN_GAP_MS = 80L
-        private const val PEAK_MAX_GAP_MS = 500L    // 휘두름 사이가 이보다 길면 처음부터 다시 센다
+        private const val THRESHOLD_G = 3.5f        // 이만큼 세게 휘둘러야 한 번으로 친다 (중력의 배수)
+        private const val PEAKS_NEEDED = 4          // 이만큼 이어서 휘둘러야 흔든 것
+        private const val PEAK_MIN_GAP_MS = 100L
+        private const val PEAK_MAX_GAP_MS = 400L    // 휘두름 사이가 이보다 길면 처음부터 다시 센다
         private const val COOLDOWN_MS = 600L        // 계속 흔들면 이 간격마다 다시 날아오른다
     }
 }
