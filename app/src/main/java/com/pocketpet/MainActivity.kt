@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -35,6 +36,7 @@ class MainActivity : Activity() {
     private lateinit var scrim: View
     private lateinit var settings: PetSettingsRepository
     private lateinit var banner: BannerSlot
+    private lateinit var sleepNowButton: Button
     private var showVipOnResume = false
     private var notificationAsked = false
 
@@ -58,6 +60,8 @@ class MainActivity : Activity() {
 
         findViewById<Button>(R.id.summonButton).setOnClickListener { summonPet() }
         findViewById<Button>(R.id.dismissButton).setOnClickListener { dismissPet() }
+        sleepNowButton = findViewById(R.id.sleepNowButton)
+        sleepNowButton.setOnClickListener { sleepNow() }
 
         setupDrawer()
         setupPetSelector()
@@ -81,6 +85,10 @@ class MainActivity : Activity() {
         // 등급이 바뀌었을 수 있으니 돌아올 때마다 배너를 다시 정한다 (VIP+는 배너 없음)
         if (settings.tier.showBanner) banner.show() else banner.hide()
         banner.resume()
+        // 시험용 ‘지금 잠들기’ 버튼: 테스트 빌드에서 설정의 스위치를 켰을 때만 보인다
+        val debuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        sleepNowButton.visibility =
+            if (debuggable && settings.testSleepButton) View.VISIBLE else View.GONE
         // 설정 화면에서 권한·바닥 높이를 바꾸고 돌아왔을 때 상태를 다시 표시한다
         updateStatus()
         // 펫 목록에서 다른 펫을 고르고 돌아왔으면 그 펫을 보여 준다
@@ -278,6 +286,15 @@ class MainActivity : Activity() {
         startForegroundService(Intent(this, PetService::class.java))
         petStatus.setText(R.string.pet_status_starting)
         refreshStatusSoon()
+    }
+
+    /** 시험용: 나와 있는 펫을 바로 잠들게 한다 */
+    private fun sleepNow() {
+        if (!PetService.isRunning) {
+            Toast.makeText(this, R.string.test_sleep_need_pet, Toast.LENGTH_SHORT).show()
+            return
+        }
+        startService(Intent(this, PetService::class.java).setAction(PetService.ACTION_SLEEP_NOW))
     }
 
     private fun openVipPage() {

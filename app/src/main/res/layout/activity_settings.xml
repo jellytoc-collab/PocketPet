@@ -234,6 +234,14 @@
                     android:layout_weight="1"
                     android:text="@string/tier_vip_plus" />
             </RadioGroup>
+
+            <Switch
+                android:id="@+id/testSleepSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/test_sleep_switch"
+                android:textSize="15sp" />
         </LinearLayout>
 
     </LinearLayout>

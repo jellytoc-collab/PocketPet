@@ -15,6 +15,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import com.pocketpet.MainActivity
@@ -30,6 +31,9 @@ class PetService : Service() {
     private lateinit var currentPet: PetDefinition
     private lateinit var overlayManager: PetOverlayManager
     private var stopping = false
+    private var screenOn = true
+    // 폰을 흔들면 펫이 날아오른다 (VIP+)
+    private val shakeDetector by lazy { ShakeDetector(this) { overlayManager.fling() } }
 
     // 설정 화면에서 값이 바뀌면 실행 중인 펫에 바로 반영한다
     private val settingsListener =
@@ -43,7 +47,9 @@ class PetService : Service() {
                 PetSettingsRepository.KEY_TIER -> {
                     // 등급이 바뀌면 던지기 가능 여부와 펫 잠금을 다시 적용한다
                     overlayManager.setCanThrow(settings.tier.canThrow)
+                    overlayManager.setCanSleep(settings.tier.plusFeatures)
                     switchPet(Pets.usable(settings.selectedPetId, settings.tier))
+                    updateShake()
                 }
                 PetSettingsRepository.KEY_SIZE ->
                     overlayManager.setSize(settings.sizeDp)
@@ -58,15 +64,32 @@ class PetService : Service() {
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_SCREEN_OFF -> overlayManager.pause()
-                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> overlayManager.resume()
+                Intent.ACTION_SCREEN_OFF -> {
+                    screenOn = false
+                    overlayManager.pause()
+                }
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
+                    screenOn = true
+                    overlayManager.resume()
+                }
             }
+            updateShake()
+        }
+    }
+
+    /** 흔들기 감지는 펫이 나와 있고, 화면이 켜져 있고, 등급이 허락할 때만 켠다 (배터리 절약) */
+    private fun updateShake() {
+        if (isRunning && !stopping && screenOn && settings.tier.canShakeFly) {
+            shakeDetector.start()
+        } else {
+            shakeDetector.stop()
         }
     }
 
     override fun onCreate() {
         super.onCreate()
         settings = PetSettingsRepository(this)
+        screenOn = getSystemService(PowerManager::class.java)?.isInteractive ?: true
         currentPet = Pets.usable(settings.selectedPetId, settings.tier)
         overlayManager = createOverlay(currentPet)
         settings.registerListener(settingsListener)
@@ -78,6 +101,11 @@ class PetService : Service() {
         // 알림의 ‘소환 해제’ 버튼을 누른 경우
         if (intent?.action == ACTION_STOP) {
             stopSelf()
+            return START_NOT_STICKY
+        }
+        // 시험용 ‘지금 잠들기’ 버튼 (펫이 이미 나와 있을 때만 보낸다)
+        if (intent?.action == ACTION_SLEEP_NOW) {
+            if (isRunning) overlayManager.sleepNow()
             return START_NOT_STICKY
         }
 
@@ -96,6 +124,7 @@ class PetService : Service() {
         }
 
         isRunning = true
+        updateShake()
         return START_NOT_STICKY
     }
 
@@ -112,6 +141,7 @@ class PetService : Service() {
         } catch (e: IllegalArgumentException) {
             // 이미 해제된 경우는 무시한다
         }
+        shakeDetector.stop()
         overlayManager.hide()
         isRunning = false
         super.onDestroy()
@@ -125,6 +155,7 @@ class PetService : Service() {
             setFloor(settings.floorDp)
             setWalkFrequency(settings.walkFrequency)
             setCanThrow(settings.tier.canThrow)
+            setCanSleep(settings.tier.plusFeatures)
         }
     }
 
@@ -133,6 +164,7 @@ class PetService : Service() {
         if (stopping) return
         stopping = true
         isRunning = false
+        shakeDetector.stop()
         val message = if (!Settings.canDrawOverlays(this)) {
             R.string.toast_permission_lost
         } else {
@@ -229,6 +261,7 @@ class PetService : Service() {
         private const val CHANNEL_ID = "pet_service"
         private const val NOTIFICATION_ID = 1
         private const val ACTION_STOP = "com.pocketpet.action.STOP_PET"
+        const val ACTION_SLEEP_NOW = "com.pocketpet.action.SLEEP_NOW"
 
         @Volatile
         var isRunning = false

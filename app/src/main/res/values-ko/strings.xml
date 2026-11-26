@@ -74,7 +74,7 @@
     <string name="pet_maren">마렌</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. 🔒 표시가 있는 펫은 VIP부터 쓸 수 있어요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. VIP는 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
+    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. 🔒 표시가 있는 펫은 VIP부터 쓸 수 있어요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. VIP는 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요. VIP+는 폰을 세게 흔들어도 펫이 날아다녀요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\n버전 %1$s\n\n화면 위를 돌아다니는 작은 친구들과 함께하세요.\n\n만든 사람: jellytoc</string>
@@ -87,6 +87,9 @@
     <string name="tier_free">일반</string>
     <string name="tier_vip">VIP</string>
     <string name="tier_vip_plus">VIP+</string>
+    <string name="test_sleep_switch">💤 메인 화면에 ‘지금 잠들기’ 버튼 보이기</string>
+    <string name="test_sleep_now">💤 지금 잠들기 (시험용)</string>
+    <string name="test_sleep_need_pet">먼저 펫을 소환해 주세요</string>
     <!-- VIP 소개 화면 -->
     <string name="vip_title">👑 Pocket Pet VIP</string>
     <string name="vip_subtitle">더 많은 친구와 더 즐겁게 놀아요</string>
@@ -94,7 +97,7 @@
     <string name="vip_plus_price">월 6,600원</string>
     <string name="vip_recommended">추천</string>
     <string name="vip_benefits">✓ 모든 펫 잠금 해제\n✓ 던지기\n✓ 앱 복귀 광고 없음</string>
-    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 잠자기 (곧 추가)\n✓ 여러 마리 소환 (곧 추가)</string>
+    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 꾸벅꾸벅 잠자기\n✓ 폰을 흔들면 펫이 날아다녀요\n✓ 여러 마리 소환 (곧 추가)</string>
     <string name="vip_subscribe">VIP 구독하기</string>
     <string name="vip_plus_subscribe">VIP+ 구독하기</string>
     <string name="vip_current">이용 중</string>

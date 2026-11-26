@@ -46,11 +46,14 @@ class PetOverlayManager(
     private var idleDrawable: Drawable? = null
     private var walkFrames: List<Drawable> = emptyList()
     private var flapFrames: List<Drawable> = emptyList()
+    private var sleepFrames: List<Drawable> = emptyList()
 
     private var petView: ImageView? = null
     private var params: WindowManager.LayoutParams? = null
-    private var widthPx = 0
+    private var widthPx = 0              // 기본 창 너비 (가만히 있기 그림 기준)
     private var heightPx = 0
+    // 잠잘 때는 옆으로 넓은 그림이라 창을 넓힌다. 넓어진 만큼의 절반을 왼쪽으로 옮겨 펫 위치는 그대로 둔다
+    private var extraLeftPx = 0
     private var sizeDp = definition.heightDp
     private var floorDp = 0
     private var currentFrame: Frame? = null
@@ -181,10 +184,10 @@ class PetOverlayManager(
         sizeDp = newSizeDp
         val lp = params ?: return     // 아직 소환 전이면 값만 기억해 둔다
         computeSize()
-        lp.width = widthPx
         lp.height = heightPx
         updateBounds()
-        lp.x = controller.x.toInt()
+        fitWindowTo(petView?.drawable)
+        lp.x = controller.x.toInt() - extraLeftPx
         lp.y = controller.y.toInt()
         relayout()
     }
@@ -206,6 +209,25 @@ class PetOverlayManager(
     /** 던질 수 있는지 (등급에 따라 바뀐다) */
     fun setCanThrow(allowed: Boolean) {
         canThrow = allowed
+    }
+
+    /** 잠잘 수 있는지 (VIP+). 바뀌면 쉬는 시간을 다시 계산하도록 깨운다 */
+    fun setCanSleep(allowed: Boolean) {
+        controller.canSleep = allowed
+        startLoop()
+    }
+
+    /** 시험용 잠들기 버튼: 땅에 있으면 바로 잠들기 시작한다 */
+    fun sleepNow() {
+        if (petView == null) return
+        if (controller.sleepNow()) startLoop()
+    }
+
+    /** 폰을 흔들었을 때: 펫이 휙 날아오른다 */
+    fun fling() {
+        if (petView == null || paused) return
+        controller.fling()
+        startLoop()
     }
 
     // ---------- 움직임 반복 ----------
@@ -260,7 +282,7 @@ class PetOverlayManager(
             if (!checkPermission()) return
         }
 
-        // 쉬는 중이면 잠든다. 권한 확인을 위해 한 번에 최대 2초씩만 잔다
+        // 쉬거나 자는 중이라 화면이 안 바뀌면 계산을 멈춘다. 권한 확인을 위해 한 번에 최대 2초씩만 멈춘다
         val rest = controller.restTimeLeft
         if (rest > MIN_SLEEP_SEC) {
             sleep(minOf(rest, PERMISSION_CHECK_SEC))
@@ -303,6 +325,8 @@ class PetOverlayManager(
         idleDrawable = context.getDrawable(definition.idle)
         walkFrames = loadStrip(definition.walkStrip, definition.walkFrameCount)
         flapFrames = loadStrip(definition.flapStrip, definition.flapFrameCount)
+        sleepFrames = definition.sleepStrip?.let { loadStrip(it, definition.sleepFrameCount) }
+            ?: emptyList()
     }
 
     /** 가로로 이어 붙인 그림을 count등분해서 컷 목록으로 만든다 */
@@ -331,17 +355,41 @@ class PetOverlayManager(
         val view = petView ?: return
         val frame = controller.currentFrame()
         if (frame != currentFrame) {
-            drawableFor(frame)?.let { view.setImageDrawable(it) }
+            drawableFor(frame)?.let {
+                view.setImageDrawable(it)
+                if (fitWindowTo(it)) {
+                    params?.x = controller.x.toInt() - extraLeftPx
+                    relayout()
+                }
+            }
             currentFrame = frame
         }
         // 걷기 그림은 오른쪽을 보고 있으므로, 왼쪽으로 걸을 때만 좌우를 뒤집는다
         view.scaleX = if (controller.state == PetState.WALK && !controller.facingRight) -1f else 1f
     }
 
+    /**
+     * 그림 비율에 맞게 창 너비를 정한다 (잠잘 때만 기본보다 넓다).
+     * 너비가 바뀌었으면 true. 창 위치 반영은 부른 쪽에서 한다.
+     */
+    private fun fitWindowTo(d: Drawable?): Boolean {
+        val lp = params ?: return false
+        val w = if (d != null && d.intrinsicHeight > 0) {
+            maxOf(widthPx, heightPx * d.intrinsicWidth / d.intrinsicHeight)
+        } else {
+            widthPx
+        }
+        extraLeftPx = (w - widthPx) / 2
+        if (lp.width == w) return false
+        lp.width = w
+        return true
+    }
+
     private fun drawableFor(frame: Frame): Drawable? = when (frame.anim) {
         Anim.IDLE -> idleDrawable
         Anim.WALK -> walkFrames.getOrNull(frame.index)
         Anim.FLAP -> flapFrames.getOrNull(frame.index)
+        Anim.SLEEP -> sleepFrames.getOrNull(frame.index) ?: idleDrawable
     }
 
     // ---------- 터치 ----------
@@ -350,8 +398,9 @@ class PetOverlayManager(
         val lp = params ?: return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                touchOffsetX = event.rawX - lp.x
-                touchOffsetY = event.rawY - lp.y
+                // 창 대신 펫 위치 기준으로 잰다 (잠자다 깨며 창이 좁아져도 펫이 튀지 않게)
+                touchOffsetX = event.rawX - controller.x
+                touchOffsetY = event.rawY - controller.y
                 velocityTracker?.recycle()
                 velocityTracker = VelocityTracker.obtain()
                 trackVelocity(event)
@@ -404,7 +453,7 @@ class PetOverlayManager(
     /** 위치를 창에 반영한다. 창이 사라졌으면 false */
     private fun applyPosition(): Boolean {
         val lp = params ?: return false
-        val newX = controller.x.toInt()
+        val newX = controller.x.toInt() - extraLeftPx
         val newY = controller.y.toInt()
         // 위치가 그대로면 창을 다시 배치하지 않는다
         if (newX == lp.x && newY == lp.y) return true

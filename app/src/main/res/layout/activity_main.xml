@@ -137,6 +137,16 @@
                 android:layout_marginTop="12dp"
                 android:text="@string/dismiss"
                 android:textSize="18sp" />
+
+            <!-- 시험용 ‘지금 잠들기’ 버튼: 테스트 빌드에서 설정의 스위치를 켰을 때만 보인다 -->
+            <Button
+                android:id="@+id/sleepNowButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/test_sleep_now"
+                android:textSize="16sp"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 

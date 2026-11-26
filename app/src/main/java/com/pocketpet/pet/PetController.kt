@@ -1,12 +1,14 @@
 package com.pocketpet.pet
 
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 import kotlin.random.Random
 
-enum class PetState { IDLE, WALK, DRAGGED, FALL, THROWN }
+enum class PetState { IDLE, WALK, DRAGGED, FALL, THROWN, SLEEP, WAKE }
 
 /** 어떤 그림 묶음의 몇 번째 컷을 보여 줄지 */
-enum class Anim { IDLE, WALK, FLAP }
+enum class Anim { IDLE, WALK, FLAP, SLEEP }
 data class Frame(val anim: Anim, val index: Int)
 
 /**
@@ -37,9 +39,38 @@ class PetController(
             if (state == PetState.IDLE) stateTimeLeft = randomRest()
         }
 
-    /** 쉬는 중이면 남은 쉬는 시간(초), 아니면 0 */
+    /** 잠자기를 쓸 수 있는지 (VIP+). 꺼지면 자던 펫은 바로 깬다 */
+    var canSleep = false
+        set(value) {
+            if (value == field) return
+            field = value
+            if (!value && (state == PetState.SLEEP || state == PetState.WAKE)) enter(PetState.IDLE)
+            else if (state == PetState.IDLE) stateTimeLeft = randomRest()
+        }
+
+    /** 이 펫이 지금 잠들 수 있는지 (잠자기 그림이 있고 등급이 허락할 때) */
+    private val sleepPossible: Boolean
+        get() = canSleep && definition.sleepStrip != null
+
+    private val sleepFrames: Int get() = definition.sleepFrameCount
+    /** 잠드는 데 걸리는 시간: 모든 컷을 한 번씩 보여 준다 */
+    private val fallAsleepSec: Float get() = sleepFrames / SLEEP_FPS
+    /** 깨어나는 데 걸리는 시간: 잠든 컷 2장을 뺀 나머지를 거꾸로 */
+    private val wakeUpSec: Float get() = (sleepFrames - 2) / WAKE_FPS
+
+    /**
+     * 화면이 바뀌지 않고 가만히 있을 시간(초). 이 동안은 매 프레임 계산하지 않아도 된다.
+     * 쉬는 중: 남은 쉬는 시간. 잠든 중: 다음 숨쉬기 컷까지 남은 시간.
+     */
     val restTimeLeft: Float
-        get() = if (state == PetState.IDLE) stateTimeLeft.coerceAtLeast(0f) else 0f
+        get() = when {
+            state == PetState.IDLE -> stateTimeLeft.coerceAtLeast(0f)
+            state == PetState.SLEEP && animTime >= fallAsleepSec -> {
+                val toNextFrame = SLEEP_LOOP_SEC - (animTime - fallAsleepSec) % SLEEP_LOOP_SEC
+                minOf(toNextFrame, stateTimeLeft).coerceAtLeast(0f)
+            }
+            else -> 0f
+        }
 
     private var minX = 0f
     private var maxX = 0f
@@ -49,6 +80,9 @@ class PetController(
     private var velocityY = 0f       // 떨어지는 속도 (초당 px)
     private var stateTimeLeft = 0f   // 현재 행동의 남은 시간 (초)
     private var animTime = 0f        // 현재 행동을 시작한 뒤 지난 시간 (초)
+    private var wallBouncesLeft = 0  // 흔들어서 날 때 벽·천장에 더 튕길 횟수
+    private var kicksLeft = 0        // 바닥에 닿기 전에 공중에서 다시 차오를 수 있는 횟수
+    private var gentleFall = false   // 마지막 튕김 뒤 천천히 내려오는 중인지
 
     /** 끌려 다니거나 공중에 떠 있는 중인지 */
     private val isInAir: Boolean
@@ -80,7 +114,14 @@ class PetController(
 
     /** 잠들어 있던 동안 흐른 시간을 쉬는 시간에서 뺀다 */
     fun passTime(sec: Float) {
-        if (state == PetState.IDLE) stateTimeLeft -= sec
+        when (state) {
+            PetState.IDLE -> stateTimeLeft -= sec
+            PetState.SLEEP -> {
+                stateTimeLeft -= sec
+                animTime += sec       // 숨쉬기 컷도 그만큼 넘어간다
+            }
+            else -> Unit
+        }
     }
 
     /** 손가락으로 누른 순간: 공중에서 휘적거리기 시작 */
@@ -119,6 +160,42 @@ class PetController(
         }
     }
 
+    /** 시험용: 땅 위에 있으면 바로 잠들기 시작한다. 잠들었으면 true */
+    fun sleepNow(): Boolean {
+        if (definition.sleepStrip == null || isInAir) return false
+        enter(PetState.SLEEP)
+        return true
+    }
+
+    /**
+     * 폰을 흔들었을 때: 위쪽 아무 방향으로 휙 날아올라 벽·천장에 튕기다 내려온다.
+     * 계속 흔들면 공중에서 또 차올라서 계속 날아다닌다. 손가락으로 잡고 있을 때는 무시한다.
+     * 흔들기를 멈춰도 벽·천장에 3번 더 튕기며 날아다니고, 마지막에는 천천히 내려앉는다.
+     */
+    fun fling() {
+        if (state == PetState.DRAGGED) return
+        enter(PetState.THROWN)
+        randomFlingVelocity()
+        wallBouncesLeft = FLING_WALL_BOUNCES
+        kicksLeft = MAX_AUTO_KICKS
+    }
+
+    /** 위쪽 아무 방향으로 빠르게 날아가는 속도를 정한다 */
+    private fun randomFlingVelocity() {
+        val speed = randomBetween(FLING_MIN_DP, FLING_MAX_DP) * density
+        val angle = Math.toRadians(randomBetween(FLING_MIN_ANGLE, FLING_MAX_ANGLE).toDouble())
+        velocityX = (cos(angle) * speed).toFloat()
+        velocityY = (-sin(angle) * speed).toFloat()   // 화면에서는 위쪽이 -
+    }
+
+    /** 다 튕겼으면: 옆으로 가는 속도를 줄이고, 천천히 내려오기 시작한다 */
+    private fun startGentleFall() {
+        wallBouncesLeft = 0
+        gentleFall = true
+        velocityX *= 0.5f
+        velocityY = velocityY.coerceAtLeast(-GENTLE_MAX_RISE_DP * density)
+    }
+
     /** dt: 지난 프레임 이후 흐른 시간 (초) */
     fun update(dt: Float) {
         animTime += dt
@@ -130,7 +207,7 @@ class PetController(
                 return
             }
             PetState.WALK -> if (updateWalk(dt)) return
-            PetState.IDLE -> Unit
+            PetState.IDLE, PetState.SLEEP, PetState.WAKE -> Unit
         }
 
         stateTimeLeft -= dt
@@ -149,26 +226,64 @@ class PetController(
             Anim.FLAP,
             (animTime * definition.flapFps).toInt() % definition.flapFrameCount
         )
+        // 한 컷씩 점점 잠들고, 다 잠들면 마지막 두 컷을 번갈아 보여 준다 (숨쉬기)
+        PetState.SLEEP -> Frame(
+            Anim.SLEEP,
+            if (animTime < fallAsleepSec) {
+                (animTime * SLEEP_FPS).toInt().coerceAtMost(sleepFrames - 1)
+            } else {
+                sleepFrames - 2 + ((animTime - fallAsleepSec) / SLEEP_LOOP_SEC).toInt() % 2
+            }
+        )
+        // 깰 때는 잠드는 컷을 거꾸로 빠르게 보여 준다
+        PetState.WAKE -> Frame(
+            Anim.SLEEP,
+            (sleepFrames - 3 - (animTime * WAKE_FPS).toInt()).coerceAtLeast(0)
+        )
     }
 
     /** 중력으로 떨어진다. 던져졌으면 옆으로도 날아가고 벽·천장에 튕긴다 */
     private fun updateFall(dt: Float) {
-        velocityY += definition.gravityDp * density * dt
+        if (gentleFall) {
+            // 마지막으로 내려앉을 때: 중력을 약하게 하고 떨어지는 속도도 제한해서 천천히
+            velocityY += definition.gravityDp * density * GENTLE_GRAVITY * dt
+            velocityY = velocityY.coerceAtMost(GENTLE_MAX_FALL_DP * density)
+        } else {
+            velocityY += definition.gravityDp * density * dt
+        }
         x += velocityX * dt
         y += velocityY * dt
 
         // 왼쪽·오른쪽 벽에 닿으면 튕겨 나온다 (튕길 때마다 조금씩 느려진다)
+        var hitWall = false
         if (x < minX) {
             x = minX
             velocityX = -velocityX * BOUNCE
+            hitWall = true
         } else if (x > maxX) {
             x = maxX
             velocityX = -velocityX * BOUNCE
+            hitWall = true
         }
         // 화면 위쪽에 닿으면 아래로 튕긴다
         if (y < topLimit && velocityY < 0f) {
             y = topLimit
             velocityY = -velocityY * BOUNCE
+            hitWall = true
+        }
+        // 흔들어서 날던 중이면 벽·천장에 튕긴 횟수를 센다. 다 튕기면 천천히 내려온다
+        if (hitWall && wallBouncesLeft > 0) {
+            wallBouncesLeft--
+            if (wallBouncesLeft == 0) startGentleFall()
+        }
+        // 아직 더 튕겨야 하는데 바닥 가까이 내려오면, 흔들 때처럼 공중에서 다시 차오른다
+        if (wallBouncesLeft > 0 && velocityY > 0f && y >= groundY - KICK_MARGIN_DP * density) {
+            if (kicksLeft > 0) {
+                kicksLeft--
+                randomFlingVelocity()
+            } else {
+                startGentleFall()
+            }
         }
         // 바닥에 닿으면 멈춘다
         if (y >= groundY) {
@@ -196,7 +311,14 @@ class PetController(
 
     private fun chooseNextState() {
         when (state) {
-            PetState.IDLE -> startWalk()          // 다 쉬었으면 걷는다
+            // 다 쉬었으면 걷는다. 잠자기를 쓸 수 있으면 가끔은 잠든다
+            PetState.IDLE ->
+                if (sleepPossible && (walkFrequency <= 0 || random.nextFloat() < SLEEP_CHANCE)) {
+                    enter(PetState.SLEEP)
+                } else {
+                    startWalk()
+                }
+            PetState.SLEEP -> enter(PetState.WAKE)   // 다 잤으면 깨어난다
             else -> enter(PetState.IDLE)
         }
     }
@@ -213,10 +335,13 @@ class PetController(
     /**
      * 쉬는 시간을 무작위로 정한다.
      * 평균은 (15 ÷ 빈도)초이고, 매번 그 0.5 ~ 1.5배 사이에서 달라진다.
-     * 빈도가 0이면 걷지 않고 계속 쉰다.
+     * 빈도가 0이면 걷지 않고 계속 쉰다. 잠자기를 쓸 수 있으면 한참 쉬다가 잠든다.
      */
     private fun randomRest(): Float {
-        if (walkFrequency <= 0) return Float.POSITIVE_INFINITY
+        if (walkFrequency <= 0) {
+            return if (sleepPossible) randomBetween(DOZE_OFF_MIN_SEC, DOZE_OFF_MAX_SEC)
+            else Float.POSITIVE_INFINITY
+        }
         val average = REST_BASE_SEC / walkFrequency
         return average * (0.5f + random.nextFloat())
     }
@@ -224,17 +349,42 @@ class PetController(
     private fun enter(newState: PetState) {
         state = newState
         animTime = 0f
+        wallBouncesLeft = 0       // 튕길 횟수는 fling()에서만 다시 채운다
+        kicksLeft = 0
+        gentleFall = false
         stateTimeLeft = when (newState) {
             PetState.IDLE -> randomRest()
             PetState.WALK -> 2f + random.nextFloat() * 3f       // 2 ~ 5초
             PetState.DRAGGED, PetState.FALL, PetState.THROWN -> 0f   // 시간 제한 없음
+            PetState.SLEEP -> fallAsleepSec + randomBetween(SLEEP_MIN_SEC, SLEEP_MAX_SEC)
+            PetState.WAKE -> wakeUpSec
         }
     }
 
+    private fun randomBetween(min: Float, max: Float): Float = min + random.nextFloat() * (max - min)
+
     companion object {
+        private const val SLEEP_CHANCE = 0.3f       // 쉬고 난 뒤 걷는 대신 잠들 확률
+        private const val SLEEP_FPS = 2f            // 잠드는 컷이 바뀌는 속도 (초당 장수)
+        private const val WAKE_FPS = 8f             // 깨어나는 컷이 바뀌는 속도
+        private const val SLEEP_LOOP_SEC = 1.2f     // 잠든 뒤 숨쉬기 컷이 바뀌는 간격
+        private const val SLEEP_MIN_SEC = 30f       // 잠자는 시간 (초)
+        private const val SLEEP_MAX_SEC = 60f
+        private const val DOZE_OFF_MIN_SEC = 20f    // 걷지 않는 펫이 잠들 때까지 쉬는 시간
+        private const val DOZE_OFF_MAX_SEC = 40f
         private const val REST_BASE_SEC = 15f
         private const val MIN_THROW_DP = 600f    // 이보다 느리게 놓으면 그냥 떨어진다 (초당 dp)
         private const val MAX_THROW_DP = 4000f   // 던지는 속도 최대치 (초당 dp)
         private const val BOUNCE = 0.6f          // 벽에 튕길 때 남는 속도 비율
+        private const val FLING_MIN_DP = 1600f   // 폰을 흔들었을 때 날아오르는 속도 (초당 dp)
+        private const val FLING_MAX_DP = 2800f
+        private const val FLING_MIN_ANGLE = 30f  // 날아오르는 방향 (0도 = 오른쪽, 90도 = 바로 위)
+        private const val FLING_MAX_ANGLE = 150f
+        private const val FLING_WALL_BOUNCES = 3       // 흔들기를 멈춘 뒤 벽·천장에 더 튕기는 횟수
+        private const val MAX_AUTO_KICKS = 4           // 벽에 닿기 전에 바닥에 내려오면 다시 차오르는 최대 횟수
+        private const val KICK_MARGIN_DP = 60f         // 바닥에서 이만큼 위에서 다시 차오른다 (바닥에 닿아 보이지 않게)
+        private const val GENTLE_MAX_RISE_DP = 400f    // 다 튕긴 뒤 위로 올라가는 속도 상한
+        private const val GENTLE_GRAVITY = 0.4f        // 마지막에 내려올 때 중력 (보통의 40%)
+        private const val GENTLE_MAX_FALL_DP = 450f    // 마지막에 내려올 때 최고 속도 (초당 dp)
     }
 }

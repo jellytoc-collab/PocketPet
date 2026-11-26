@@ -23,6 +23,13 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putString(KEY_TIER, value.name).apply()
         }
 
+    /** 시험용: 메인 화면에 ‘지금 잠들기’ 버튼을 보여 줄지 (테스트 빌드에서만 쓴다) */
+    var testSleepButton: Boolean
+        get() = prefs.getBoolean(KEY_TEST_SLEEP_BUTTON, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_TEST_SLEEP_BUTTON, value).apply()
+        }
+
     /** 크기 (기본 크기 대비 %) — 최솟값만 있고 최댓값은 없다 */
     var sizePercent: Int
         get() = prefs.getInt(KEY_SIZE, DEFAULT_SIZE_PERCENT)
@@ -72,6 +79,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_FLOOR = "floor_dp"
         const val KEY_WALK_FREQ = "walk_frequency"
         const val KEY_TIER = "tier"
+        const val KEY_TEST_SLEEP_BUTTON = "test_sleep_button"
 
         const val DEFAULT_PET = "shiro"
 
