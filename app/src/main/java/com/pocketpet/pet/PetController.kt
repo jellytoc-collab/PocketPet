@@ -80,7 +80,8 @@ class PetController(
     private var velocityY = 0f       // 떨어지는 속도 (초당 px)
     private var stateTimeLeft = 0f   // 현재 행동의 남은 시간 (초)
     private var animTime = 0f        // 현재 행동을 시작한 뒤 지난 시간 (초)
-    private var floorBouncesLeft = 0 // 흔들어서 날 때 바닥에서 더 튕길 횟수
+    private var wallBouncesLeft = 0  // 흔들어서 날 때 벽·천장에 더 튕길 횟수
+    private var kicksLeft = 0        // 바닥에 닿기 전에 공중에서 다시 차오를 수 있는 횟수
     private var gentleFall = false   // 마지막 튕김 뒤 천천히 내려오는 중인지
 
     /** 끌려 다니거나 공중에 떠 있는 중인지 */
@@ -169,16 +170,30 @@ class PetController(
     /**
      * 폰을 흔들었을 때: 위쪽 아무 방향으로 휙 날아올라 벽·천장에 튕기다 내려온다.
      * 계속 흔들면 공중에서 또 차올라서 계속 날아다닌다. 손가락으로 잡고 있을 때는 무시한다.
-     * 흔들기를 멈추면 바닥에서 3번 통통 튕긴 뒤, 마지막에는 천천히 내려앉는다.
+     * 흔들기를 멈춰도 벽·천장에 3번 더 튕기며 날아다니고, 마지막에는 천천히 내려앉는다.
      */
     fun fling() {
         if (state == PetState.DRAGGED) return
+        enter(PetState.THROWN)
+        randomFlingVelocity()
+        wallBouncesLeft = FLING_WALL_BOUNCES
+        kicksLeft = MAX_AUTO_KICKS
+    }
+
+    /** 위쪽 아무 방향으로 빠르게 날아가는 속도를 정한다 */
+    private fun randomFlingVelocity() {
         val speed = randomBetween(FLING_MIN_DP, FLING_MAX_DP) * density
         val angle = Math.toRadians(randomBetween(FLING_MIN_ANGLE, FLING_MAX_ANGLE).toDouble())
         velocityX = (cos(angle) * speed).toFloat()
         velocityY = (-sin(angle) * speed).toFloat()   // 화면에서는 위쪽이 -
-        enter(PetState.THROWN)
-        floorBouncesLeft = FLING_FLOOR_BOUNCES
+    }
+
+    /** 다 튕겼으면: 옆으로 가는 속도를 줄이고, 천천히 내려오기 시작한다 */
+    private fun startGentleFall() {
+        wallBouncesLeft = 0
+        gentleFall = true
+        velocityX *= 0.5f
+        velocityY = velocityY.coerceAtLeast(-GENTLE_MAX_RISE_DP * density)
     }
 
     /** dt: 지난 프레임 이후 흐른 시간 (초) */
@@ -240,30 +255,35 @@ class PetController(
         y += velocityY * dt
 
         // 왼쪽·오른쪽 벽에 닿으면 튕겨 나온다 (튕길 때마다 조금씩 느려진다)
+        var hitWall = false
         if (x < minX) {
             x = minX
             velocityX = -velocityX * BOUNCE
+            hitWall = true
         } else if (x > maxX) {
             x = maxX
             velocityX = -velocityX * BOUNCE
+            hitWall = true
         }
         // 화면 위쪽에 닿으면 아래로 튕긴다
         if (y < topLimit && velocityY < 0f) {
             y = topLimit
             velocityY = -velocityY * BOUNCE
+            hitWall = true
         }
-        // 흔들어서 날던 중이면 바닥에서 통통 튕긴다. 마지막 튕김 뒤에는 천천히 내려온다
-        if (y >= groundY && floorBouncesLeft > 0 && velocityY > 0f) {
-            y = groundY
-            floorBouncesLeft--
-            var up = (velocityY * FLOOR_BOUNCE).coerceAtLeast(MIN_FLOOR_BOUNCE_DP * density)
-            if (floorBouncesLeft == 0) {
-                gentleFall = true
-                up = up.coerceAtMost(LAST_BOUNCE_DP * density)
-                velocityX *= 0.5f
+        // 흔들어서 날던 중이면 벽·천장에 튕긴 횟수를 센다. 다 튕기면 천천히 내려온다
+        if (hitWall && wallBouncesLeft > 0) {
+            wallBouncesLeft--
+            if (wallBouncesLeft == 0) startGentleFall()
+        }
+        // 아직 더 튕겨야 하는데 바닥 가까이 내려오면, 흔들 때처럼 공중에서 다시 차오른다
+        if (wallBouncesLeft > 0 && velocityY > 0f && y >= groundY - KICK_MARGIN_DP * density) {
+            if (kicksLeft > 0) {
+                kicksLeft--
+                randomFlingVelocity()
+            } else {
+                startGentleFall()
             }
-            velocityY = -up
-            return
         }
         // 바닥에 닿으면 멈춘다
         if (y >= groundY) {
@@ -329,7 +349,8 @@ class PetController(
     private fun enter(newState: PetState) {
         state = newState
         animTime = 0f
-        floorBouncesLeft = 0      // 바닥 튕김은 fling()에서만 다시 채운다
+        wallBouncesLeft = 0       // 튕길 횟수는 fling()에서만 다시 채운다
+        kicksLeft = 0
         gentleFall = false
         stateTimeLeft = when (newState) {
             PetState.IDLE -> randomRest()
@@ -359,10 +380,10 @@ class PetController(
         private const val FLING_MAX_DP = 2800f
         private const val FLING_MIN_ANGLE = 30f  // 날아오르는 방향 (0도 = 오른쪽, 90도 = 바로 위)
         private const val FLING_MAX_ANGLE = 150f
-        private const val FLING_FLOOR_BOUNCES = 3      // 흔들기를 멈춘 뒤 바닥에서 튕기는 횟수
-        private const val FLOOR_BOUNCE = 0.7f          // 바닥에서 튕길 때 남는 속도 비율
-        private const val MIN_FLOOR_BOUNCE_DP = 900f   // 바닥 튕김이 너무 작아 보이지 않게 하는 최소 속도
-        private const val LAST_BOUNCE_DP = 800f        // 마지막 튕김 속도 상한 (천천히 내려오니 너무 높이 뜨지 않게)
+        private const val FLING_WALL_BOUNCES = 3       // 흔들기를 멈춘 뒤 벽·천장에 더 튕기는 횟수
+        private const val MAX_AUTO_KICKS = 4           // 벽에 닿기 전에 바닥에 내려오면 다시 차오르는 최대 횟수
+        private const val KICK_MARGIN_DP = 60f         // 바닥에서 이만큼 위에서 다시 차오른다 (바닥에 닿아 보이지 않게)
+        private const val GENTLE_MAX_RISE_DP = 400f    // 다 튕긴 뒤 위로 올라가는 속도 상한
         private const val GENTLE_GRAVITY = 0.4f        // 마지막에 내려올 때 중력 (보통의 40%)
         private const val GENTLE_MAX_FALL_DP = 450f    // 마지막에 내려올 때 최고 속도 (초당 dp)
     }
