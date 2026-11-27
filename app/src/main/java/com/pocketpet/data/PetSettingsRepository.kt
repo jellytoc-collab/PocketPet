@@ -30,6 +30,13 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putString(KEY_SUMMONED, value.distinct().joinToString(",")).apply()
         }
 
+    /** 말풍선 대사를 보여 줄지 (VIP+에서만 실제로 말한다). 기본은 켜짐 */
+    var talkEnabled: Boolean
+        get() = prefs.getBoolean(KEY_TALK, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_TALK, value).apply()
+        }
+
     /** 시험용: 메인 화면에 ‘지금 잠들기’ 버튼을 보여 줄지 (테스트 빌드에서만 쓴다) */
     var testSleepButton: Boolean
         get() = prefs.getBoolean(KEY_TEST_SLEEP_BUTTON, false)
@@ -68,6 +75,7 @@ class PetSettingsRepository(context: Context) {
             .remove(KEY_SIZE)
             .remove(KEY_FLOOR)
             .remove(KEY_WALK_FREQ)
+            .remove(KEY_TALK)
             .apply()
     }
 
@@ -88,6 +96,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_TIER = "tier"
         const val KEY_TEST_SLEEP_BUTTON = "test_sleep_button"
         const val KEY_SUMMONED = "summoned_pets"
+        const val KEY_TALK = "talk_enabled"
 
         const val DEFAULT_PET = "shiro"
 

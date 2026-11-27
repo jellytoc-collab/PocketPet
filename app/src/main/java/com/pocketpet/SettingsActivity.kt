@@ -63,6 +63,10 @@ class SettingsActivity : Activity() {
             initial = settings.walkFrequency
         ) { settings.walkFrequency = it }
 
+        val talkSwitch = findViewById<Switch>(R.id.talkSwitch)
+        talkSwitch.isChecked = settings.talkEnabled
+        talkSwitch.setOnCheckedChangeListener { _, on -> settings.talkEnabled = on }
+
         findViewById<Button>(R.id.resetButton).setOnClickListener { confirmReset() }
         setupTierTestSwitch()
     }

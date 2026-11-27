@@ -14,7 +14,7 @@
     <string name="pet_status_idle">펫 상태: 쉬는 중</string>
     <string name="pet_status_starting">펫 상태: 부르는 중…</string>
     <string name="pet_status_running_count">펫 상태: %1$d마리 소환됨</string>
-    <string name="dismiss_one">%1$s 돌려보내기</string>
+    <string name="dismiss_count">소환 해제 (%1$d)</string>
     <string name="dismiss_all">모두 돌려보내기</string>
     <string name="toast_already_out">이미 화면에 나와 있어요</string>
     <string name="toast_max_pets">한 번에 %1$d마리까지 소환할 수 있어요</string>
@@ -39,6 +39,11 @@
     <string name="settings_floor">바닥 높이</string>
     <string name="settings_walk_freq">걷는 빈도</string>
     <string name="settings_walk_freq_hint">숫자가 클수록 자주 걸어요. 0이면 걷지 않고 서 있어요.</string>
+    <string name="settings_talk">말풍선 대사</string>
+    <string name="settings_talk_hint">펫이 머리 위 말풍선으로 말해요. (VIP+ 전용)</string>
+    <string name="dismiss_popup_title">누구를 돌려보낼까요?</string>
+    <string name="dismiss_popup_hint">이름을 누르면 그 펫만 돌려보내요.</string>
+    <string name="dismiss_popup_close">나가기</string>
     <string name="settings_reset">설정 초기화</string>
     <string name="reset_confirm_title">설정을 초기화할까요?</string>
     <string name="reset_confirm_message">크기, 바닥 높이, 걷는 빈도가 처음 값으로 돌아가요.</string>

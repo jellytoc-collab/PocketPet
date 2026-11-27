@@ -14,7 +14,7 @@
     <string name="pet_status_idle">Status: resting</string>
     <string name="pet_status_starting">Status: calling…</string>
     <string name="pet_status_running_count">Status: %1$d pets on screen</string>
-    <string name="dismiss_one">Send %1$s back</string>
+    <string name="dismiss_count">Dismiss (%1$d)</string>
     <string name="dismiss_all">Send all back</string>
     <string name="toast_already_out">This pet is already on the screen</string>
     <string name="toast_max_pets">You can summon up to %1$d pets at once</string>
@@ -39,6 +39,11 @@
     <string name="settings_floor">Floor height</string>
     <string name="settings_walk_freq">Walking frequency</string>
     <string name="settings_walk_freq_hint">Higher numbers mean more walking. At 0 the pet just stands still.</string>
+    <string name="settings_talk">Speech bubbles</string>
+    <string name="settings_talk_hint">Pets talk in a bubble above their heads. (VIP+ only)</string>
+    <string name="dismiss_popup_title">Who should go home?</string>
+    <string name="dismiss_popup_hint">Tap a name to send just that pet home.</string>
+    <string name="dismiss_popup_close">Close</string>
     <string name="settings_reset">Reset settings</string>
     <string name="reset_confirm_title">Reset settings?</string>
     <string name="reset_confirm_message">Size, floor height and walking frequency will go back to their defaults.</string>

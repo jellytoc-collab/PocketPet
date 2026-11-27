@@ -320,14 +320,29 @@ class MainActivity : Activity() {
     }
 
     private fun dismissPet() {
-        // VIP+로 여러 마리가 나와 있고 고른 펫이 그중 하나면, 그 펫만 돌려보낸다
+        // 한 마리면 바로 돌려보낸다. 여러 마리면 누구를 돌려보낼지 고르는 팝업을 띄운다
         val out = summonedNow()
-        val id = Pets.ALL[petIndex].id
-        if (out.size > 1 && id in out) {
-            settings.summonedPets = out - id
-        } else {
-            stopService(Intent(this, PetService::class.java))
+        if (out.size <= 1) {
+            stopAllPets()
+            return
         }
+        DismissDialog(
+            this,
+            out,
+            onDismissOne = { id ->
+                val left = summonedNow() - id
+                if (left.isEmpty()) stopAllPets()
+                else {
+                    settings.summonedPets = left
+                    refreshStatusSoon()
+                }
+            },
+            onDismissAll = { stopAllPets() }
+        ).show()
+    }
+
+    private fun stopAllPets() {
+        stopService(Intent(this, PetService::class.java))
         refreshStatusSoon()
     }
 
@@ -335,15 +350,11 @@ class MainActivity : Activity() {
     private fun summonedNow(): List<String> =
         if (PetService.isRunning && settings.tier.maxPets > 1) settings.summonedPets else emptyList()
 
-    /** 소환 해제 버튼 글자: 여러 마리가 나와 있으면 ‘○○ 돌려보내기’ 또는 ‘모두 돌려보내기’ */
+    /** 소환 해제 버튼 글자: 여러 마리가 나와 있으면 ‘소환 해제 (3)’처럼 마릿수를 붙인다 */
     private fun updateDismissLabel() {
-        val out = summonedNow()
-        val pet = Pets.ALL[petIndex]
-        dismissButton.text = when {
-            out.size <= 1 -> getString(R.string.dismiss)
-            pet.id in out -> getString(R.string.dismiss_one, getString(pet.nameRes))
-            else -> getString(R.string.dismiss_all)
-        }
+        val count = summonedNow().size
+        dismissButton.text = if (count > 1) getString(R.string.dismiss_count, count)
+        else getString(R.string.dismiss)
     }
 
     /** 서비스가 실제로 시작·종료될 시간을 조금 기다린 뒤 상태를 다시 표시한다 */

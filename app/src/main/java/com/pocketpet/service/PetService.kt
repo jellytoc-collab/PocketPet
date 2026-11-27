@@ -39,6 +39,9 @@ class PetService : Service() {
     // 폰을 흔들면 펫들이 날아오른다 (VIP+)
     private val shakeDetector by lazy { ShakeDetector(this) { overlays.values.forEach { it.fling() } } }
 
+    /** 말풍선 대사: VIP+이고 설정에서 켜 두었을 때 */
+    private val canTalk: Boolean get() = settings.tier.plusFeatures && settings.talkEnabled
+
     /** 여러 마리 소환을 쓸 수 있는 등급인지 */
     private val multi: Boolean get() = settings.tier.maxPets > 1
 
@@ -53,6 +56,7 @@ class PetService : Service() {
                     }
                 }
                 PetSettingsRepository.KEY_SUMMONED -> if (multi) syncPets()
+                PetSettingsRepository.KEY_TALK -> overlays.values.forEach { it.setCanTalk(canTalk) }
                 PetSettingsRepository.KEY_TIER -> {
                     // VIP+가 되면 지금 나와 있는 펫부터 여러 마리 목록에 넣는다
                     if (multi && settings.summonedPets.isEmpty()) {
@@ -62,7 +66,7 @@ class PetService : Service() {
                     overlays.values.forEach {
                         it.setCanThrow(settings.tier.canThrow)
                         it.setCanSleep(settings.tier.plusFeatures)
-                        it.setCanTalk(settings.tier.plusFeatures)
+                        it.setCanTalk(canTalk)
                     }
                     syncPets()
                     updateShake()
@@ -223,7 +227,7 @@ class PetService : Service() {
             setWalkFrequency(settings.walkFrequency)
             setCanThrow(settings.tier.canThrow)
             setCanSleep(settings.tier.plusFeatures)
-            setCanTalk(settings.tier.plusFeatures)
+            setCanTalk(canTalk)
         }
     }
 
