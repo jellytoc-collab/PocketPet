@@ -1,4 +1,4 @@
-package com.pocketpet
+﻿package com.pocketpet
 
 import android.Manifest
 import android.app.Activity
@@ -425,8 +425,8 @@ class MainActivity : Activity() {
     }
 
     companion object {
-        /** 문의 메일을 받을 주소 — 본인 이메일로 바꿔 주세요 */
-        const val CONTACT_EMAIL = "your-email@example.com"
+        /** 문의 메일을 받을 주소 (개인정보처리방침의 문의 칸에도 쓰인다) */
+        const val CONTACT_EMAIL = "qed3ideal@gmail.com"
 
         private const val STATUS_DELAY_MS = 700L
         private const val DRAWER_WIDTH_DP = 280
