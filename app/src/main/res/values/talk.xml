@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pet speech bubbles (VIP+). Korean originals are in values-ko/talk.xml.
+    One item = "situation: line"
+      situation: summon, idle, grab, fly, sleep, wake
+    " >> " splits a line: the first part shows, disappears, then the second part shows.
+-->
+<resources>
+    <string-array name="talk_shiro">
+        <item>summon: Oh, h-hello…</item>
+        <item>summon: Can I… stay with you today too?</item>
+        <item>idle: These clothes are so warm and cozy…</item>
+        <item>idle: …Were you looking at me?</item>
+        <item>idle: I like it quiet</item>
+        <item>idle: I wonder what color the sky is today…</item>
+        <item>grab: Eep…!</item>
+        <item>grab: G-gently, please…</item>
+        <item>fly: Waaah…!</item>
+        <item>fly: My hood is coming off…!</item>
+        <item>sleep: Just… closing my eyes a little…</item>
+        <item>sleep: So sleepy…</item>
+        <item>wake: Oh… did I fall asleep?</item>
+        <item>wake: I saw you in my dream too…</item>
+    </string-array>
+
+    <string-array name="talk_kuro">
+        <item>summon: …You called?</item>
+        <item>summon: Hmph, I only came because I was bored</item>
+        <item>idle: This eyepatch… >> Don\'t ask</item>
+        <item>idle: …It\'s not like I was waiting for you</item>
+        <item>idle: My right eye is aching…</item>
+        <item>idle: Ugh, what a hassle…</item>
+        <item>grab: Hey, put me down!</item>
+        <item>grab: …Don\'t squeeze so hard</item>
+        <item>fly: Whoa, heeey!</item>
+        <item>fly: You\'ll pay for this…!</item>
+        <item>sleep: …Taking a quick nap</item>
+        <item>sleep: Wake me and you\'re done for…</item>
+        <item>wake: …I wasn\'t sleeping</item>
+        <item>wake: What are you looking at?</item>
+    </string-array>
+
+    <string-array name="talk_momo">
+        <item>summon: Ta-da~ Momo is here!</item>
+        <item>summon: I missed you, hehe</item>
+        <item>idle: I want strawberry cake~</item>
+        <item>idle: Cute as always, right? Hehe</item>
+        <item>idle: Isn\'t my bunny pin pretty?</item>
+        <item>idle: Play with me, play with me~</item>
+        <item>grab: Kyaa~ Is this a hug?</item>
+        <item>grab: Hehe, that tickles</item>
+        <item>fly: Kyaaa~ So fun!</item>
+        <item>fly: One more time~!</item>
+        <item>sleep: Mmm… sleepy…</item>
+        <item>sleep: Good night, dream of me~</item>
+        <item>wake: Yawn~ Slept so well!</item>
+        <item>wake: Momo fully recharged!</item>
+    </string-array>
+
+    <string-array name="talk_luna">
+        <item>summon: The stars brought me here…</item>
+        <item>summon: Good night… >> I mean, good day</item>
+        <item>idle: Will we see stars tonight…</item>
+        <item>idle: The moon is smiling, hehe</item>
+        <item>idle: Go on, make a wish</item>
+        <item>idle: I feel all soft and floaty…</item>
+        <item>grab: Oh my… I\'m floating</item>
+        <item>grab: Like I\'m on a cloud</item>
+        <item>fly: I\'m a shooting star…!</item>
+        <item>fly: All the way to space~</item>
+        <item>sleep: Off to dreamland to see the stars…</item>
+        <item>sleep: Lullaby, lullaby…</item>
+        <item>wake: I saw so many stars</item>
+        <item>wake: Is it morning already…?</item>
+    </string-array>
+
+    <string-array name="talk_tashu">
+        <item>summon: Nice to meet… >> Oh, nice to see you again!</item>
+        <item>summon: I\'ll be in your care today too</item>
+        <item>idle: I\'ll pray your day goes well</item>
+        <item>idle: Did you do a good deed today?</item>
+        <item>idle: My white dress mustn\'t get dirty…</item>
+        <item>idle: Thank you, always</item>
+        <item>grab: Oh, you startled me…!</item>
+        <item>grab: Please handle me with care</item>
+        <item>fly: Th-the sky is so close…!</item>
+        <item>fly: I\'m scaaared…!</item>
+        <item>sleep: A little prayer… then sleep</item>
+        <item>sleep: Good night</item>
+        <item>wake: Good morning!</item>
+        <item>wake: I feel so refreshed</item>
+    </string-array>
+
+    <string-array name="talk_mashi">
+        <item>summon: Ta-da! Mashi has arrived!</item>
+        <item>summon: It\'s showtime!</item>
+        <item>idle: Guess which card this was?</item>
+        <item>idle: What will come out of my hat~</item>
+        <item>idle: Applause is always welcome</item>
+        <item>idle: Heh, preparing my next trick</item>
+        <item>grab: Oh, audience participation time?</item>
+        <item>grab: My hat\'s falling off!</item>
+        <item>fly: Behold, levitation!</item>
+        <item>fly: Hahaha, a great success!</item>
+        <item>sleep: That\'s all for tonight\'s show…</item>
+        <item>sleep: Curtain down…</item>
+        <item>wake: Act two begins!</item>
+        <item>wake: Magicians never oversleep</item>
+    </string-array>
+
+    <string-array name="talk_hari">
+        <item>summon: Jingle~ Hari is here!</item>
+        <item>summon: Heh, you missed me, right?</item>
+        <item>idle: Wanna touch my tail? >> Nope~</item>
+        <item>idle: I want fried tofu…</item>
+        <item>idle: Nice bells, right? Jingle jingle</item>
+        <item>idle: Heh, you totally fell for it</item>
+        <item>grab: Not the taaail!</item>
+        <item>grab: Hehe, that tickles</item>
+        <item>fly: A fox\'s rain shower~!</item>
+        <item>fly: Wooow, so high!</item>
+        <item>sleep: Tucking in with my tail…</item>
+        <item>sleep: Let\'s play in my dreams…</item>
+        <item>wake: Jingle! I\'m up!</item>
+        <item>wake: You were peeking, weren\'t you?</item>
+    </string-array>
+
+    <string-array name="talk_miru">
+        <item>summon: Mm~ I\'m here</item>
+        <item>summon: Today\'s playlist is good</item>
+        <item>idle: Have you heard this song?</item>
+        <item>idle: Just a bit more volume…</item>
+        <item>idle: Just hanging out like this is nice</item>
+        <item>idle: Hmm hmm~</item>
+        <item>grab: Hey, my headphones!</item>
+        <item>grab: You\'re cutting off my music~</item>
+        <item>fly: Oh, the bass drop!</item>
+        <item>fly: Whoa, this is fun!</item>
+        <item>sleep: Gonna sleep to a calm song…</item>
+        <item>sleep: Mm… sleepy</item>
+        <item>wake: The song ended…</item>
+        <item>wake: Hit replay~</item>
+    </string-array>
+
+    <string-array name="talk_leon">
+        <item>summon: Ready to explore!</item>
+        <item>summon: Ooh, a new screen!</item>
+        <item>idle: This screen layout is fascinating…</item>
+        <item>idle: Planning a new invention!</item>
+        <item>idle: Time for my goggles!</item>
+        <item>idle: What\'s inside that icon?</item>
+        <item>grab: Oh? A flight experiment?</item>
+        <item>grab: Careful with my bag!</item>
+        <item>fly: Flight test successful!</item>
+        <item>fly: Record the data!</item>
+        <item>sleep: I\'ll finish my research tomorrow…</item>
+        <item>sleep: Gotta cool my head</item>
+        <item>wake: I got an idea in my dream!</item>
+        <item>wake: Back to exploring!</item>
+    </string-array>
+
+    <string-array name="talk_noel">
+        <item>summon: I\'ll watch over you today too</item>
+        <item>summon: Hello, let\'s spend the day together</item>
+        <item>idle: Was today hard for you?</item>
+        <item>idle: Have you had some water?</item>
+        <item>idle: You\'re doing great</item>
+        <item>idle: It\'s okay to take a break</item>
+        <item>grab: Oh, careful with my wings~</item>
+        <item>grab: Gently, gently</item>
+        <item>fly: It\'s fine, I have wings!</item>
+        <item>fly: I\'m used to the sky~</item>
+        <item>sleep: May I rest a little…</item>
+        <item>sleep: I\'ll have sweet dreams</item>
+        <item>wake: Let\'s keep going!</item>
+        <item>wake: I was by your side the whole time</item>
+    </string-array>
+
+    <string-array name="talk_neon">
+        <item>summon: Connected</item>
+        <item>summon: …I\'m here, meow</item>
+        <item>idle: Check your battery</item>
+        <item>idle: Wi-Fi is slow</item>
+        <item>idle: …Bored, meow</item>
+        <item>idle: Turn the brightness down, my eyes hurt</item>
+        <item>grab: System error, meow!</item>
+        <item>grab: Let go. >> …Actually, a little longer</item>
+        <item>fly: Gravity settings are broken!</item>
+        <item>fly: Nyaaaang!</item>
+        <item>sleep: Entering power saving mode</item>
+        <item>sleep: …Sleeping, meow</item>
+        <item>wake: Reboot complete</item>
+        <item>wake: Update finished, meow</item>
+    </string-array>
+
+    <string-array name="talk_yuki">
+        <item>summon: I\'m here… I was waiting</item>
+        <item>summon: It smells like snow</item>
+        <item>idle: I\'ll stay by your side</item>
+        <item>idle: Ears up… what was that sound?</item>
+        <item>idle: I love snowy days</item>
+        <item>idle: I hope my flower doesn\'t wilt</item>
+        <item>grab: P-please don\'t touch my ears…</item>
+        <item>grab: You\'re warm</item>
+        <item>fly: Like a snowstorm…!</item>
+        <item>fly: My tail is swishing!</item>
+        <item>sleep: Curling up… to sleep</item>
+        <item>sleep: So cozy…</item>
+        <item>wake: Has the snow stopped?</item>
+        <item>wake: You stayed here the whole time</item>
+    </string-array>
+
+    <string-array name="talk_maren">
+        <item>summon: Hehe, did you call?</item>
+        <item>summon: Which potion shall we make today</item>
+        <item>idle: This flower is a sleepy herb, dear</item>
+        <item>idle: Shall I cast a spell…</item>
+        <item>idle: I could go for a cup of tea</item>
+        <item>idle: I\'ll cast a lucky charm on you</item>
+        <item>grab: Oh my, flying without my broom!</item>
+        <item>grab: I\'d better hold on to my hat</item>
+        <item>fly: Flying spells are my specialty!</item>
+        <item>fly: Hehe, what a nice breeze</item>
+        <item>sleep: Too much sleeping potion…</item>
+        <item>sleep: Sleep tight, dear…</item>
+        <item>wake: Magic fully recharged</item>
+        <item>wake: I had a lovely dream</item>
+    </string-array>
+</resources>

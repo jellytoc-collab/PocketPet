@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    펫 말풍선 대사 (VIP+).
+    한 줄 = "상황: 대사"
+      상황: summon(소환) idle(혼잣말) grab(잡았을 때) fly(날아갈 때) sleep(잠들 때) wake(깼을 때)
+    " >> " 로 나누면 앞부분이 먼저 뜨고, 잠깐 사라졌다가 뒷부분이 뜬다.
+-->
+<resources>
+    <string-array name="talk_shiro">
+        <item>summon: 아, 안녕하세요…</item>
+        <item>summon: 오늘도… 같이 있어도 돼요?</item>
+        <item>idle: 이 옷은 따듯하고 포근해요…</item>
+        <item>idle: …저 보고 있었어요?</item>
+        <item>idle: 조용한 게 좋아요</item>
+        <item>idle: 오늘 하늘은 무슨 색일까…</item>
+        <item>grab: 히익…!</item>
+        <item>grab: 사, 살살 해 주세요…</item>
+        <item>fly: 으아아…!</item>
+        <item>fly: 후드가 벗겨져요…!</item>
+        <item>sleep: 조금만… 눈 감을게요…</item>
+        <item>sleep: 졸려요…</item>
+        <item>wake: 아… 잠들었었어요?</item>
+        <item>wake: 꿈에서도 만났어요…</item>
+    </string-array>
+
+    <string-array name="talk_kuro">
+        <item>summon: …불렀냐</item>
+        <item>summon: 흥, 심심해서 와 준 거야</item>
+        <item>idle: 이 안대는… >> 묻지 마</item>
+        <item>idle: …딱히 너 기다린 거 아냐</item>
+        <item>idle: 오른쪽 눈이 쑤신다…</item>
+        <item>idle: 귀찮아…</item>
+        <item>grab: 야, 내려놔!</item>
+        <item>grab: …너무 꽉 잡지 마</item>
+        <item>fly: 우왓, 야아아!</item>
+        <item>fly: 기억해 둬라…!</item>
+        <item>sleep: …잠깐 눈 붙인다</item>
+        <item>sleep: 깨우면 죽는다…</item>
+        <item>wake: …안 잤어</item>
+        <item>wake: 뭘 봐</item>
+    </string-array>
+
+    <string-array name="talk_momo">
+        <item>summon: 짜잔~ 모모 왔당!</item>
+        <item>summon: 보고 싶었어, 헤헤</item>
+        <item>idle: 딸기 케이크 먹고 싶당~</item>
+        <item>idle: 오늘도 귀엽지? 헤헤</item>
+        <item>idle: 토끼 핀 예쁘지?</item>
+        <item>idle: 놀아 줘, 놀아 줘~</item>
+        <item>grab: 꺄아~ 안아 주는 거야?</item>
+        <item>grab: 헤헤 간지러워</item>
+        <item>fly: 꺄아아~ 재밌당!</item>
+        <item>fly: 한 번 더~!</item>
+        <item>sleep: 우웅… 졸려…</item>
+        <item>sleep: 잘 자, 내 꿈 꿔~</item>
+        <item>wake: 하암~ 잘 잤당!</item>
+        <item>wake: 모모 다시 충전 완료!</item>
+    </string-array>
+
+    <string-array name="talk_luna">
+        <item>summon: 별이 데려다줬어요…</item>
+        <item>summon: 좋은 밤… >> 아니, 좋은 하루예요</item>
+        <item>idle: 오늘 밤엔 별이 보일까요…</item>
+        <item>idle: 달님이 웃고 있어요, 후후</item>
+        <item>idle: 소원 하나 빌어 봐요</item>
+        <item>idle: 몽글몽글한 기분이에요…</item>
+        <item>grab: 어머… 둥실 떴네요</item>
+        <item>grab: 구름 위에 있는 것 같아요</item>
+        <item>fly: 별똥별이 된 기분…!</item>
+        <item>fly: 우주까지 가요~</item>
+        <item>sleep: 별 보러 꿈나라 갈게요…</item>
+        <item>sleep: 자장자장…</item>
+        <item>wake: 별을 한가득 보고 왔어요</item>
+        <item>wake: 벌써 아침인가요…?</item>
+    </string-array>
+
+    <string-array name="talk_tashu">
+        <item>summon: 처음 뵙겠… >> 아니, 또 뵙네요!</item>
+        <item>summon: 오늘도 잘 부탁드립니다</item>
+        <item>idle: 오늘 하루도 무사하길 빌게요</item>
+        <item>idle: 착한 일 하나 했나요?</item>
+        <item>idle: 하얀 옷이 더러워지면 안 돼요…</item>
+        <item>idle: 감사합니다, 늘요</item>
+        <item>grab: 앗, 놀랐습니다…!</item>
+        <item>grab: 조심히 다뤄 주세요</item>
+        <item>fly: 하, 하늘이 가까워요…!</item>
+        <item>fly: 무서워요오…!</item>
+        <item>sleep: 기도하고… 잘게요</item>
+        <item>sleep: 안녕히 주무세요</item>
+        <item>wake: 좋은 아침입니다!</item>
+        <item>wake: 개운하게 잤습니다</item>
+    </string-array>
+
+    <string-array name="talk_mashi">
+        <item>summon: 짜잔! 마시 등장!</item>
+        <item>summon: 쇼 타임이다!</item>
+        <item>idle: 이 카드, 뭐였게?</item>
+        <item>idle: 모자에서 뭐가 나올까~</item>
+        <item>idle: 박수는 언제든 환영이야</item>
+        <item>idle: 후훗, 다음 마술 준비 중</item>
+        <item>grab: 오, 관객 참여 시간인가?</item>
+        <item>grab: 모자 떨어진다!</item>
+        <item>fly: 이것이 공중 부양 마술!</item>
+        <item>fly: 하하하, 대성공!</item>
+        <item>sleep: 오늘 공연은 여기까지…</item>
+        <item>sleep: 막을 내릴게…</item>
+        <item>wake: 2부 공연 시작!</item>
+        <item>wake: 마술사는 늦잠 안 자</item>
+    </string-array>
+
+    <string-array name="talk_hari">
+        <item>summon: 딸랑~ 하리 왔어!</item>
+        <item>summon: 후훗, 보고 싶었지?</item>
+        <item>idle: 꼬리 만져 볼래? >> 안 돼~</item>
+        <item>idle: 유부 먹고 싶다…</item>
+        <item>idle: 방울 소리 좋지? 딸랑딸랑</item>
+        <item>idle: 후훗, 너 방금 속았지?</item>
+        <item>grab: 꼬리는 안 돼애!</item>
+        <item>grab: 히히, 간지러워</item>
+        <item>fly: 여우비다~!</item>
+        <item>fly: 우와아, 높다!</item>
+        <item>sleep: 꼬리 덮고 잘래…</item>
+        <item>sleep: 꿈에서 놀자…</item>
+        <item>wake: 딸랑! 깼어!</item>
+        <item>wake: 몰래 보고 있었지?</item>
+    </string-array>
+
+    <string-array name="talk_miru">
+        <item>summon: 음~ 왔어</item>
+        <item>summon: 오늘 플레이리스트 좋다</item>
+        <item>idle: 이 노래 들어 봤어?</item>
+        <item>idle: 볼륨 조금만 더…</item>
+        <item>idle: 그냥 이렇게 있는 것도 좋다</item>
+        <item>idle: 흥얼흥얼~</item>
+        <item>grab: 어, 헤드폰 떨어져!</item>
+        <item>grab: 음악 끊기잖아~</item>
+        <item>fly: 오, 베이스 드롭이다!</item>
+        <item>fly: 우와 이거 신나는데?</item>
+        <item>sleep: 잔잔한 노래 틀고 잘게…</item>
+        <item>sleep: 음… 졸려</item>
+        <item>wake: 노래 끝났네…</item>
+        <item>wake: 다시 재생~</item>
+    </string-array>
+
+    <string-array name="talk_leon">
+        <item>summon: 탐험 준비 완료!</item>
+        <item>summon: 오오, 새로운 화면이다!</item>
+        <item>idle: 이 화면 구조, 흥미로워…</item>
+        <item>idle: 새 발명품 구상 중!</item>
+        <item>idle: 고글 써야겠다!</item>
+        <item>idle: 저 아이콘 안에는 뭐가 있을까?</item>
+        <item>grab: 오? 비행 실험인가?</item>
+        <item>grab: 가방 조심해!</item>
+        <item>fly: 비행 테스트 성공이다!</item>
+        <item>fly: 데이터 기록해 둬!</item>
+        <item>sleep: 연구는 내일 마저…</item>
+        <item>sleep: 머리 좀 식힐게</item>
+        <item>wake: 꿈에서 아이디어 떠올랐어!</item>
+        <item>wake: 다시 탐험이다!</item>
+    </string-array>
+
+    <string-array name="talk_noel">
+        <item>summon: 오늘도 지켜 줄게요</item>
+        <item>summon: 안녕하세요, 함께해요</item>
+        <item>idle: 오늘 힘들진 않았어요?</item>
+        <item>idle: 물 마셨어요?</item>
+        <item>idle: 당신은 잘하고 있어요</item>
+        <item>idle: 쉬어 가도 괜찮아요</item>
+        <item>grab: 어머, 날개 다쳐요~</item>
+        <item>grab: 살살이요, 살살</item>
+        <item>fly: 날개가 있어서 괜찮아요!</item>
+        <item>fly: 하늘은 익숙해요~</item>
+        <item>sleep: 잠깐 쉬어도 될까요…</item>
+        <item>sleep: 좋은 꿈 꿀게요</item>
+        <item>wake: 다시 힘내요!</item>
+        <item>wake: 계속 곁에 있었어요</item>
+    </string-array>
+
+    <string-array name="talk_neon">
+        <item>summon: 접속 완료</item>
+        <item>summon: …왔다냥</item>
+        <item>idle: 배터리 확인해</item>
+        <item>idle: 와이파이 느리네</item>
+        <item>idle: …심심하다냥</item>
+        <item>idle: 화면 밝기 낮춰, 눈 아파</item>
+        <item>grab: 시스템 오류다냥!</item>
+        <item>grab: 놔. >> …아니 조금만</item>
+        <item>fly: 중력 설정 이상해!</item>
+        <item>fly: 냐아아앙!</item>
+        <item>sleep: 절전 모드 진입</item>
+        <item>sleep: …잔다냥</item>
+        <item>wake: 재부팅 완료</item>
+        <item>wake: 업데이트 끝났다냥</item>
+    </string-array>
+
+    <string-array name="talk_yuki">
+        <item>summon: 왔어요… 기다렸어요</item>
+        <item>summon: 눈 냄새가 나요</item>
+        <item>idle: 곁에 있을게요</item>
+        <item>idle: 귀가 쫑긋… 무슨 소리지?</item>
+        <item>idle: 눈 오는 날이 좋아요</item>
+        <item>idle: 꽃이 시들지 않았으면</item>
+        <item>grab: 귀, 귀는 만지지 마세요…</item>
+        <item>grab: 따뜻하네요</item>
+        <item>fly: 눈보라 같아요…!</item>
+        <item>fly: 꼬리가 흔들려요!</item>
+        <item>sleep: 몸을 둥글게… 잘게요</item>
+        <item>sleep: 포근해요…</item>
+        <item>wake: 눈이 그쳤나요?</item>
+        <item>wake: 계속 여기 있었네요</item>
+    </string-array>
+
+    <string-array name="talk_maren">
+        <item>summon: 후후, 불렀니?</item>
+        <item>summon: 오늘의 물약은 뭘로 할까</item>
+        <item>idle: 이 꽃은 잠 오는 약초란다</item>
+        <item>idle: 주문을 외워 볼까…</item>
+        <item>idle: 차 한잔 하고 싶네</item>
+        <item>idle: 너한테 행운 마법을 걸어 줄게</item>
+        <item>grab: 어머, 빗자루 없이 나는 건 처음이야</item>
+        <item>grab: 모자 꼭 잡아야겠다</item>
+        <item>fly: 비행 마법은 내 특기야!</item>
+        <item>fly: 후후, 바람이 좋네</item>
+        <item>sleep: 수면 물약을 너무 마셨나…</item>
+        <item>sleep: 잘 자렴…</item>
+        <item>wake: 마력 충전 끝</item>
+        <item>wake: 좋은 꿈을 꿨단다</item>
+    </string-array>
+</resources>

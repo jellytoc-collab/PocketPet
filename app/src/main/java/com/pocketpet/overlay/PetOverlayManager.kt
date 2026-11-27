@@ -75,6 +75,16 @@ class PetOverlayManager(
     // 던지기는 VIP부터. 일반 등급이면 놓았을 때 그냥 떨어진다
     private var canThrow = false
 
+    // 말풍선 대사 (VIP+)
+    private val bubble = SpeechBubble(context, windowManager)
+    private var canTalk = false
+    private var lastState: PetState? = null    // 행동이 바뀌는 순간을 알아채려고 기억해 둔다
+    private var screenLeft = 0
+    private var screenRight = 0
+    /** 상황별 대사 목록 (summon, idle, grab, fly, sleep, wake) */
+    private val lines: Map<String, List<String>> by lazy { loadLines() }
+    private val idleTalkRunnable = Runnable { onIdleTalk() }
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!loopRunning) return
@@ -135,14 +145,19 @@ class PetOverlayManager(
         petView = view
         params = lp
         lostReported = false
+        lastState = controller.state
 
         startLoop()
+        say(TALK_SUMMON, force = true)
+        scheduleIdleTalk()
         return true
     }
 
     /** 펫을 정리한다. 여러 번 불러도 안전하다 */
     fun hide() {
         stopLoop()
+        handler.removeCallbacks(idleTalkRunnable)
+        bubble.clear()
         velocityTracker?.recycle()
         velocityTracker = null
         val view = petView
@@ -161,6 +176,8 @@ class PetOverlayManager(
     fun pause() {
         paused = true
         stopLoop()
+        handler.removeCallbacks(idleTalkRunnable)
+        bubble.clear()
     }
 
     /** 화면이 켜졌을 때: 권한을 확인하고 다시 움직인다 */
@@ -170,6 +187,7 @@ class PetOverlayManager(
         if (petView == null) return
         if (!checkPermission()) return
         startLoop()
+        scheduleIdleTalk()
     }
 
     /** 화면 크기가 바뀌었을 때(회전 등) 이동 범위를 다시 계산한다 */
@@ -215,6 +233,78 @@ class PetOverlayManager(
     fun setCanSleep(allowed: Boolean) {
         controller.canSleep = allowed
         startLoop()
+    }
+
+    /** 말풍선 대사를 쓸 수 있는지 (VIP+) */
+    fun setCanTalk(allowed: Boolean) {
+        canTalk = allowed
+        if (allowed) {
+            scheduleIdleTalk()
+        } else {
+            handler.removeCallbacks(idleTalkRunnable)
+            bubble.clear()
+        }
+    }
+
+    // ---------- 말풍선 ----------
+
+    /**
+     * 상황에 맞는 대사를 하나 골라 말한다.
+     * force가 아니면 이미 말하는 중일 때는 건너뛴다 (잡았다 놓았다 할 때 말이 쏟아지지 않게).
+     */
+    private fun say(situation: String, force: Boolean = false) {
+        if (!canTalk || petView == null || paused) return
+        if (!force && bubble.busy) return
+        val line = lines[situation]?.randomOrNull() ?: return
+        bubble.say(line)
+        moveBubble()
+    }
+
+    private fun moveBubble() {
+        if (!bubble.busy) return
+        // 펫 그림의 가운데는 창이 넓어져도 controller.x + 기본 너비의 절반이다
+        bubble.moveTo(controller.x + widthPx / 2f, controller.y, screenLeft, screenRight)
+    }
+
+    /** 행동이 바뀌는 순간에 맞는 대사를 한다 */
+    private fun onStateMaybeChanged() {
+        val state = controller.state
+        if (state == lastState) return
+        lastState = state
+        when (state) {
+            PetState.DRAGGED -> say(TALK_GRAB)
+            PetState.THROWN -> say(TALK_FLY)
+            PetState.SLEEP -> say(TALK_SLEEP, force = true)
+            PetState.WAKE -> say(TALK_WAKE, force = true)
+            else -> Unit
+        }
+    }
+
+    /** 가만히 있거나 걷는 중이면 가끔 혼잣말을 한다 */
+    private fun onIdleTalk() {
+        val state = controller.state
+        if (state == PetState.IDLE || state == PetState.WALK) say(TALK_IDLE)
+        scheduleIdleTalk()
+    }
+
+    private fun scheduleIdleTalk() {
+        handler.removeCallbacks(idleTalkRunnable)
+        if (!canTalk || petView == null || paused) return
+        val delayMs = IDLE_TALK_MIN_MS + (Math.random() * (IDLE_TALK_MAX_MS - IDLE_TALK_MIN_MS)).toLong()
+        handler.postDelayed(idleTalkRunnable, delayMs)
+    }
+
+    /** talk.xml 의 "상황: 대사" 줄들을 상황별로 묶는다 */
+    private fun loadLines(): Map<String, List<String>> {
+        val res = definition.talk ?: return emptyMap()
+        return context.resources.getStringArray(res)
+            .mapNotNull { item ->
+                val colon = item.indexOf(':')
+                if (colon <= 0) null
+                else item.substring(0, colon).trim() to item.substring(colon + 1).trim()
+            }
+            .filter { it.second.isNotEmpty() }
+            .groupBy({ it.first }, { it.second })
     }
 
     /** 시험용 잠들기 버튼: 땅에 있으면 바로 잠들기 시작한다 */
@@ -272,6 +362,7 @@ class PetOverlayManager(
         lastFrameTimeNanos = frameTimeNanos
 
         controller.update(dt)
+        onStateMaybeChanged()
         applyFrame()
         if (!applyPosition()) return
 
@@ -405,6 +496,7 @@ class PetOverlayManager(
                 velocityTracker = VelocityTracker.obtain()
                 trackVelocity(event)
                 controller.startDrag()
+                onStateMaybeChanged()
                 applyFrame()
                 startLoop()      // 잠들어 있었다면 깨운다
             }
@@ -459,11 +551,14 @@ class PetOverlayManager(
         if (newX == lp.x && newY == lp.y) return true
         lp.x = newX
         lp.y = newY
+        moveBubble()
         return relayout()
     }
 
     private fun updateBounds() {
         val area = usableArea()
+        screenLeft = area.left
+        screenRight = area.right
         val bottomMargin = ((BOTTOM_MARGIN_DP + floorDp) * density).toInt()
         controller.setBounds(
             minX = area.left.toFloat(),
@@ -499,5 +594,13 @@ class PetOverlayManager(
         private const val BOTTOM_MARGIN_DP = 8
         private const val PERMISSION_CHECK_SEC = 2f
         private const val MIN_SLEEP_SEC = 0.3f
+        private const val IDLE_TALK_MIN_MS = 20_000L   // 혼잣말 간격 (20 ~ 45초 사이에서 무작위)
+        private const val IDLE_TALK_MAX_MS = 45_000L
+        private const val TALK_SUMMON = "summon"
+        private const val TALK_IDLE = "idle"
+        private const val TALK_GRAB = "grab"
+        private const val TALK_FLY = "fly"
+        private const val TALK_SLEEP = "sleep"
+        private const val TALK_WAKE = "wake"
     }
 }

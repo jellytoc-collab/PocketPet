@@ -62,6 +62,7 @@ class PetService : Service() {
                     overlays.values.forEach {
                         it.setCanThrow(settings.tier.canThrow)
                         it.setCanSleep(settings.tier.plusFeatures)
+                        it.setCanTalk(settings.tier.plusFeatures)
                     }
                     syncPets()
                     updateShake()
@@ -222,6 +223,7 @@ class PetService : Service() {
             setWalkFrequency(settings.walkFrequency)
             setCanThrow(settings.tier.canThrow)
             setCanSleep(settings.tier.plusFeatures)
+            setCanTalk(settings.tier.plusFeatures)
         }
     }
 
