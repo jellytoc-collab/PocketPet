@@ -41,12 +41,21 @@ android {
 
     buildTypes {
         getByName("debug") {
+            // 시험용 버전: 구글이 주는 테스트 광고 ID (눌러도 괜찮다)
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            resValue("string", "admob_banner_id", "ca-app-pub-3940256099942544/9214589741")
+            resValue("string", "admob_app_open_id", "ca-app-pub-3940256099942544/9257395921")
             // 도장이 있으면 항상 같은 도장으로 서명한다 → 덮어쓰기 업데이트 가능
             if (keystorePath != null) {
                 signingConfig = signingConfigs.getByName("upload")
             }
         }
         getByName("release") {
+            // 플레이스토어 버전: 내 진짜 AdMob 광고 ID
+            // 🚨 진짜 광고는 절대 직접 누르지 않는다 (계정 정지 위험)
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-6732124200971826~3609405963"
+            resValue("string", "admob_banner_id", "ca-app-pub-6732124200971826/6840919016")
+            resValue("string", "admob_app_open_id", "ca-app-pub-6732124200971826/3429121761")
             // 플레이스토어에 올릴 버전
             isMinifyEnabled = false
             if (keystorePath != null) {

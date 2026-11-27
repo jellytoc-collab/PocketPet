@@ -18,10 +18,11 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.pocketpet.R
 
 /**
  * 구글 광고(AdMob) 관련 코드를 모아 둔 곳.
- * 지금은 구글이 주는 테스트 광고 ID를 쓴다 — 출시 전에 내 AdMob 광고 ID로 바꾼다.
+ * 광고 ID는 app/build.gradle.kts 에 있다: 시험용(debug)은 구글 테스트 광고, 플레이스토어용(release)은 진짜 광고.
  * 🚨 실제 광고 ID로 바꾼 뒤에는 내 광고를 절대 누르지 않는다 (계정 정지 위험)
  */
 object Ads {
@@ -120,7 +121,7 @@ class BannerSlot(private val activity: Activity, private val container: FrameLay
         val metrics = activity.resources.displayMetrics
         val widthDp = (metrics.widthPixels / metrics.density).toInt()
         val view = AdView(activity).apply {
-            adUnitId = BANNER_UNIT_ID
+            adUnitId = activity.getString(R.string.admob_banner_id)
             // 화면 너비에 맞춘 배너 크기
             setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp))
         }
@@ -158,8 +159,6 @@ class BannerSlot(private val activity: Activity, private val container: FrameLay
     fun resume() { adView?.resume() }
 
     companion object {
-        /** 배너 광고 ID (지금은 테스트용) */
-        private const val BANNER_UNIT_ID = "ca-app-pub-3940256099942544/9214589741"
 
         private const val RETRY_BASE_MS = 30 * 1000L
         private const val MAX_RETRY = 3
