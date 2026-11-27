@@ -13,6 +13,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
+import com.pocketpet.R
 import com.pocketpet.data.PetSettingsRepository
 
 /**
@@ -67,7 +68,7 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
         loading = true
         AppOpenAd.load(
             app,
-            APP_OPEN_UNIT_ID,
+            app.getString(R.string.admob_app_open_id),
             AdRequest.Builder().build(),
             object : AppOpenAd.AppOpenAdLoadCallback() {
                 override fun onAdLoaded(loaded: AppOpenAd) {
@@ -163,9 +164,6 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
     override fun onActivityDestroyed(activity: Activity) {}
 
     companion object {
-        /** 앱 복귀 광고 ID (지금은 테스트용) */
-        private const val APP_OPEN_UNIT_ID = "ca-app-pub-3940256099942544/9257395921"
-
         /** 복귀 광고 사이 최소 간격: 2시간 */
         private const val MIN_INTERVAL_MS = 2 * 60 * 60 * 1000L
 
