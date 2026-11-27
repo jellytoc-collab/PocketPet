@@ -40,6 +40,8 @@ class MainActivity : Activity() {
     private lateinit var dismissButton: Button
     private var showVipOnResume = false
     private var notificationAsked = false
+    private var consentDone = false   // 광고 동의 확인이 끝났는지
+    private var resumedNow = false    // 지금 화면이 보이는 중인지
 
     private var petIndex = 0
     private var drawerOpen = false
@@ -72,17 +74,39 @@ class MainActivity : Activity() {
 
         // 앱을 새로 켰을 때(화면 회전 등이 아닐 때) VIP 소개 화면을 띄운다. VIP+는 띄우지 않는다
         showVipOnResume = savedInstanceState == null && settings.tier != Tier.VIP_PLUS
+
+        // 광고 동의부터 확인한다 (필요한 지역이면 구글 동의 창). 끝나야 VIP 화면·배너를 띄운다
+        Ads.gatherConsent(this) { onConsentDone() }
+    }
+
+    /** 광고 동의 확인이 끝났을 때 */
+    private fun onConsentDone() {
+        if (isDestroyed) return
+        consentDone = true
+        findViewById<View>(R.id.menuAdPrivacy).visibility =
+            if (Ads.privacyOptionsRequired(this)) View.VISIBLE else View.GONE
+        // 화면이 보이는 중이면 미뤄 둔 일(VIP 화면, 배너)을 지금 한다
+        if (resumedNow) refreshScreen()
     }
 
     override fun onResume() {
         super.onResume()
-        if (showVipOnResume) {
-            showVipOnResume = false
-            openVipPage()
-        } else if (!notificationAsked) {
-            // 알림 권한은 VIP 화면이 닫힌 뒤에 물어본다 (두 창이 겹치지 않게)
-            notificationAsked = true
-            requestNotificationPermissionIfNeeded()
+        resumedNow = true
+        refreshScreen()
+    }
+
+    /** 화면이 보일 때마다(그리고 광고 동의가 끝났을 때) 화면 상태를 다시 맞춘다 */
+    private fun refreshScreen() {
+        // 광고 동의 확인이 끝난 뒤에만 VIP 화면·알림 권한을 띄운다 (동의 창이 뒤에 가려지지 않게)
+        if (consentDone) {
+            if (showVipOnResume) {
+                showVipOnResume = false
+                openVipPage()
+            } else if (!notificationAsked) {
+                // 알림 권한은 VIP 화면이 닫힌 뒤에 물어본다 (두 창이 겹치지 않게)
+                notificationAsked = true
+                requestNotificationPermissionIfNeeded()
+            }
         }
         // 등급이 바뀌었을 수 있으니 돌아올 때마다 배너를 다시 정한다 (VIP+는 배너 없음)
         if (settings.tier.showBanner) banner.show() else banner.hide()
@@ -99,6 +123,7 @@ class MainActivity : Activity() {
     }
 
     override fun onPause() {
+        resumedNow = false
         banner.pause()
         super.onPause()
     }
@@ -140,6 +165,7 @@ class MainActivity : Activity() {
         menuItem(R.id.menuPrivacy) {
             startActivity(InfoActivity.intent(this, InfoActivity.TYPE_PRIVACY))
         }
+        menuItem(R.id.menuAdPrivacy) { Ads.showPrivacyOptions(this) }
     }
 
     /** 메뉴 항목을 누르면 메뉴를 닫은 뒤 action을 실행한다 */
@@ -320,14 +346,29 @@ class MainActivity : Activity() {
     }
 
     private fun dismissPet() {
-        // VIP+로 여러 마리가 나와 있고 고른 펫이 그중 하나면, 그 펫만 돌려보낸다
+        // 한 마리면 바로 돌려보낸다. 여러 마리면 누구를 돌려보낼지 고르는 팝업을 띄운다
         val out = summonedNow()
-        val id = Pets.ALL[petIndex].id
-        if (out.size > 1 && id in out) {
-            settings.summonedPets = out - id
-        } else {
-            stopService(Intent(this, PetService::class.java))
+        if (out.size <= 1) {
+            stopAllPets()
+            return
         }
+        DismissDialog(
+            this,
+            out,
+            onDismissOne = { id ->
+                val left = summonedNow() - id
+                if (left.isEmpty()) stopAllPets()
+                else {
+                    settings.summonedPets = left
+                    refreshStatusSoon()
+                }
+            },
+            onDismissAll = { stopAllPets() }
+        ).show()
+    }
+
+    private fun stopAllPets() {
+        stopService(Intent(this, PetService::class.java))
         refreshStatusSoon()
     }
 
@@ -335,15 +376,11 @@ class MainActivity : Activity() {
     private fun summonedNow(): List<String> =
         if (PetService.isRunning && settings.tier.maxPets > 1) settings.summonedPets else emptyList()
 
-    /** 소환 해제 버튼 글자: 여러 마리가 나와 있으면 ‘○○ 돌려보내기’ 또는 ‘모두 돌려보내기’ */
+    /** 소환 해제 버튼 글자: 여러 마리가 나와 있으면 ‘소환 해제 (3)’처럼 마릿수를 붙인다 */
     private fun updateDismissLabel() {
-        val out = summonedNow()
-        val pet = Pets.ALL[petIndex]
-        dismissButton.text = when {
-            out.size <= 1 -> getString(R.string.dismiss)
-            pet.id in out -> getString(R.string.dismiss_one, getString(pet.nameRes))
-            else -> getString(R.string.dismiss_all)
-        }
+        val count = summonedNow().size
+        dismissButton.text = if (count > 1) getString(R.string.dismiss_count, count)
+        else getString(R.string.dismiss)
     }
 
     /** 서비스가 실제로 시작·종료될 시간을 조금 기다린 뒤 상태를 다시 표시한다 */

@@ -14,7 +14,7 @@
     <string name="pet_status_idle">Status: resting</string>
     <string name="pet_status_starting">Status: calling…</string>
     <string name="pet_status_running_count">Status: %1$d pets on screen</string>
-    <string name="dismiss_one">Send %1$s back</string>
+    <string name="dismiss_count">Dismiss (%1$d)</string>
     <string name="dismiss_all">Send all back</string>
     <string name="toast_already_out">This pet is already on the screen</string>
     <string name="toast_max_pets">You can summon up to %1$d pets at once</string>
@@ -39,6 +39,11 @@
     <string name="settings_floor">Floor height</string>
     <string name="settings_walk_freq">Walking frequency</string>
     <string name="settings_walk_freq_hint">Higher numbers mean more walking. At 0 the pet just stands still.</string>
+    <string name="settings_talk">Speech bubbles</string>
+    <string name="settings_talk_hint">Pets talk in a bubble above their heads. (VIP+ only)</string>
+    <string name="dismiss_popup_title">Who should go home?</string>
+    <string name="dismiss_popup_hint">Tap a name to send just that pet home.</string>
+    <string name="dismiss_popup_close">Close</string>
     <string name="settings_reset">Reset settings</string>
     <string name="reset_confirm_title">Reset settings?</string>
     <string name="reset_confirm_message">Size, floor height and walking frequency will go back to their defaults.</string>
@@ -86,7 +91,8 @@
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
 
     <!-- 개인정보처리방침 -->
-    <string name="privacy_body">Effective date: November 21, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not collect personal information such as your name, contacts or location, and does not send any data to external servers.\n\n2. Information stored on your device\nSettings such as your chosen pet, size, floor height and walking frequency are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n\n4. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n5. Contact\n%1$s</string>
+    <string name="privacy_body">Effective date: November 27, 2026\n\nPocket Pet (the ‘App’) respects your privacy.\n\n1. Information we collect\nThe App does not directly collect personal information such as your name, contacts or location, and the developer runs no servers. However, as described under ‘Advertising’ below, Google may process some information to show ads.\n\n2. Information stored on your device\nSettings such as your chosen pet, summoned pets, size, floor height, walking frequency and speech bubble on/off are stored only on your device. They are deleted when you uninstall the App.\n\n3. Permissions and sensors\n• Display over other apps: used to show your pet on the screen.\n• Notifications: used to let you know your pet is running.\n• Foreground service: used to keep your pet on the screen after you close the App.\n• Motion sensor (accelerometer): used by the ‘Shake to fly’ (VIP+) feature to notice when you shake your phone. It only runs while a pet is on screen and the screen is on. Sensor readings are never stored or sent anywhere.\n\n4. Advertising\nThe Free and VIP tiers show Google AdMob ads. To show and measure ads, Google may collect and use the advertising ID, device information and approximate location (based on IP address). In regions that require consent, such as Europe, you will be asked before ads are shown, and you can change your choice at any time under ‘Ad privacy settings’ in the menu. See Google’s policy (policies.google.com/technologies/ads) for details.\n\n5. Payments\nPurchases of paid content are handled by Google Play billing. The App does not receive or store payment details such as card numbers.\n\n6. Contact\n%1$s</string>
+    <string name="menu_ad_privacy">📢  Ad privacy settings</string>
     <!-- Tiers -->
     <string name="locked_pet_name">🔒 %1$s</string>
     <string name="tier_test_title">🧪 Test tier (only in test builds)</string>

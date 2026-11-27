@@ -79,6 +79,7 @@ class PetOverlayManager(
     private val bubble = SpeechBubble(context, windowManager)
     private var canTalk = false
     private var lastState: PetState? = null    // 행동이 바뀌는 순간을 알아채려고 기억해 둔다
+    private var shakeFlying = false            // 흔들어서 날고 있는 중인지 (날기 대사를 붙잡아 둔다)
     private var screenLeft = 0
     private var screenRight = 0
     /** 상황별 대사 목록 (summon, idle, grab, fly, sleep, wake) */
@@ -271,6 +272,12 @@ class PetOverlayManager(
         val state = controller.state
         if (state == lastState) return
         lastState = state
+        // 흔들어서 날던 펫이 내려앉으면(또는 잡히면) 대사를 2초 더 보여 주고 지운다
+        if (shakeFlying && state != PetState.THROWN && state != PetState.FALL) {
+            shakeFlying = false
+            bubble.releaseAfter(SHAKE_TALK_AFTER_LAND_MS)
+            return
+        }
         when (state) {
             PetState.DRAGGED -> say(TALK_GRAB)
             PetState.THROWN -> say(TALK_FLY)
@@ -317,6 +324,15 @@ class PetOverlayManager(
     fun fling() {
         if (petView == null || paused) return
         controller.fling()
+        lastState = controller.state
+        // 날기 대사는 나는 동안 계속 띄워 두고, 내려앉은 뒤 2초 있다가 지운다
+        shakeFlying = true
+        if (canTalk && !bubble.holding) {
+            lines[TALK_FLY]?.randomOrNull()?.let {
+                bubble.hold(it)
+                moveBubble()
+            }
+        }
         startLoop()
     }
 
@@ -596,6 +612,7 @@ class PetOverlayManager(
         private const val MIN_SLEEP_SEC = 0.3f
         private const val IDLE_TALK_MIN_MS = 20_000L   // 혼잣말 간격 (20 ~ 45초 사이에서 무작위)
         private const val IDLE_TALK_MAX_MS = 45_000L
+        private const val SHAKE_TALK_AFTER_LAND_MS = 2_000L   // 흔들어서 날다 내려앉은 뒤 대사를 더 보여 주는 시간
         private const val TALK_SUMMON = "summon"
         private const val TALK_IDLE = "idle"
         private const val TALK_GRAB = "grab"

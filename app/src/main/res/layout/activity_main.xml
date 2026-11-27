@@ -324,6 +324,23 @@
             android:text="@string/menu_privacy"
             android:textColor="#3B2F2F"
             android:textSize="17sp" />
+
+        <!-- 광고 동의를 다시 고르는 메뉴: 유럽 등 동의가 필요한 지역에서만 보인다 -->
+        <TextView
+            android:id="@+id/menuAdPrivacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:text="@string/menu_ad_privacy"
+            android:textColor="#3B2F2F"
+            android:textSize="17sp"
+            android:visibility="gone" />
     </LinearLayout>
 
 </FrameLayout>

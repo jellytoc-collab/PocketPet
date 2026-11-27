@@ -45,7 +45,9 @@ class AppOpenAdManager(private val app: Application) : Application.ActivityLifec
     private var wentToBackground = false  // 화면이 모두 사라졌다가(다른 앱으로 감) 돌아오는 중인지
     private var returnPending = false     // 돌아왔으니 광고를 보여 줄 차례인지
 
-    fun start() {
+    /** visibleScreens: 이미 보이고 있는 우리 화면 수 (화면에서 늦게 시작할 때 1) */
+    fun start(visibleScreens: Int = 0) {
+        startedCount = visibleScreens
         app.registerActivityLifecycleCallbacks(this)
         preload()
     }

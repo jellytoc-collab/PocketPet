@@ -49,6 +49,31 @@ class SpeechBubble(private val context: Context, private val windowManager: Wind
         showPart(parts, 0)
     }
 
+    /** 붙잡아 둔 대사(흔들어서 날 때)를 보여 주는 중인지 */
+    var holding = false
+        private set
+
+    /**
+     * 시간이 지나도 사라지지 않게 대사를 띄운다. releaseAfter()를 부를 때까지 남아 있다.
+     * 두 부분 대사는 한 줄로 이어서 보여 준다.
+     */
+    fun hold(line: String) {
+        clear()
+        val text = line.split(SPLIT).map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
+        if (text.isEmpty()) return
+        busy = true
+        holding = true
+        showText(text)
+    }
+
+    /** 붙잡아 둔 대사를 delayMs 뒤에 지운다 */
+    fun releaseAfter(delayMs: Long) {
+        if (!holding) return
+        holding = false
+        handler.removeCallbacksAndMessages(null)
+        handler.postDelayed({ clear() }, delayMs)
+    }
+
     /** 펫 위치가 바뀌었을 때 말풍선을 따라 옮긴다 */
     fun moveTo(centerX: Float, topY: Float, screenLeft: Int, screenRight: Int) {
         this.centerX = centerX
@@ -63,6 +88,7 @@ class SpeechBubble(private val context: Context, private val windowManager: Wind
         handler.removeCallbacksAndMessages(null)
         removeView()
         busy = false
+        holding = false
     }
 
     private fun showPart(parts: List<String>, index: Int) {
