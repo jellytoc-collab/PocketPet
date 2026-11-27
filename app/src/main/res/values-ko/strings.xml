@@ -13,6 +13,11 @@
     <string name="pet_status_running">펫 상태: 소환됨</string>
     <string name="pet_status_idle">펫 상태: 쉬는 중</string>
     <string name="pet_status_starting">펫 상태: 부르는 중…</string>
+    <string name="pet_status_running_count">펫 상태: %1$d마리 소환됨</string>
+    <string name="dismiss_one">%1$s 돌려보내기</string>
+    <string name="dismiss_all">모두 돌려보내기</string>
+    <string name="toast_already_out">이미 화면에 나와 있어요</string>
+    <string name="toast_max_pets">한 번에 %1$d마리까지 소환할 수 있어요</string>
     <string name="permission_granted">다른 앱 위에 표시 권한: 허용됨 ✅</string>
     <string name="permission_needed">다른 앱 위에 표시 권한: 필요함 ⚠️\n소환하기를 누르면 설정 화면으로 이동해요</string>
     <string name="permission_guide">목록에서 Pocket Pet을 찾아 ‘다른 앱 위에 표시’를 허용해 주세요</string>
@@ -49,6 +54,7 @@
     <!-- 알림·안내 -->
     <string name="notification_channel">펫 실행 상태</string>
     <string name="notification_text">%1$s 소환 중</string>
+    <string name="notification_text_multi">%1$s 외 %2$d마리 소환 중</string>
     <string name="toast_permission_lost">‘다른 앱 위에 표시’ 권한이 꺼져서 펫이 돌아갔어요</string>
     <string name="toast_cannot_show">펫을 화면에 표시할 수 없어요</string>
     <string name="toast_no_app">이 기능을 열 수 있는 앱이 없어요</string>
@@ -74,7 +80,7 @@
     <string name="pet_maren">마렌</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. 🔒 표시가 있는 펫은 VIP부터 쓸 수 있어요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. VIP는 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요. VIP+는 폰을 세게 흔들어도 펫이 날아다녀요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
+    <string name="help_body">1. 펫 고르기\n◀ ▶ 버튼으로 마음에 드는 친구를 골라요. 🔒 표시가 있는 펫은 VIP부터 쓸 수 있어요. ≡ → 펫 목록에서 모든 펫을 한눈에 보고 고를 수도 있어요.\n\n2. 소환하기\n처음 한 번은 Pocket Pet의 ‘다른 앱 위에 표시’ 권한을 허용해야 해요. VIP+는 펫을 고르고 소환하기를 누를 때마다 한 마리씩 더 나와요 (최대 5마리). 나와 있는 펫을 고르고 돌려보내기를 누르면 그 펫만 돌아가요.\n\n3. 같이 놀기\n펫을 누른 채 끌면 팔을 휘적거리며 손가락을 따라와요. 손을 떼면 바닥으로 떨어져요. VIP는 놓으면서 휙 던지면 날아가서 화면 가장자리에 튕겨요. VIP+는 폰을 세게 흔들어도 펫이 날아다녀요.\n\n4. 설정\n≡ → 설정에서 크기, 바닥 높이, 걷는 빈도를 바꿀 수 있어요.\n\n5. 돌려보내기\n앱이나 알림에서 ‘소환 해제’를 눌러요.\n\n문제 해결\n• 펫이 사라졌어요: ‘다른 앱 위에 표시’ 권한이 켜져 있는지, 바닥 높이가 너무 높지 않은지 확인해 주세요.\n• 한참 뒤에 펫이 멈춰요: 폰 설정에서 Pocket Pet의 배터리 최적화를 꺼 주세요.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\n버전 %1$s\n\n화면 위를 돌아다니는 작은 친구들과 함께하세요.\n\n만든 사람: jellytoc</string>
@@ -97,7 +103,7 @@
     <string name="vip_plus_price">월 6,600원</string>
     <string name="vip_recommended">추천</string>
     <string name="vip_benefits">✓ 모든 펫 잠금 해제\n✓ 던지기\n✓ 앱 복귀 광고 없음</string>
-    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 대사 (곧 추가)\n✓ 꾸벅꾸벅 잠자기\n✓ 폰을 흔들면 펫이 날아다녀요\n✓ 여러 마리 소환 (곧 추가)</string>
+    <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 머리 위 말풍선 대사\n✓ 꾸벅꾸벅 잠자기\n✓ 폰을 흔들면 펫이 날아다녀요\n✓ 최대 5마리 함께 소환</string>
     <string name="vip_subscribe">VIP 구독하기</string>
     <string name="vip_plus_subscribe">VIP+ 구독하기</string>
     <string name="vip_current">이용 중</string>

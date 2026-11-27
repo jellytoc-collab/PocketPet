@@ -37,6 +37,7 @@ class MainActivity : Activity() {
     private lateinit var settings: PetSettingsRepository
     private lateinit var banner: BannerSlot
     private lateinit var sleepNowButton: Button
+    private lateinit var dismissButton: Button
     private var showVipOnResume = false
     private var notificationAsked = false
 
@@ -59,7 +60,8 @@ class MainActivity : Activity() {
         scrim = findViewById(R.id.drawerScrim)
 
         findViewById<Button>(R.id.summonButton).setOnClickListener { summonPet() }
-        findViewById<Button>(R.id.dismissButton).setOnClickListener { dismissPet() }
+        dismissButton = findViewById(R.id.dismissButton)
+        dismissButton.setOnClickListener { dismissPet() }
         sleepNowButton = findViewById(R.id.sleepNowButton)
         sleepNowButton.setOnClickListener { sleepNow() }
 
@@ -269,6 +271,7 @@ class MainActivity : Activity() {
         petPreview.alpha = if (unlocked) 1f else LOCKED_ALPHA
         petName.text = if (unlocked) getString(pet.nameRes)
         else getString(R.string.locked_pet_name, getString(pet.nameRes))
+        if (::dismissButton.isInitialized) updateDismissLabel()
     }
 
     // ---------- 소환 ----------
@@ -282,6 +285,21 @@ class MainActivity : Activity() {
         if (!Settings.canDrawOverlays(this)) {
             openOverlaySettings()
             return
+        }
+        // VIP+: 소환할 때마다 고른 펫을 한 마리씩 더한다
+        val tier = settings.tier
+        if (tier.maxPets > 1) {
+            val pet = Pets.ALL[petIndex]
+            val out = summonedNow()
+            if (pet.id in out) {
+                Toast.makeText(this, R.string.toast_already_out, Toast.LENGTH_SHORT).show()
+                return
+            }
+            if (out.size >= tier.maxPets) {
+                Toast.makeText(this, getString(R.string.toast_max_pets, tier.maxPets), Toast.LENGTH_SHORT).show()
+                return
+            }
+            settings.summonedPets = out + pet.id
         }
         startForegroundService(Intent(this, PetService::class.java))
         petStatus.setText(R.string.pet_status_starting)
@@ -302,8 +320,30 @@ class MainActivity : Activity() {
     }
 
     private fun dismissPet() {
-        stopService(Intent(this, PetService::class.java))
+        // VIP+로 여러 마리가 나와 있고 고른 펫이 그중 하나면, 그 펫만 돌려보낸다
+        val out = summonedNow()
+        val id = Pets.ALL[petIndex].id
+        if (out.size > 1 && id in out) {
+            settings.summonedPets = out - id
+        } else {
+            stopService(Intent(this, PetService::class.java))
+        }
         refreshStatusSoon()
+    }
+
+    /** VIP+ 여러 마리 모드에서 지금 화면에 나와 있는 펫 id들 (아니면 빈 목록) */
+    private fun summonedNow(): List<String> =
+        if (PetService.isRunning && settings.tier.maxPets > 1) settings.summonedPets else emptyList()
+
+    /** 소환 해제 버튼 글자: 여러 마리가 나와 있으면 ‘○○ 돌려보내기’ 또는 ‘모두 돌려보내기’ */
+    private fun updateDismissLabel() {
+        val out = summonedNow()
+        val pet = Pets.ALL[petIndex]
+        dismissButton.text = when {
+            out.size <= 1 -> getString(R.string.dismiss)
+            pet.id in out -> getString(R.string.dismiss_one, getString(pet.nameRes))
+            else -> getString(R.string.dismiss_all)
+        }
     }
 
     /** 서비스가 실제로 시작·종료될 시간을 조금 기다린 뒤 상태를 다시 표시한다 */
@@ -326,10 +366,13 @@ class MainActivity : Activity() {
             if (Settings.canDrawOverlays(this)) R.string.permission_granted
             else R.string.permission_needed
         )
-        petStatus.setText(
-            if (PetService.isRunning) R.string.pet_status_running
-            else R.string.pet_status_idle
-        )
+        val count = summonedNow().size
+        when {
+            count > 1 -> petStatus.text = getString(R.string.pet_status_running_count, count)
+            PetService.isRunning -> petStatus.setText(R.string.pet_status_running)
+            else -> petStatus.setText(R.string.pet_status_idle)
+        }
+        updateDismissLabel()
         // 바닥이 너무 높아서 펫이 화면 밖에 있으면 빨간 경고를 보여 준다
         val hidden = ScreenInfo.isPetHidden(this, settings.floorDp)
         hiddenWarning.visibility = if (hidden) View.VISIBLE else View.GONE
