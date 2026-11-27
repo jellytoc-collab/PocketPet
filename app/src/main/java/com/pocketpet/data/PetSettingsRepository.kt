@@ -23,6 +23,13 @@ class PetSettingsRepository(context: Context) {
             prefs.edit().putString(KEY_TIER, value.name).apply()
         }
 
+    /** VIP+ 여러 마리 소환: 지금 화면에 나와 있는 펫들 (소환한 순서) */
+    var summonedPets: List<String>
+        get() = prefs.getString(KEY_SUMMONED, "").orEmpty().split(',').filter { it.isNotBlank() }
+        set(value) {
+            prefs.edit().putString(KEY_SUMMONED, value.distinct().joinToString(",")).apply()
+        }
+
     /** 시험용: 메인 화면에 ‘지금 잠들기’ 버튼을 보여 줄지 (테스트 빌드에서만 쓴다) */
     var testSleepButton: Boolean
         get() = prefs.getBoolean(KEY_TEST_SLEEP_BUTTON, false)
@@ -80,6 +87,7 @@ class PetSettingsRepository(context: Context) {
         const val KEY_WALK_FREQ = "walk_frequency"
         const val KEY_TIER = "tier"
         const val KEY_TEST_SLEEP_BUTTON = "test_sleep_button"
+        const val KEY_SUMMONED = "summoned_pets"
 
         const val DEFAULT_PET = "shiro"
 

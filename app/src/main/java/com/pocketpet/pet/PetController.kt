@@ -112,6 +112,13 @@ class PetController(
         enter(PetState.IDLE)
     }
 
+    /** 여러 마리를 소환할 때: 겹치지 않게 바닥 위 아무 곳에 둔다 */
+    fun placeRandomly() {
+        x = randomBetween(minX, maxX)
+        y = groundY
+        enter(PetState.IDLE)
+    }
+
     /** 잠들어 있던 동안 흐른 시간을 쉬는 시간에서 뺀다 */
     fun passTime(sec: Float) {
         when (state) {

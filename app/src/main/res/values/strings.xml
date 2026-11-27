@@ -13,6 +13,11 @@
     <string name="pet_status_running">Status: on screen</string>
     <string name="pet_status_idle">Status: resting</string>
     <string name="pet_status_starting">Status: calling…</string>
+    <string name="pet_status_running_count">Status: %1$d pets on screen</string>
+    <string name="dismiss_one">Send %1$s back</string>
+    <string name="dismiss_all">Send all back</string>
+    <string name="toast_already_out">This pet is already on the screen</string>
+    <string name="toast_max_pets">You can summon up to %1$d pets at once</string>
     <string name="permission_granted">Display over other apps: allowed ✅</string>
     <string name="permission_needed">Display over other apps: needed ⚠️\nTap Summon to open the settings</string>
     <string name="permission_guide">Find Pocket Pet in the list and allow ‘Display over other apps’</string>
@@ -49,6 +54,7 @@
     <!-- 알림·안내 -->
     <string name="notification_channel">Pet status</string>
     <string name="notification_text">%1$s is on your screen</string>
+    <string name="notification_text_multi">%1$s and %2$d more are on your screen</string>
     <string name="toast_permission_lost">Your pet went home because ‘Display over other apps’ was turned off</string>
     <string name="toast_cannot_show">The pet cannot be shown on the screen</string>
     <string name="toast_no_app">No app found to open this</string>
@@ -74,7 +80,7 @@
     <string name="pet_maren">Maren</string>
 
     <!-- 사용법 -->
-    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. Pets marked 🔒 are available from VIP. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. With VIP, flick it while letting go and it flies, bouncing off the edges of the screen. With VIP+ you can also shake your phone hard to send it flying.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
+    <string name="help_body">1. Choose a pet\nUse ◀ ▶ to pick the friend you like. Pets marked 🔒 are available from VIP. You can also see all pets at once in ≡ → Pet list.\n\n2. Summon\nThe first time, allow ‘Display over other apps’ for Pocket Pet. With VIP+, every tap on Summon adds the selected pet, up to 5 at once. Pick a pet on screen and tap Send back to send just that one home.\n\n3. Play together\nPress and drag your pet and it follows your finger, flapping its arms. Let go and it drops to the floor. With VIP, flick it while letting go and it flies, bouncing off the edges of the screen. With VIP+ you can also shake your phone hard to send it flying.\n\n4. Settings\nChange the size, floor height and walking frequency in ≡ → Settings.\n\n5. Send it back\nTap ‘Send back’ in the app or on the notification.\n\nTroubleshooting\n• The pet disappeared: check that ‘Display over other apps’ is still allowed.\n• The pet stops after a while: turn off battery optimization for Pocket Pet in your phone settings.</string>
 
     <!-- 앱 정보 -->
     <string name="about_body">Pocket Pet\nVersion %1$s\n\nSpend your day with little friends that wander your screen.\n\nMade by jellytoc</string>
@@ -97,7 +103,7 @@
     <string name="vip_plus_price">₩6,600 / month</string>
     <string name="vip_recommended">Best</string>
     <string name="vip_benefits">✓ Unlock all pets\n✓ Throwing\n✓ No ads when you come back to the app</string>
-    <string name="vip_plus_benefits">✓ Everything in VIP\n✓ No ads at all, banner included\n✓ Speech bubbles (coming soon)\n✓ Dozing off to sleep\n✓ Shake your phone and your pet flies around\n✓ Summon several pets (coming soon)</string>
+    <string name="vip_plus_benefits">✓ Everything in VIP\n✓ No ads at all, banner included\n✓ Speech bubbles (coming soon)\n✓ Dozing off to sleep\n✓ Shake your phone and your pet flies around\n✓ Summon up to 5 pets together</string>
     <string name="vip_subscribe">Subscribe to VIP</string>
     <string name="vip_plus_subscribe">Subscribe to VIP+</string>
     <string name="vip_current">Current plan</string>

@@ -85,8 +85,8 @@ class PetOverlayManager(
 
     private val wakeRunnable = Runnable { onWake() }
 
-    /** 펫을 띄운다. 성공하면 true */
-    fun show(): Boolean {
+    /** 펫을 띄운다. 성공하면 true. spread: 다른 펫과 겹치지 않게 아무 곳에 둔다 (여러 마리 소환) */
+    fun show(spread: Boolean = false): Boolean {
         // 이미 펫이 떠 있으면 새로 만들지 않는다 (중복 생성 방지)
         if (petView != null) return true
         if (!Settings.canDrawOverlays(context)) return false
@@ -122,7 +122,7 @@ class PetOverlayManager(
         }
 
         updateBounds()
-        controller.placeInMiddle()
+        if (spread) controller.placeRandomly() else controller.placeInMiddle()
         lp.x = controller.x.toInt()
         lp.y = controller.y.toInt()
 

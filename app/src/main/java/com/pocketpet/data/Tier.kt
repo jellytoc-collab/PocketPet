@@ -18,6 +18,9 @@ enum class Tier {
     /** 폰을 흔들면 펫이 날아다니는지 (VIP+ 전용) */
     val canShakeFly: Boolean get() = this == VIP_PLUS
 
+    /** 한 번에 화면에 띄울 수 있는 펫 수 (VIP+는 여러 마리) */
+    val maxPets: Int get() = if (this == VIP_PLUS) MAX_PETS_PLUS else 1
+
     /** 앱에 돌아왔을 때 광고를 보여 줄지 */
     val showAppOpenAd: Boolean get() = this == FREE
 
@@ -28,6 +31,8 @@ enum class Tier {
     val plusFeatures: Boolean get() = this == VIP_PLUS
 
     companion object {
+        const val MAX_PETS_PLUS = 5   // VIP+ 여러 마리 소환 최대 수
+
         fun fromName(name: String?): Tier = entries.firstOrNull { it.name == name } ?: FREE
     }
 }
