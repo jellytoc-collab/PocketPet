@@ -105,16 +105,26 @@
     <!-- VIP page -->
     <string name="vip_title">👑 Pocket Pet VIP</string>
     <string name="vip_subtitle">More friends, more fun</string>
-    <string name="vip_price">₩3,300 / month</string>
-    <string name="vip_plus_price">₩6,600 / month</string>
     <string name="vip_recommended">Best</string>
     <string name="vip_benefits">✓ Unlock all pets\n✓ Throwing\n✓ No ads when you come back to the app</string>
     <string name="vip_plus_benefits">✓ Everything in VIP\n✓ No ads at all, banner included\n✓ Speech bubbles above their heads\n✓ Dozing off to sleep\n✓ Shake your phone and your pet flies around\n✓ Summon up to 5 pets together</string>
-    <string name="vip_subscribe">Subscribe to VIP</string>
-    <string name="vip_plus_subscribe">Subscribe to VIP+</string>
     <string name="vip_current">Current plan</string>
     <string name="vip_included">Included in VIP+</string>
-    <string name="vip_terms">Subscriptions renew automatically every month. You can cancel anytime in Google Play.</string>
+    <string name="vip_price">₩2,900 / month · ₩24,000 / year</string>
+    <string name="vip_plus_price">₩5,900 / month · ₩49,000 / year</string>
+    <string name="vip_year_button">Yearly · %1$s</string>
+    <string name="vip_year_trial_button">%1$d-day free trial → Yearly %2$s</string>
+    <string name="vip_month_button">Monthly · %1$s</string>
+    <string name="vip_price_line">%1$s / month · %2$s / year</string>
+    <string name="vip_month_default">₩2,900</string>
+    <string name="vip_year_default">₩24,000</string>
+    <string name="vip_plus_month_default">₩5,900</string>
+    <string name="vip_plus_year_default">₩49,000</string>
+    <string name="vip_terms">Subscriptions renew automatically (monthly or yearly). After a free trial, the yearly price is charged automatically. Cancel during the trial and you won’t be charged. You can cancel anytime in Google Play.</string>
+    <string name="vip_manage">Manage subscription</string>
+    <string name="billing_not_ready">Loading plans. Please try again in a moment.</string>
+    <string name="billing_error">Couldn’t start the purchase. Please try again later.</string>
+    <string name="billing_pending">It will apply as soon as the payment is confirmed.</string>
+    <string name="billing_thanks">Thanks for subscribing! 🎉</string>
     <string name="vip_later">Exit</string>
-    <string name="vip_not_ready">Payments are coming soon</string>
 </resources>

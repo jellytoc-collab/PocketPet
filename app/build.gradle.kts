@@ -14,6 +14,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:24.4.0")
     // 광고 동의 창(UMP): 유럽 등에서 광고 전에 동의를 받는 구글 라이브러리 (광고 예외에 포함)
     implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+    // 구글 Play 결제(구독): 광고와 함께 허용된 예외
+    implementation("com.android.billingclient:billing:8.0.0")
 }
 
 android {

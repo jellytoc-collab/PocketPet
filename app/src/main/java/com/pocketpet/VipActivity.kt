@@ -1,12 +1,17 @@
 package com.pocketpet
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import com.pocketpet.billing.Billing
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.Tier
 import kotlin.math.roundToInt
@@ -15,7 +20,7 @@ import kotlin.math.roundToInt
  * VIP / VIP+ 소개 화면.
  * 앱을 새로 켤 때(VIP+가 아니면), 그리고 잠긴 펫을 소환하려 할 때 나온다.
  * 카드를 옆으로 밀어 넘기고(VIP+ → VIP), 나가기 버튼은 1초 뒤에 나타난다.
- * 구독 버튼은 구글 결제를 연결하면 실제로 동작한다.
+ * 등급마다 연간(무료 체험이 있으면 체험으로 시작)·월간 구독 버튼이 있다.
  */
 class VipActivity : Activity() {
 
@@ -46,23 +51,88 @@ class VipActivity : Activity() {
     }
 
     private fun setupButtons() {
-        val tier = PetSettingsRepository(this).tier
-        val vipButton = findViewById<Button>(R.id.vipButton)
-        val plusButton = findViewById<Button>(R.id.vipPlusButton)
-
-        // 이미 쓰고 있는 등급(또는 그보다 낮은 등급) 버튼은 ‘이용 중’으로 막는다
-        if (tier != Tier.FREE) {
-            vipButton.isEnabled = false
-            vipButton.setText(if (tier == Tier.VIP) R.string.vip_current else R.string.vip_included)
+        findViewById<Button>(R.id.vipYearButton).setOnClickListener {
+            Billing.subscribe(this, Billing.VIP, Billing.PLAN_YEARLY)
         }
-        if (tier == Tier.VIP_PLUS) {
-            plusButton.isEnabled = false
-            plusButton.setText(R.string.vip_current)
+        findViewById<Button>(R.id.vipButton).setOnClickListener {
+            Billing.subscribe(this, Billing.VIP, Billing.PLAN_MONTHLY)
         }
-
-        vipButton.setOnClickListener { subscribe() }
-        plusButton.setOnClickListener { subscribe() }
+        findViewById<Button>(R.id.vipPlusYearButton).setOnClickListener {
+            Billing.subscribe(this, Billing.VIP_PLUS, Billing.PLAN_YEARLY)
+        }
+        findViewById<Button>(R.id.vipPlusButton).setOnClickListener {
+            Billing.subscribe(this, Billing.VIP_PLUS, Billing.PLAN_MONTHLY)
+        }
+        findViewById<Button>(R.id.manageButton).setOnClickListener {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Billing.manageUrl(this))))
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(this, R.string.toast_no_app, Toast.LENGTH_SHORT).show()
+            }
+        }
         findViewById<Button>(R.id.laterButton).setOnClickListener { finish() }
+        updateButtons()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Billing.addListener(billingListener)
+        Billing.refresh()
+        updateButtons()
+    }
+
+    override fun onStop() {
+        Billing.removeListener(billingListener)
+        super.onStop()
+    }
+
+    private val billingListener: () -> Unit = { updateButtons() }
+
+    /** 가격·체험 여부·지금 등급에 맞게 버튼 글자를 다시 쓴다 */
+    private fun updateButtons() {
+        val tier = PetSettingsRepository(this).tier
+        bindCard(
+            Billing.VIP, R.id.vipPrice, R.id.vipYearButton, R.id.vipButton,
+            R.string.vip_month_default, R.string.vip_year_default,
+            owned = tier != Tier.FREE,
+            ownedText = if (tier == Tier.VIP) R.string.vip_current else R.string.vip_included
+        )
+        bindCard(
+            Billing.VIP_PLUS, R.id.vipPlusPrice, R.id.vipPlusYearButton, R.id.vipPlusButton,
+            R.string.vip_plus_month_default, R.string.vip_plus_year_default,
+            owned = tier == Tier.VIP_PLUS,
+            ownedText = R.string.vip_current
+        )
+        findViewById<View>(R.id.manageButton).visibility =
+            if (tier != Tier.FREE) View.VISIBLE else View.GONE
+    }
+
+    private fun bindCard(
+        productId: String, priceId: Int, yearId: Int, monthId: Int,
+        monthDefault: Int, yearDefault: Int,
+        owned: Boolean, ownedText: Int
+    ) {
+        val yearButton = findViewById<Button>(yearId)
+        val monthButton = findViewById<Button>(monthId)
+        // 구글에서 불러온 가격(나라별 통화). 아직 못 불러왔으면 기본 가격을 보여 준다
+        val yearText = Billing.priceOf(productId, Billing.PLAN_YEARLY) ?: getString(yearDefault)
+        val monthText = Billing.priceOf(productId, Billing.PLAN_MONTHLY) ?: getString(monthDefault)
+
+        findViewById<TextView>(priceId).text = getString(R.string.vip_price_line, monthText, yearText)
+
+        if (owned) {
+            // 이미 쓰고 있는 등급(또는 그보다 낮은 등급)은 ‘이용 중’으로 막는다
+            yearButton.isEnabled = false
+            yearButton.setText(ownedText)
+            monthButton.visibility = View.GONE
+            return
+        }
+        yearButton.isEnabled = true
+        monthButton.visibility = View.VISIBLE
+        val trial = Billing.trialDaysOf(productId, Billing.PLAN_YEARLY)
+        yearButton.text = if (trial != null) getString(R.string.vip_year_trial_button, trial, yearText)
+        else getString(R.string.vip_year_button, yearText)
+        monthButton.text = getString(R.string.vip_month_button, monthText)
     }
 
     /** 나가기 버튼: 1초 뒤에 스르륵 나타난다 */
@@ -118,11 +188,6 @@ class VipActivity : Activity() {
                 setColor(if (i == currentPage) 0xFFF28C38.toInt() else 0xFFE3D3C2.toInt())
             }
         }
-    }
-
-    /** 아직 구글 결제를 연결하기 전이라 안내만 한다 */
-    private fun subscribe() {
-        Toast.makeText(this, R.string.vip_not_ready, Toast.LENGTH_SHORT).show()
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).roundToInt()

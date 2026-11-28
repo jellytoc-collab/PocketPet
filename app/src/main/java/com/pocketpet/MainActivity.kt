@@ -19,6 +19,7 @@ import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import com.pocketpet.ads.Ads
 import com.pocketpet.ads.BannerSlot
+import com.pocketpet.billing.Billing
 import com.pocketpet.data.PetSettingsRepository
 import com.pocketpet.data.ScreenInfo
 import com.pocketpet.data.Tier
@@ -92,6 +93,8 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         resumedNow = true
+        // 구독이 끝났거나 새로 생겼을 수 있으니 돌아올 때마다 확인한다 (등급이 바뀌면 화면도 바뀐다)
+        Billing.refresh()
         refreshScreen()
     }
 
