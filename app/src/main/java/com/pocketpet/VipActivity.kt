@@ -92,12 +92,14 @@ class VipActivity : Activity() {
     private fun updateButtons() {
         val tier = PetSettingsRepository(this).tier
         bindCard(
-            Billing.VIP, R.id.vipPrice, R.id.vipYearButton, R.id.vipButton, R.string.vip_price,
+            Billing.VIP, R.id.vipPrice, R.id.vipYearButton, R.id.vipButton,
+            R.string.vip_month_default, R.string.vip_year_default,
             owned = tier != Tier.FREE,
             ownedText = if (tier == Tier.VIP) R.string.vip_current else R.string.vip_included
         )
         bindCard(
-            Billing.VIP_PLUS, R.id.vipPlusPrice, R.id.vipPlusYearButton, R.id.vipPlusButton, R.string.vip_plus_price,
+            Billing.VIP_PLUS, R.id.vipPlusPrice, R.id.vipPlusYearButton, R.id.vipPlusButton,
+            R.string.vip_plus_month_default, R.string.vip_plus_year_default,
             owned = tier == Tier.VIP_PLUS,
             ownedText = R.string.vip_current
         )
@@ -106,18 +108,17 @@ class VipActivity : Activity() {
     }
 
     private fun bindCard(
-        productId: String, priceId: Int, yearId: Int, monthId: Int, fallbackPrice: Int,
+        productId: String, priceId: Int, yearId: Int, monthId: Int,
+        monthDefault: Int, yearDefault: Int,
         owned: Boolean, ownedText: Int
     ) {
         val yearButton = findViewById<Button>(yearId)
         val monthButton = findViewById<Button>(monthId)
-        val yearPrice = Billing.priceOf(productId, Billing.PLAN_YEARLY)
-        val monthPrice = Billing.priceOf(productId, Billing.PLAN_MONTHLY)
+        // 구글에서 불러온 가격(나라별 통화). 아직 못 불러왔으면 기본 가격을 보여 준다
+        val yearText = Billing.priceOf(productId, Billing.PLAN_YEARLY) ?: getString(yearDefault)
+        val monthText = Billing.priceOf(productId, Billing.PLAN_MONTHLY) ?: getString(monthDefault)
 
-        // 가격 줄: 구글에서 불러온 가격(나라별 통화), 아직이면 기본 문구
-        findViewById<TextView>(priceId).text =
-            if (yearPrice != null && monthPrice != null) "$monthPrice · $yearPrice"
-            else getString(fallbackPrice)
+        findViewById<TextView>(priceId).text = getString(R.string.vip_price_line, monthText, yearText)
 
         if (owned) {
             // 이미 쓰고 있는 등급(또는 그보다 낮은 등급)은 ‘이용 중’으로 막는다
@@ -129,10 +130,9 @@ class VipActivity : Activity() {
         yearButton.isEnabled = true
         monthButton.visibility = View.VISIBLE
         val trial = Billing.trialDaysOf(productId, Billing.PLAN_YEARLY)
-        val yearText = yearPrice ?: "…"
         yearButton.text = if (trial != null) getString(R.string.vip_year_trial_button, trial, yearText)
         else getString(R.string.vip_year_button, yearText)
-        monthButton.text = getString(R.string.vip_month_button, monthPrice ?: "…")
+        monthButton.text = getString(R.string.vip_month_button, monthText)
     }
 
     /** 나가기 버튼: 1초 뒤에 스르륵 나타난다 */

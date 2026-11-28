@@ -115,6 +115,11 @@
     <string name="vip_year_button">Yearly · %1$s</string>
     <string name="vip_year_trial_button">%1$d-day free trial → Yearly %2$s</string>
     <string name="vip_month_button">Monthly · %1$s</string>
+    <string name="vip_price_line">%1$s / month · %2$s / year</string>
+    <string name="vip_month_default">₩2,900</string>
+    <string name="vip_year_default">₩24,000</string>
+    <string name="vip_plus_month_default">₩5,900</string>
+    <string name="vip_plus_year_default">₩49,000</string>
     <string name="vip_terms">Subscriptions renew automatically (monthly or yearly). After a free trial, the yearly price is charged automatically. Cancel during the trial and you won’t be charged. You can cancel anytime in Google Play.</string>
     <string name="vip_manage">Manage subscription</string>
     <string name="billing_not_ready">Loading plans. Please try again in a moment.</string>
