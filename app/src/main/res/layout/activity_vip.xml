@@ -99,21 +99,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    android:id="@+id/vipPlusPrice"
                     android:text="@string/vip_plus_price"
                     android:textColor="#F28C38"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/vipPlusYearButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="#F28C38"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/vipPlusButton"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="#F28C38"
-                    android:text="@string/vip_plus_subscribe"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_height="50dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#FFE3C7"
+                    android:textAllCaps="false"
+                    android:textColor="#3B2F2F"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <!-- VIP 카드 -->
@@ -154,21 +165,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    android:id="@+id/vipPrice"
                     android:text="@string/vip_price"
                     android:textColor="#F28C38"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/vipYearButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="#F28C38"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/vipButton"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="#F28C38"
-                    android:text="@string/vip_subscribe"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_height="50dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#FFE3C7"
+                    android:textAllCaps="false"
+                    android:textColor="#3B2F2F"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
     </com.pocketpet.SnapPager>
@@ -192,6 +214,17 @@
         android:text="@string/vip_terms"
         android:textColor="#7A6A5A"
         android:textSize="13sp" />
+
+    <!-- 구독 중일 때만 보인다: Google Play 구독 관리(해지·변경) 화면을 연다 -->
+    <Button
+        android:id="@+id/manageButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:text="@string/vip_manage"
+        android:textColor="#F28C38"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
     <!-- 나가기: 1초 뒤에 나타난다 -->
     <Button

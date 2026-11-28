@@ -105,16 +105,21 @@
     <!-- VIP 소개 화면 -->
     <string name="vip_title">👑 Pocket Pet VIP</string>
     <string name="vip_subtitle">더 많은 친구와 더 즐겁게 놀아요</string>
-    <string name="vip_price">월 3,300원</string>
-    <string name="vip_plus_price">월 6,600원</string>
     <string name="vip_recommended">추천</string>
     <string name="vip_benefits">✓ 모든 펫 잠금 해제\n✓ 던지기\n✓ 앱 복귀 광고 없음</string>
     <string name="vip_plus_benefits">✓ VIP 혜택 전부\n✓ 배너 광고까지 모든 광고 없음\n✓ 머리 위 말풍선 대사\n✓ 꾸벅꾸벅 잠자기\n✓ 폰을 흔들면 펫이 날아다녀요\n✓ 최대 5마리 함께 소환</string>
-    <string name="vip_subscribe">VIP 구독하기</string>
-    <string name="vip_plus_subscribe">VIP+ 구독하기</string>
     <string name="vip_current">이용 중</string>
     <string name="vip_included">VIP+에 포함</string>
-    <string name="vip_terms">구독은 매달 자동으로 갱신돼요. Google Play에서 언제든 해지할 수 있어요.</string>
+    <string name="vip_price">월 2,900원 · 연 24,000원</string>
+    <string name="vip_plus_price">월 5,900원 · 연 49,000원</string>
+    <string name="vip_year_button">연간 구독 · %1$s</string>
+    <string name="vip_year_trial_button">%1$d일 무료 체험 → 연간 구독 %2$s</string>
+    <string name="vip_month_button">월간 구독 · %1$s</string>
+    <string name="vip_terms">구독은 자동으로 갱신돼요(월간은 매달, 연간은 매년). 무료 체험이 끝나면 연 요금이 자동 결제되며, 체험 중에 해지하면 요금이 나가지 않아요. Google Play에서 언제든 해지할 수 있어요.</string>
+    <string name="vip_manage">구독 관리 (해지·변경)</string>
+    <string name="billing_not_ready">상품 정보를 불러오는 중이에요. 잠시 후 다시 눌러 주세요.</string>
+    <string name="billing_error">결제를 진행하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="billing_pending">결제가 확인되면 바로 적용돼요.</string>
+    <string name="billing_thanks">구독해 주셔서 고마워요! 🎉</string>
     <string name="vip_later">나가기</string>
-    <string name="vip_not_ready">결제는 곧 연결될 예정이에요</string>
 </resources>
